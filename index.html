@@ -255,7 +255,7 @@ footer{padding:48px 40px;border-top:1px solid var(--bd);display:flex;justify-con
     <div class="section-label">Early Access</div>
     <div class="section-title">Be First to Know When We Launch.</div>
     <div class="section-desc">Drop your email and we'll let you know the second Black Stack Diesel goes live. No spam, just diesel.</div>
-    <form class="email-form" id="emailForm" onsubmit="handleSignup(event)">
+    <form class="email-form" id="emailForm">
       <input class="email-input" type="email" placeholder="you@email.com" required>
       <button class="email-submit" type="submit">Notify Me</button>
     </form>
@@ -284,5 +284,5 @@ footer{padding:48px 40px;border-top:1px solid var(--bd);display:flex;justify-con
 <script>
 const observer=new IntersectionObserver(e=>{e.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}})},{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
-function handleSignup(e){e.preventDefault();document.getElementById('emailForm').style.display='none';document.querySelector('.email-note').style.display='none';document.getElementById('emailSuccess').style.display='block'}
+document.getElementById('emailForm').addEventListener('submit',function(e){e.preventDefault();this.style.display='none';document.querySelector('.email-note').style.display='none';var s=document.getElementById('emailSuccess');s.textContent='Thanks for staying in touch! We will notify you the second BlackStack Diesel goes live.';s.style.display='block'});
 document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener
