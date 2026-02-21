@@ -34,9 +34,12 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Archives
+*.tar.gz
+*.zip
+
 # Testing
 coverage/
 
 # Misc
-*.tgz
 .cache/

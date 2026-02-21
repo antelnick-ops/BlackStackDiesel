@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Black Stack Diesel — AI Diagnostics & Parts for Diesel Trucks</title>
+<meta name="description" content="Black Stack Diesel is a mobile app for diesel truck owners and mechanics. AI-powered diagnostics, engine-specific parts, and photo-based troubleshooting. Only see what fits your truck.">
+<meta property="og:title" content="Black Stack Diesel — Coming Soon">
+<meta property="og:description" content="AI-powered diagnostics and parts for diesel trucks. Built by truck people, for truck people.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://black-stack-diesel.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Archivo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#08090B;--bg2:#0E1014;--bg3:#151820;--bg4:#1C2029;
+  --ember:#FF6B2C;--ember2:#E85A1E;--ember-glow:rgba(255,107,44,.1);
+  --amber:#F5A623;--smoke:#2A2D35;
+  --t1:#F2EDE6;--t2:#A0A4B0;--t3:#5E6270;
+  --bd:rgba(255,255,255,.06);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Archivo',sans-serif;background:var(--bg);color:var(--t1);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.4}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(to bottom,rgba(8,9,11,.95),transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.nav-logo{display:flex;align-items:center;gap:12px}
+.nav-logo-icon{width:36px;height:36px;background:var(--ember);border-radius:8px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.nav-logo-icon::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.2))}
+.nav-logo-icon svg{width:20px;height:20px;fill:#fff;position:relative;z-index:1}
+.nav-brand{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;letter-spacing:3px;text-transform:uppercase}
+.nav-brand em{font-style:normal;color:var(--ember)}
+.nav-links{display:flex;gap:32px;align-items:center}
+.nav-links a{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--t2);transition:.2s}
+.nav-links a:hover{color:var(--ember)}
+.nav-cta{padding:10px 24px;background:var(--ember);border-radius:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#fff;transition:.2s}
+.nav-cta:hover{background:var(--ember2);transform:translateY(-1px)}
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:120px 40px 80px}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 40%,rgba(255,107,44,.06),transparent 60%),radial-gradient(ellipse at 70% 60%,rgba(245,166,35,.04),transparent 50%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse at center,black 30%,transparent 70%)}
+.hero-content{max-width:900px;text-align:center;position:relative;z-index:2}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 20px;background:var(--bg3);border:1px solid var(--bd);border-radius:40px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--ember);margin-bottom:32px}
+.hero-badge-dot{width:6px;height:6px;background:var(--ember);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{font-family:'Rajdhani',sans-serif;font-size:clamp(48px,8vw,96px);font-weight:700;line-height:.95;text-transform:uppercase;letter-spacing:2px;margin-bottom:24px}
+.hero h1 em{font-style:normal;color:var(--ember);display:block}
+.hero p{font-size:clamp(16px,2vw,20px);color:var(--t2);max-width:600px;margin:0 auto 40px;line-height:1.6;font-weight:300}
+.hero-ctas{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn-main{padding:16px 40px;background:var(--ember);border:none;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:#fff;cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.btn-main:hover{background:var(--ember2);transform:translateY(-2px);box-shadow:0 8px 32px rgba(255,107,44,.3)}
+.btn-ghost{padding:16px 40px;background:transparent;border:2px solid var(--smoke);border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:var(--t2);cursor:pointer;transition:.2s}
+.btn-ghost:hover{border-color:var(--t2);color:var(--t1)}
+.hero-stats{display:flex;justify-content:center;gap:48px;margin-top:64px;padding-top:40px;border-top:1px solid var(--bd)}
+.hero-stat{text-align:center}
+.hero-stat-val{font-family:'Rajdhani',sans-serif;font-size:36px;font-weight:700;color:var(--ember)}
+.hero-stat-lbl{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--t3);margin-top:4px}
+section{padding:100px 40px}
+.section-label{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:4px;color:var(--ember);margin-bottom:16px}
+.section-title{font-family:'Rajdhani',sans-serif;font-size:clamp(32px,5vw,52px);font-weight:700;text-transform:uppercase;letter-spacing:1px;line-height:1.1;margin-bottom:20px}
+.section-desc{font-size:17px;color:var(--t2);max-width:560px;line-height:1.65;font-weight:300}
+.container{max-width:1200px;margin:0 auto}
+.features{background:var(--bg2)}
+.features-header{text-align:center;margin-bottom:64px}
+.features-header .section-desc{margin:0 auto}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feat-card{background:var(--bg3);border:1px solid var(--bd);border-radius:16px;padding:36px 28px;transition:.3s;position:relative;overflow:hidden}
+.feat-card:hover{transform:translateY(-4px);border-color:rgba(255,107,44,.15);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--ember),transparent);opacity:0;transition:.3s}
+.feat-card:hover::before{opacity:1}
+.feat-icon{width:52px;height:52px;background:var(--ember-glow);border:1px solid rgba(255,107,44,.15);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:24px}
+.feat-card h3{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.feat-card p{font-size:14px;color:var(--t2);line-height:1.6}
+.preview{position:relative;overflow:hidden}
+.preview-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(255,107,44,.06),transparent 70%);pointer-events:none}
+.preview-layout{display:flex;align-items:center;gap:80px}
+.preview-text{flex:1}
+.preview-text .section-desc{margin-bottom:32px}
+.preview-list{display:flex;flex-direction:column;gap:16px}
+.preview-item{display:flex;align-items:flex-start;gap:14px}
+.preview-check{width:28px;height:28px;background:var(--ember-glow);border:1px solid rgba(255,107,44,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;color:var(--ember)}
+.preview-item div h4{font-size:15px;font-weight:700;margin-bottom:2px}
+.preview-item div p{font-size:13px;color:var(--t3);line-height:1.5}
+.preview-phone{flex:0 0 320px;position:relative}
+.phone-mock{width:280px;height:580px;background:var(--bg3);border:3px solid #2A2D35;border-radius:40px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6);position:relative;margin:0 auto}
+.phone-screen{position:absolute;inset:12px;background:var(--bg);border-radius:30px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.phone-screen .nav-logo-icon{width:48px;height:48px;border-radius:12px;margin-bottom:12px}
+.phone-screen .nav-logo-icon svg{width:26px;height:26px}
+.phone-label{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;text-transform:uppercase;letter-spacing:3px;margin-bottom:6px}
+.phone-label em{font-style:normal;color:var(--ember)}
+.phone-sub{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:2px;margin-bottom:24px}
+.phone-features{display:flex;flex-direction:column;gap:10px;width:100%}
+.phone-feat{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg3);border:1px solid var(--bd);border-radius:10px;font-size:12px;font-weight:600;color:var(--t2)}
+.phone-feat span{font-size:18px}
+.phone-notch{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:100px;height:24px;background:#111;border-radius:0 0 14px 14px;z-index:5}
+.engines{background:var(--bg2)}
+.engines-layout{display:flex;gap:64px;align-items:flex-start}
+.engines-text{flex:1}
+.engines-text .section-desc{margin-bottom:32px}
+.engines-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.engine-card{background:var(--bg3);border:1px solid var(--bd);border-radius:12px;padding:20px;transition:.2s}
+.engine-card:hover{border-color:rgba(255,107,44,.15)}
+.engine-make{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--ember);margin-bottom:6px}
+.engine-name{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:1px;line-height:1.2;margin-bottom:4px}
+.engine-years{font-size:11px;color:var(--t3)}
+.cta-section{text-align:center;position:relative;overflow:hidden}
+.cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:800px;height:400px;background:radial-gradient(ellipse,rgba(255,107,44,.08),transparent 70%);pointer-events:none}
+.cta-section .section-title{max-width:700px;margin:0 auto 16px}
+.cta-section .section-desc{margin:0 auto 40px;text-align:center}
+.email-form{display:flex;gap:12px;max-width:480px;margin:0 auto 20px;flex-wrap:wrap;justify-content:center}
+.email-input{flex:1;min-width:260px;height:56px;background:var(--bg3);border:2px solid var(--smoke);border-radius:12px;padding:0 20px;font-size:16px;color:var(--t1);font-family:'Archivo',sans-serif;outline:none;transition:.2s}
+.email-input::placeholder{color:var(--t3)}
+.email-input:focus{border-color:var(--ember);box-shadow:0 0 0 4px var(--ember-glow)}
+.email-submit{height:56px;padding:0 32px;background:var(--ember);border:none;border-radius:12px;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#fff;cursor:pointer;transition:.2s;white-space:nowrap}
+.email-submit:hover{background:var(--ember2);transform:translateY(-1px);box-shadow:0 6px 24px rgba(255,107,44,.3)}
+.email-note{font-size:12px;color:var(--t3)}
+.email-success{display:none;padding:16px 24px;background:rgba(52,199,89,.1);border:1px solid rgba(52,199,89,.2);border-radius:10px;color:#34C759;font-weight:600;max-width:480px;margin:0 auto}
+footer{padding:48px 40px;border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+.footer-brand{display:flex;align-items:center;gap:10px}
+.footer-brand span{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--t3)}
+.footer-links{display:flex;gap:24px;align-items:center}
+.footer-links a{font-size:13px;color:var(--t3);transition:.2s}
+.footer-links a:hover{color:var(--ember)}
+.footer-social a{width:40px;height:40px;background:var(--bg3);border:1px solid var(--bd);border-radius:10px;display:inline-flex;align-items:center;justify-content:center;transition:.2s}
+.footer-social a:hover{border-color:var(--ember);background:var(--ember-glow)}
+.footer-social a svg{width:18px;height:18px;fill:var(--t2)}
+.footer-legal{font-size:11px;color:var(--t3);width:100%;text-align:center;margin-top:20px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+@media(max-width:900px){
+  nav{padding:16px 20px}.nav-links a:not(.nav-cta){display:none}
+  .hero{padding:100px 20px 60px}
+  .hero-stats{gap:24px;flex-wrap:wrap}
+  section{padding:60px 20px}
+  .features-grid{grid-template-columns:1fr}
+  .preview-layout{flex-direction:column;gap:40px}
+  .preview-phone{flex:none;width:100%}
+  .engines-layout{flex-direction:column;gap:32px}
+  .engines-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .hero h1{font-size:40px}
+  .hero-ctas{flex-direction:column;align-items:center}
+  .btn-main,.btn-ghost{width:100%;text-align:center}
+  .email-form{flex-direction:column}.email-input{min-width:100%}
+}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-icon"><svg viewBox="0 0 24 24"><path d="M19 17h2a2 2 0 002-2v-2a4 4 0 00-4-4h-1V7a5 5 0 00-10 0v2H7a4 4 0 00-4 4v2a2 2 0 002 2h2m4 0v4m4-4v4M8 17h8"/></svg></div>
+    <span class="nav-brand">Black<em>Stack</em>Diesel</span>
+  </div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#app">App</a>
+    <a href="#engines">Engines</a>
+    <a href="#signup" class="nav-cta">Get Early Access</a>
+  </div>
+</nav>
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span class="hero-badge-dot"></span> Coming Soon — 2026</div>
+    <h1>Your Diesel.<br><em>Diagnosed Right.</em></h1>
+    <p>AI-powered diagnostics and parts for diesel trucks. Input your rig — year, make, model, engine — and only see what fits your truck. Nothing else.</p>
+    <div class="hero-ctas">
+      <a href="#signup" class="btn-main">Get Early Access</a>
+      <a href="#features" class="btn-ghost">See Features</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-val">3</div><div class="hero-stat-lbl">Engine Platforms</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">30+</div><div class="hero-stat-lbl">Years Covered</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">500+</div><div class="hero-stat-lbl">Parts Cataloged</div></div>
+    </div>
+  </div>
+</section>
+<section class="features" id="features">
+  <div class="container">
+    <div class="features-header reveal">
+      <div class="section-label">What It Does</div>
+      <div class="section-title">Built for Diesel. Nothing Else.</div>
+      <div class="section-desc">Every feature is designed around your specific truck. No generic advice, no wrong parts, no wasted time.</div>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card reveal"><div class="feat-icon">🧠</div><h3>AI Diagnostics</h3><p>Describe your problem or upload a photo. Our AI knows the difference between a VP44 failure and a CP3 issue — because it knows your exact engine.</p></div>
+      <div class="feat-card reveal"><div class="feat-icon">🔧</div><h3>Vehicle-Filtered Parts</h3><p>Every part in the marketplace is filtered to your year, make, model, and engine. If it doesn't fit your truck, you'll never see it.</p></div>
+      <div class="feat-card reveal"><div class="feat-icon">📸</div><h3>Photo Troubleshooting</h3><p>Snap a photo of your engine bay, code reader, or damage. The AI analyzes it against known issues for your specific platform.</p></div>
+      <div class="feat-card reveal"><div class="feat-icon">🚛</div><h3>Smart Vehicle Setup</h3><p>Pick your year, and we only show makes that built trucks that year. Pick your make, only matching models appear. All the way down to your exact engine.</p></div>
+      <div class="feat-card reveal"><div class="feat-icon">📦</div><h3>Order & Track</h3><p>Buy parts directly in the app. Track your orders from warehouse to doorstep. No middlemen, no guesswork.</p></div>
+      <div class="feat-card reveal"><div class="feat-icon">⚡</div><h3>Engine-Specific Knowledge</h3><p>The AI knows KDP issues on 5.9 Cummins, head gasket problems on 6.0 Power Strokes, and injector balance rates on Duramax. Your truck's known issues, front and center.</p></div>
+    </div>
+  </div>
+</section>
+<section class="preview" id="app">
+  <div class="preview-glow"></div>
+  <div class="container">
+    <div class="preview-layout">
+      <div class="preview-text reveal">
+        <div class="section-label">The App</div>
+        <div class="section-title">Everything Your Truck Needs. One App.</div>
+        <div class="section-desc">Black Stack Diesel is a mobile-first app built for diesel truck owners and mechanics. Set up your vehicle once and the entire experience adapts.</div>
+        <div class="preview-list">
+          <div class="preview-item"><div class="preview-check">✓</div><div><h4>AI Chat Diagnostics</h4><p>Talk through issues with an AI that knows your engine inside and out</p></div></div>
+          <div class="preview-item"><div class="preview-check">✓</div><div><h4>Parts Marketplace</h4><p>Only shows parts that fit your exact truck — injectors, turbos, filters, all of it</p></div></div>
+          <div class="preview-item"><div class="preview-check">✓</div><div><h4>Photo Upload</h4><p>Snap engine bay photos and get visual diagnostics for your platform</p></div></div>
+          <div class="preview-item"><div class="preview-check">✓</div><div><h4>Cummins · Power Stroke · Duramax</h4><p>All three major diesel platforms from 1994 to 2024</p></div></div>
+        </div>
+      </div>
+      <div class="preview-phone reveal">
+        <div class="phone-mock">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="nav-logo-icon"><svg viewBox="0 0 24 24"><path d="M19 17h2a2 2 0 002-2v-2a4 4 0 00-4-4h-1V7a5 5 0 00-10 0v2H7a4 4 0 00-4 4v2a2 2 0 002 2h2m4 0v4m4-4v4M8 17h8"/></svg></div>
+            <div class="phone-label">Black<em>Stack</em></div>
+            <div class="phone-sub">Diesel</div>
+            <div class="phone-features">
+              <div class="phone-feat"><span>🧠</span> AI Diagnostics</div>
+              <div class="phone-feat"><span>🔧</span> Parts Marketplace</div>
+              <div class="phone-feat"><span>📸</span> Photo Analysis</div>
+              <div class="phone-feat"><span>🚛</span> Vehicle Profile</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="engines" id="engines">
+  <div class="container">
+    <div class="engines-layout">
+      <div class="engines-text reveal">
+        <div class="section-label">Supported Platforms</div>
+        <div class="section-title">We Know Your Engine.</div>
+        <div class="section-desc">From the legendary 12-valve Cummins to the latest L5P Duramax, Black Stack Diesel covers the diesel engines that matter. Dodge, Ford, Chevy, and GMC — 1994 to 2024.</div>
+      </div>
+      <div class="engines-grid reveal">
+        <div class="engine-card"><div class="engine-make">Cummins</div><div class="engine-name">5.9L 12V / 24V / ISB</div><div class="engine-years">1994 – 2007 · Ram 2500/3500</div></div>
+        <div class="engine-card"><div class="engine-make">Cummins</div><div class="engine-name">6.7L ISB / HO</div><div class="engine-years">2007 – 2024 · Ram 2500/3500</div></div>
+        <div class="engine-card"><div class="engine-make">Power Stroke</div><div class="engine-name">7.3L / 6.0L / 6.4L</div><div class="engine-years">1999 – 2010 · F-250/350</div></div>
+        <div class="engine-card"><div class="engine-make">Power Stroke</div><div class="engine-name">6.7L V8 Gen 1–3</div><div class="engine-years">2011 – 2024 · F-250/350</div></div>
+        <div class="engine-card"><div class="engine-make">Duramax</div><div class="engine-name">6.6L LB7 – LBZ</div><div class="engine-years">2001 – 2007 · Silverado/Sierra</div></div>
+        <div class="engine-card"><div class="engine-make">Duramax</div><div class="engine-name">6.6L LMM – L5P</div><div class="engine-years">2007 – 2024 · Silverado/Sierra</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="cta-section" id="signup">
+  <div class="cta-glow"></div>
+  <div class="container reveal">
+    <div class="section-label">Early Access</div>
+    <div class="section-title">Be First to Know When We Launch.</div>
+    <div class="section-desc">Drop your email and we'll let you know the second Black Stack Diesel goes live. No spam, just diesel.</div>
+    <form class="email-form" id="emailForm" onsubmit="handleSignup(event)">
+      <input class="email-input" type="email" placeholder="you@email.com" required>
+      <button class="email-submit" type="submit">Notify Me</button>
+    </form>
+    <div class="email-note">We respect your inbox. Unsubscribe anytime.</div>
+    <div class="email-success" id="emailSuccess">You're on the list. We'll be in touch soon.</div>
+  </div>
+</section>
+<footer>
+  <div class="footer-brand">
+    <div class="nav-logo-icon" style="width:28px;height:28px;border-radius:6px"><svg viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M19 17h2a2 2 0 002-2v-2a4 4 0 00-4-4h-1V7a5 5 0 00-10 0v2H7a4 4 0 00-4 4v2a2 2 0 002 2h2m4 0v4m4-4v4M8 17h8"/></svg></div>
+    <span>Black Stack Diesel</span>
+  </div>
+  <div class="footer-links">
+    <a href="#features">Features</a>
+    <a href="#engines">Engines</a>
+    <a href="#signup">Early Access</a>
+    <a href="mailto:contact@black-stack-diesel.com">Contact</a>
+    <div class="footer-social">
+      <a href="https://www.facebook.com/profile.php?id=61588485453942" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+      </a>
+    </div>
+  </div>
+  <div class="footer-legal">© 2026 Dynamic Innovative Solutions LLC. All rights reserved. Black Stack Diesel™</div>
+</footer>
+<script>
+const observer=new IntersectionObserver(e=>{e.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}})},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+function handleSignup(e){e.preventDefault();document.getElementById('emailForm').style.display='none';document.querySelector('.email-note').style.display='none';document.getElementById('emailSuccess').style.display='block'}
+document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth'})})});
+</script>
+</body>
+</html>
