@@ -255,9 +255,9 @@ footer{padding:48px 40px;border-top:1px solid var(--bd);display:flex;justify-con
     <div class="section-label">Early Access</div>
     <div class="section-title">Be First to Know When We Launch.</div>
     <div class="section-desc">Drop your email and we'll let you know the second Black Stack Diesel goes live. No spam, just diesel.</div>
-    <form class="email-form" id="emailForm">
+    <form class="email-form" id="emailForm" method="post" action="javascript:void(0)">
       <input class="email-input" type="email" name="email" placeholder="you@email.com" required>
-      <button class="email-submit" type="submit">Notify Me</button>
+      <button class="email-submit" type="button" id="emailBtn">Notify Me</button>
     </form>
     <div class="email-note">We respect your inbox. Unsubscribe anytime.</div>
     <div class="email-success" id="emailSuccess">You're on the list. We'll be in touch soon.</div>
@@ -285,7 +285,17 @@ footer{padding:48px 40px;border-top:1px solid var(--bd);display:flex;justify-con
 const observer=new IntersectionObserver(e=>{e.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}})},{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 window.addEventListener('DOMContentLoaded', function(){
-  var form = document.getElementById('emailForm');
-  if(form) form.addEventListener('submit', async function(e){e.preventDefault();var email=document.querySelector('.email-input').value.trim();if(!email)return;var btn=document.querySelector('.email-submit');btn.textContent='Sending...';btn.disabled=true;try{var res=await fetch('https://jfjbilfsiebifzddveof.supabase.co/rest/v1/waitlist',{method:'POST',headers:{'Content-Type':'application/json','apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamJpbGZzaWViaWZ6ZGR2ZW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2OTg4ODUsImV4cCI6MjA4NzI3NDg4NX0.bbTQ0l4HsHoKUzoKACBvbXJ0TbnUM5tltK4YLKyuMr8','Prefer':'return=minimal'},body:JSON.stringify({email:email})});if(res.ok){form.style.display='none';document.querySelector('.email-note').style.display='none';var s=document.getElementById('emailSuccess');s.textContent='Thanks for staying in touch! We will notify you the second BlackStack Diesel goes live.';s.style.display='block'}else if(res.status===409){var s=document.getElementById('emailSuccess');s.textContent='You are already on the list! We will be in touch soon.';s.style.display='block'}else{throw new Error('fail')}}catch(err){btn.textContent='Notify Me';btn.disabled=false;alert('Something went wrong. Please try again.')}});
+  document.getElementById('emailBtn').onclick = async function(){
+    var email = document.querySelector('.email-input').value.trim();
+    if(!email) return;
+    this.textContent='Sending...';
+    this.disabled=true;
+    try{
+      var res = await fetch('https://jfjbilfsiebifzddveof.supabase.co/rest/v1/waitlist',{method:'POST',headers:{'Content-Type':'application/json','apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamJpbGZzaWViaWZ6ZGR2ZW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2OTg4ODUsImV4cCI6MjA4NzI3NDg4NX0.bbTQ0l4HsHoKUzoKACBvbXJ0TbnUM5tltK4YLKyuMr8','Prefer':'return=minimal'},body:JSON.stringify({email:email})});
+      if(res.ok){document.getElementById('emailForm').style.display='none';document.querySelector('.email-note').style.display='none';var s=document.getElementById('emailSuccess');s.textContent='Thanks for staying in touch! We will notify you the second BlackStack Diesel goes live.';s.style.display='block'}
+      else if(res.status===409){var s=document.getElementById('emailSuccess');s.textContent='You are already on the list!';s.style.display='block'}
+      else{throw new Error('fail')}
+    }catch(err){this.textContent='Notify Me';this.disabled=false;alert('Something went wrong. Please try again.')}
+  };
 });
 document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener
