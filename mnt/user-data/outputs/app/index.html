@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Diesel Hub</title>
+<title>Black Stack Diesel</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Teko:wght@300;400;500;600;700&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -153,15 +154,16 @@ body{font-family:'Work Sans',sans-serif;background:#000;color:var(--t1);overflow
 
 <!-- LOGIN -->
 <div class="scr on" id="s-login">
-<div class="ll"><svg viewBox="0 0 24 24"><path d="M19 17h2a2 2 0 002-2v-2a4 4 0 00-4-4h-1V7a5 5 0 00-10 0v2H7a4 4 0 00-4 4v2a2 2 0 002 2h2m4 0v4m4-4v4M8 17h8"/></svg></div>
-<div class="lt">Diesel<em>Hub</em></div>
-<div class="ls">Parts · Diagnostics · Done right.</div>
-<div class="fg"><label>Email</label><input class="fi" type="email" placeholder="you@email.com"></div>
+<img src="../logo.png" alt="BlackStack Diesel" style="width:90px;height:90px;object-fit:contain;margin-bottom:20px;border-radius:18px">
+<div class="lt">Black<em>Stack</em></div>
+<div class="ls">AI Diagnostics · Parts · Done right.</div>
+<div class="fg"><label>Email</label><input class="fi" type="email" placeholder="you@email.com" id="lEmail"></div>
 <div class="fg"><label>Password</label><input class="fi" type="password" placeholder="••••••••" id="lpw"><div class="pwt" onclick="let i=document.getElementById('lpw');i.type=i.type==='password'?'text':'password'"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div></div>
-<button class="bp" onclick="go('veh')">Sign In</button>
+<div id="authErr" style="color:var(--red);font-size:12px;margin-bottom:8px;display:none;text-align:center"></div>
+<button class="bp" id="authBtn" onclick="handleSignIn()">Sign In</button>
 <div class="ld"><span>or</span></div>
-<div class="sb"><div class="sbt"><svg viewBox="0 0 24 24" fill="#4285F4"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Google</div><div class="sbt"><svg viewBox="0 0 24 24" fill="#fff"><path d="M16.37 1.43c0 1.14-.5 2.27-1.18 3.08-.74.9-1.99 1.57-2.99 1.57-.18 0-.36-.02-.53-.06.02-.15.03-.32.03-.48 0-1.08.47-2.24 1.18-3.05C13.61 1.73 14.97 1 16.37 1l.03.43zm3.13 17.81c-.68 1.34-1.47 2.58-2.67 2.58-.93 0-1.24-.6-2.37-.6-1.15 0-1.5.58-2.38.6-1.14.03-2-1.32-2.69-2.66-1.44-2.72-1.6-5.93-.7-7.63.63-1.2 1.77-1.95 2.98-1.95 1.11 0 1.81.6 2.73.6.89 0 1.43-.6 2.72-.6 1.06 0 2.06.58 2.68 1.58-2.36 1.3-1.97 4.68.38 5.58-.46 1.17-.68 1.69-1.37 2.72l-.31.38z"/></svg>Apple</div></div>
-<div class="la">Don't have an account? <a href="#">Sign Up</a></div>
+<div class="sb"><div class="sbt" onclick="handleGoogleSignIn()"><svg viewBox="0 0 24 24" fill="#4285F4"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Google</div><div class="sbt" onclick="handleAppleSignIn()"><svg viewBox="0 0 24 24" fill="#fff"><path d="M16.37 1.43c0 1.14-.5 2.27-1.18 3.08-.74.9-1.99 1.57-2.99 1.57-.18 0-.36-.02-.53-.06.02-.15.03-.32.03-.48 0-1.08.47-2.24 1.18-3.05C13.61 1.73 14.97 1 16.37 1l.03.43zm3.13 17.81c-.68 1.34-1.47 2.58-2.67 2.58-.93 0-1.24-.6-2.37-.6-1.15 0-1.5.58-2.38.6-1.14.03-2-1.32-2.69-2.66-1.44-2.72-1.6-5.93-.7-7.63.63-1.2 1.77-1.95 2.98-1.95 1.11 0 1.81.6 2.73.6.89 0 1.43-.6 2.72-.6 1.06 0 2.06.58 2.68 1.58-2.36 1.3-1.97 4.68.38 5.58-.46 1.17-.68 1.69-1.37 2.72l-.31.38z"/></svg>Apple</div></div>
+<div class="la" id="authToggle">Don't have an account? <a href="#" onclick="toggleAuthMode(event)">Sign Up</a></div>
 </div>
 
 <!-- VEHICLE SETUP -->
@@ -173,13 +175,13 @@ body{font-family:'Work Sans',sans-serif;background:#000;color:var(--t1);overflow
 <div class="vsg hid" id="vg-model"><label>Model</label><div class="vo" id="modelO"></div></div>
 <div class="vsg hid" id="vg-engine"><label>Engine</label><div class="vo" id="engineO"></div></div>
 <div class="vp hid" id="vprev"><div class="vpt">Your Vehicle</div><div class="vpn" id="vpn"></div><div class="vpe" id="vpen"></div><div class="vtg" id="vtags"></div></div>
-<button class="bp hid" id="vcon" onclick="confirmV()">Continue to Diesel Hub</button>
+<button class="bp hid" id="vcon" onclick="confirmV()">Continue to BlackStack Diesel</button>
 </div>
 
 <!-- AI -->
 <div class="scr" id="s-ai">
 <div class="ait"><h2>AI Diagnostics</h2><div class="aic" id="aiChip">—</div></div>
-<div class="ach" id="aiChat"><div class="am bot"><div class="bn">DieselHub AI</div>Hey! I'm set up for your truck. Describe your issue, upload a photo, or pick a common problem below.</div></div>
+<div class="ach" id="aiChat"><div class="am bot"><div class="bn">BlackStack AI</div>Hey! I'm set up for your truck. Describe your issue, upload a photo, or pick a common problem below.</div></div>
 <div class="asg" id="aiSugs"></div>
 <div class="aua" onclick="document.getElementById('aiF').click()"><svg viewBox="0 0 24 24" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><p>Tap to upload a photo</p><span>Engine bay, codes, damage — anything helps</span><input type="file" id="aiF" accept="image/*" multiple style="display:none" onchange="aiUpload(event)"></div>
 <div class="aui hid" id="aiImgs"></div>
@@ -202,7 +204,7 @@ body{font-family:'Work Sans',sans-serif;background:#000;color:var(--t1);overflow
 
 <!-- PROFILE -->
 <div class="scr" id="s-pro">
-<div class="pc"><div class="pa">JD</div><div class="pn">John Doe</div><div class="pe"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5a303532343e353f1a3f373b333674393537">[email&#160;protected]</a></div></div>
+<div class="pc"><div class="pa" id="proAvatar">??</div><div class="pn" id="proName">Loading...</div><div class="pe" id="proEmail">—</div></div>
 <div class="pvc"><div class="pvi">🚛</div><div class="pvinfo"><h4 id="pVeh">No vehicle set</h4><p id="pEng">—</p></div><button class="pev" onclick="go('veh')">Edit</button></div>
 <div class="pss"><div class="pst"><div class="psv">7</div><div class="psl">Orders</div></div><div class="pst"><div class="psv">$2.4K</div><div class="psl">Spent</div></div><div class="pst"><div class="psv">12</div><div class="psl">AI Chats</div></div></div>
 <div class="pm">
@@ -212,7 +214,7 @@ body{font-family:'Work Sans',sans-serif;background:#000;color:var(--t1);overflow
 <div class="pmi"><div class="pmico"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div><span class="pml">Notifications</span><span class="pmch">›</span></div>
 <div class="pmi"><div class="pmico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><span class="pml">Help & Support</span><span class="pmch">›</span></div>
 </div>
-<button class="plo" onclick="go('login')">Sign Out</button>
+<button class="plo" onclick="handleSignOut()">Sign Out</button>
 </div>
 
 <!-- CART DRAWER -->
@@ -227,7 +229,102 @@ body{font-family:'Work Sans',sans-serif;background:#000;color:var(--t1);overflow
 </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
+// Supabase Init
+const SUPABASE_URL = 'https://jfjbilfsiebifzddveof.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamJpbGZzaWViaWZ6ZGR2ZW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2OTg4ODUsImV4cCI6MjA4NzI3NDg4NX0.bbTQ0l4HsHoKUzoKACBvbXJ0TbnUM5tltK4YLKyuMr8';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+let authMode = 'signin'; // 'signin' or 'signup'
+let currentUser = null;
+
+function showAuthErr(msg) {
+  const el = document.getElementById('authErr');
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 5000);
+}
+
+function toggleAuthMode(e) {
+  e.preventDefault();
+  authMode = authMode === 'signin' ? 'signup' : 'signin';
+  document.getElementById('authBtn').textContent = authMode === 'signin' ? 'Sign In' : 'Create Account';
+  document.getElementById('authToggle').innerHTML = authMode === 'signin'
+    ? 'Don\'t have an account? <a href="#" onclick="toggleAuthMode(event)">Sign Up</a>'
+    : 'Already have an account? <a href="#" onclick="toggleAuthMode(event)">Sign In</a>';
+  document.getElementById('authErr').style.display = 'none';
+}
+
+async function handleSignIn() {
+  const email = document.getElementById('lEmail').value.trim();
+  const pw = document.getElementById('lpw').value;
+  if (!email || !pw) return showAuthErr('Please enter email and password.');
+  if (pw.length < 6) return showAuthErr('Password must be at least 6 characters.');
+
+  const btn = document.getElementById('authBtn');
+  btn.textContent = 'Loading...';
+  btn.disabled = true;
+
+  try {
+    let result;
+    if (authMode === 'signup') {
+      result = await sb.auth.signUp({ email, password: pw });
+      if (result.error) throw result.error;
+      if (result.data.user && !result.data.session) {
+        showAuthErr('Check your email to confirm your account!');
+        btn.textContent = 'Create Account';
+        btn.disabled = false;
+        return;
+      }
+    } else {
+      result = await sb.auth.signInWithPassword({ email, password: pw });
+      if (result.error) throw result.error;
+    }
+    onAuthSuccess(result.data.user);
+  } catch (err) {
+    showAuthErr(err.message || 'Authentication failed.');
+    btn.textContent = authMode === 'signin' ? 'Sign In' : 'Create Account';
+    btn.disabled = false;
+  }
+}
+
+async function handleGoogleSignIn() {
+  const { error } = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/app/' } });
+  if (error) showAuthErr(error.message);
+}
+
+async function handleAppleSignIn() {
+  const { error } = await sb.auth.signInWithOAuth({ provider: 'apple', options: { redirectTo: window.location.origin + '/app/' } });
+  if (error) showAuthErr(error.message);
+}
+
+function onAuthSuccess(user) {
+  currentUser = user;
+  const email = user.email || '';
+  const name = user.user_metadata?.full_name || email.split('@')[0];
+  const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  document.getElementById('proAvatar').textContent = initials;
+  document.getElementById('proName').textContent = name;
+  document.getElementById('proEmail').textContent = email;
+  go('veh');
+}
+
+async function handleSignOut() {
+  await sb.auth.signOut();
+  currentUser = null;
+  document.getElementById('lEmail').value = '';
+  document.getElementById('lpw').value = '';
+  go('login');
+}
+
+// Check for existing session on load
+async function checkSession() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) {
+    onAuthSuccess(session.user);
+  }
+}
+checkSession();
 const DB={Dodge:{"Ram 2500":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],e:{"1994-1998":["5.9L 12V Cummins","8.0L V10 Magnum"],"1998-2002":["5.9L 24V Cummins ISB","8.0L V10 Magnum"],"2003-2007":["5.9L Cummins ISB 325","5.7L HEMI V8"],"2007-2012":["6.7L Cummins ISB","5.7L HEMI V8"],"2013-2018":["6.7L Cummins ISB 385","6.4L HEMI V8"],"2019-2024":["6.7L Cummins HO 420","6.4L HEMI V8"]}},"Ram 3500":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],e:{"1994-1998":["5.9L 12V Cummins"],"1998-2002":["5.9L 24V Cummins ISB"],"2003-2007":["5.9L Cummins ISB 325"],"2007-2012":["6.7L Cummins ISB"],"2013-2018":["6.7L Cummins ISB 385"],"2019-2024":["6.7L Cummins HO 420"]}}},Ford:{"F-250":{y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],e:{"1999-2003":["7.3L Power Stroke V8","5.4L Triton V8"],"2003-2007":["6.0L Power Stroke V8","5.4L Triton V8"],"2008-2010":["6.4L Power Stroke V8","5.4L Triton V8"],"2011-2016":["6.7L Power Stroke V8","6.2L Boss V8"],"2017-2019":["6.7L Power Stroke V8 Gen2","6.2L Boss V8"],"2020-2024":["6.7L Power Stroke V8 Gen3","7.3L Godzilla V8"]}},"F-350":{y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],e:{"1999-2003":["7.3L Power Stroke V8"],"2003-2007":["6.0L Power Stroke V8"],"2008-2010":["6.4L Power Stroke V8"],"2011-2016":["6.7L Power Stroke V8"],"2017-2019":["6.7L Power Stroke V8 Gen2"],"2020-2024":["6.7L Power Stroke V8 Gen3"]}}},Chevrolet:{"Silverado 2500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],e:{"2001-2004":["6.6L Duramax LB7","6.0L Vortec V8"],"2004-2006":["6.6L Duramax LLY","6.0L Vortec V8"],"2006-2007":["6.6L Duramax LBZ","6.0L Vortec V8"],"2007-2010":["6.6L Duramax LMM","6.0L Vortec V8"],"2011-2016":["6.6L Duramax LML","6.0L Vortec V8"],"2017-2019":["6.6L Duramax L5P","6.0L Vortec V8"],"2020-2024":["6.6L Duramax L5P Gen2","6.6L V8 Gas"]}},"Silverado 3500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2024":["6.6L Duramax L5P Gen2"]}}},GMC:{"Sierra 2500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],e:{"2001-2004":["6.6L Duramax LB7","6.0L Vortec V8"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2024":["6.6L Duramax L5P Gen2"]}}}};
 
 const PDB={cummins59:{m:["5.9L 12V Cummins","5.9L 24V Cummins ISB","5.9L Cummins ISB 325"],cats:["Injectors","Turbo","Fuel System","Exhaust","Engine","Filters"],prods:[{n:"Bosch Injector Set (6)",b:"Bosch",p:689,c:"Injectors",i:"💉"},{n:"HX35W Turbo Rebuild Kit",b:"Holset",p:249,c:"Turbo",i:"🌀"},{n:"VP44 Injection Pump Reman",b:"Industrial Injection",p:1295,c:"Fuel System",i:"⛽"},{n:"FASS Lift Pump 150GPH",b:"FASS",p:549,c:"Fuel System",i:"⛽"},{n:'4" Turbo-Back Exhaust',b:"MBRP",p:379,c:"Exhaust",i:"💨"},{n:"Head Gasket Set",b:"Mahle",p:189,c:"Engine",i:"🔧"},{n:"Fleetguard Oil Filter 3pk",b:"Cummins",p:34,c:"Filters",i:"🛢️"},{n:"Fuel Filter/Water Sep",b:"Fleetguard",p:28,c:"Filters",i:"🛢️"},{n:"Grid Heater Delete Kit",b:"BD Diesel",p:149,c:"Engine",i:"⚡"},{n:"Killer Dowel Pin Kit",b:"Industrial Injection",p:39,c:"Engine",i:"🔧"}]},cummins67:{m:["6.7L Cummins ISB","6.7L Cummins ISB 385","6.7L Cummins HO 420"],cats:["Injectors","Turbo","Fuel System","DPF/DEF","Engine","Filters"],prods:[{n:"Bosch Reman Injector Set (6)",b:"Bosch",p:1849,c:"Injectors",i:"💉"},{n:"HE351VE VGT Turbo Reman",b:"Holset",p:1195,c:"Turbo",i:"🌀"},{n:"CP3 Injection Pump",b:"Bosch",p:895,c:"Fuel System",i:"⛽"},{n:"FASS Titanium 250GPH",b:"FASS",p:749,c:"Fuel System",i:"⛽"},{n:'5" DPF-Back Exhaust',b:"aFe Power",p:549,c:"Exhaust",i:"💨"},{n:"DPF Cleaning Kit",b:"DET",p:189,c:"DPF/DEF",i:"♻️"},{n:"DEF Fluid 2.5 Gal",b:"BlueDEF",p:18,c:"DPF/DEF",i:"♻️"},{n:"EGR Cooler",b:"Dorman",p:449,c:"Engine",i:"🔧"}]},ps73:{m:["7.3L Power Stroke V8"],cats:["Injectors","Turbo","Fuel System","Exhaust","Electrical"],prods:[{n:"AD Injector Set (8)",b:"Alliant Power",p:1249,c:"Injectors",i:"💉"},{n:"GTP38 Turbo Reman",b:"Garrett",p:549,c:"Turbo",i:"🌀"},{n:"HPOP Oil Pump",b:"Motorcraft",p:695,c:"Fuel System",i:"⛽"},{n:'4" Turbo-Back Exhaust',b:"Diamond Eye",p:349,c:"Exhaust",i:"💨"},{n:"Glow Plug Set (8)",b:"Motorcraft",p:89,c:"Electrical",i:"⚡"},{n:"ICP Sensor",b:"Alliant Power",p:59,c:"Electrical",i:"⚡"},{n:"CPS Cam Sensor",b:"Motorcraft",p:42,c:"Electrical",i:"⚡"},{n:"Turbo Up Pipes",b:"Dorman",p:189,c:"Exhaust",i:"💨"}]},ps60:{m:["6.0L Power Stroke V8"],cats:["Injectors","Turbo","Head Studs","EGR","Fuel System","Engine"],prods:[{n:"Reman Injector Set (8)",b:"Alliant Power",p:2495,c:"Injectors",i:"💉"},{n:"GT3782VA Turbo Reman",b:"Garrett",p:795,c:"Turbo",i:"🌀"},{n:"ARP Head Stud Kit",b:"ARP",p:449,c:"Head Studs",i:"🔩"},{n:"EGR Delete Kit",b:"Sinister Diesel",p:289,c:"EGR",i:"🔧"},{n:"Oil Cooler",b:"Dorman",p:219,c:"Engine",i:"🔧"},{n:"HPOP Pump",b:"Motorcraft",p:845,c:"Fuel System",i:"⛽"},{n:"STC Fitting Kit",b:"Ford OEM",p:79,c:"Fuel System",i:"⛽"},{n:"Dummy Plug Kit (8)",b:"Accurate Diesel",p:109,c:"Fuel System",i:"⛽"}]},ps64:{m:["6.4L Power Stroke V8"],cats:["Injectors","Turbo","DPF/DEF","Engine"],prods:[{n:"Reman Injector Set (8)",b:"Alliant Power",p:3295,c:"Injectors",i:"💉"},{n:"Compound Turbo Reman",b:"Garrett",p:1695,c:"Turbo",i:"🌀"},{n:"DPF Filter Assembly",b:"Dorman",p:995,c:"DPF/DEF",i:"♻️"},{n:"Injector Sleeve Set",b:"Alliant Power",p:249,c:"Engine",i:"🔧"},{n:"HFCM Fuel Module",b:"Motorcraft",p:389,c:"Engine",i:"⛽"}]},ps67:{m:["6.7L Power Stroke V8","6.7L Power Stroke V8 Gen2","6.7L Power Stroke V8 Gen3"],cats:["Injectors","Turbo","Fuel System","DPF/DEF","Filters"],prods:[{n:"Bosch Injector Set (8)",b:"Bosch",p:3695,c:"Injectors",i:"💉"},{n:"GT32 Turbo Assembly",b:"Garrett",p:1495,c:"Turbo",i:"🌀"},{n:"CP4 to CP3 Conversion",b:"S&S Diesel",p:2195,c:"Fuel System",i:"⛽"},{n:"DPF Cleaning Kit",b:"FSX",p:219,c:"DPF/DEF",i:"♻️"},{n:"DEF Fluid 2.5 Gal",b:"BlueDEF",p:18,c:"DPF/DEF",i:"♻️"},{n:"Motorcraft Oil Filter 3pk",b:"Motorcraft",p:36,c:"Filters",i:"🛢️"},{n:"Fuel Filter Kit",b:"Motorcraft",p:58,c:"Filters",i:"🛢️"}]},dmax:{m:["6.6L Duramax LB7","6.6L Duramax LLY","6.6L Duramax LBZ","6.6L Duramax LMM","6.6L Duramax LML","6.6L Duramax L5P","6.6L Duramax L5P Gen2"],cats:["Injectors","Turbo","Fuel System","Exhaust","Allison Trans","Filters"],prods:[{n:"Bosch Injector Set (8)",b:"Bosch",p:2195,c:"Injectors",i:"💉"},{n:"Garrett Turbo Reman",b:"Garrett",p:895,c:"Turbo",i:"🌀"},{n:"CP3 Injection Pump",b:"Bosch",p:749,c:"Fuel System",i:"⛽"},{n:"FASS 150GPH Lift Pump",b:"FASS",p:549,c:"Fuel System",i:"⛽"},{n:'4" Turbo-Back Exhaust',b:"MBRP",p:399,c:"Exhaust",i:"💨"},{n:"ACDelco Oil Filter 3pk",b:"ACDelco",p:32,c:"Filters",i:"🛢️"},{n:"Allison Trans Filter Kit",b:"ACDelco",p:89,c:"Allison Trans",i:"⚙️"},{n:"Allison Shift Kit",b:"Suncoast",p:349,c:"Allison Trans",i:"⚙️"},{n:"Water Pump",b:"ACDelco",p:179,c:"Fuel System",i:"🔧"}]}};
@@ -253,7 +350,7 @@ function confirmV(){const v=S.v;const ch=`${v.year} ${v.make.charAt(0)}. ${v.mod
 // AI
 function updateSugs(){const e=S.v.engine||'';const el=document.getElementById('aiSugs');let s=[];if(/cummins/i.test(e))s=['Killer dowel pin issue?','VP44 pump failure','White smoke cold start','Turbo lag / boost leak','Grid heater problem'];else if(/7\.3.*power stroke/i.test(e))s=['Hard start no start','CPS sensor failure','Turbo pedestal leak','HPOP losing pressure','Glow plug issues'];else if(/6\.0.*power stroke/i.test(e))s=['Head gasket blown?','EGR cooler failure','HPOP failure','Injector stiction','Oil cooler clogged'];else if(/6\.4.*power stroke/i.test(e))s=['DPF regen problems','Turbo actuator issue','Radiator cracked','Fuel dilution in oil'];else if(/6\.7.*power stroke/i.test(e))s=['CP4 pump failure?','Turbo vane sticking','DEF system warning','Coolant leak','DPF clogged'];else if(/duramax/i.test(e))s=['Injector balance rates','Allison shifting hard','White smoke at idle','Injector failure','Fuel filter light'];else s=['Check engine light','Loss of power','Hard starting','Exhaust smoke','Strange noise'];el.innerHTML='';s.forEach(t=>{const d=document.createElement('div');d.className='as';d.textContent=t;d.onclick=()=>{addMsg('usr',t);d.remove();setTimeout(()=>aiReply(t),600)};el.appendChild(d)})}
 function sendMsg(){const inp=document.getElementById('aiIn');const t=inp.value.trim();if(!t)return;addMsg('usr',t);inp.value='';setTimeout(()=>aiReply(t),600)}
-function addMsg(type,txt){const c=document.getElementById('aiChat');const d=document.createElement('div');d.className='am '+type;if(type==='bot')d.innerHTML=`<div class="bn">DieselHub AI</div>${txt}`;else d.textContent=txt;c.appendChild(d);d.scrollIntoView({behavior:'smooth',block:'end'})}
+function addMsg(type,txt){const c=document.getElementById('aiChat');const d=document.createElement('div');d.className='am '+type;if(type==='bot')d.innerHTML=`<div class="bn">BlackStack AI</div>${txt}`;else d.textContent=txt;c.appendChild(d);d.scrollIntoView({behavior:'smooth',block:'end'})}
 function aiReply(msg){const v=S.v;const eng=v.engine||'your engine';const trk=`${v.year} ${v.make} ${v.model}`;const l=msg.toLowerCase();let r='';if(/smoke|white/.test(l))r=`On your <b>${trk}</b> with the <b>${eng}</b>, white exhaust smoke typically means coolant entering combustion. Common causes: head gasket failure, injector cup leak, or cracked head. Start with a coolant level check and compression test. Want me to find the right gasket kit?`;else if(/hard start|no start/.test(l))r=`Hard starting on the <b>${eng}</b> — does it crank but not fire, or slow crank? For your ${trk}, common causes: glow plug/grid heater failure, low fuel pressure (lift pump), or injector issues. If it starts easier warm, that usually rules out compression.`;else if(/power|turbo|lag/.test(l))r=`Loss of power on your <b>${trk}</b> could be turbo-related (boost leak, vanes sticking) or fuel delivery (clogged filter, failing lift pump). Start with a boost leak test and check your fuel filter. The ${eng} is known for this at higher mileage.`;else if(/check engine|code|light/.test(l))r=`For your <b>${trk}</b> — upload a photo of the code readout or tell me the specific code. Common codes on the <b>${eng}</b>: P0087 (fuel rail), P0401 (EGR flow), P2463 (DPF soot). I can give exact diagnostics with the code.`;else if(/head gasket|blown|overheat/.test(l))r=`Head gasket on the <b>${eng}</b> — classic signs: white smoke, mystery coolant loss, milky oil, overheating. For your ${trk}, I'd strongly recommend ARP head studs with the gasket — it's the definitive fix. Want me to pull up the parts?`;else if(/dowel pin|kdp/.test(l))r=`The killer dowel pin (KDP) is critical on your <b>${eng}</b>. If it hasn't been addressed, it's a ticking time bomb — the pin can drop into the gear train and destroy the engine. The fix is a $39 tab kit and a few hours of labor. Absolutely do this ASAP. Want me to find the kit?`;else if(/vp44|injection pump/.test(l))r=`VP44 failure is extremely common on the <b>${eng}</b>. Symptoms: hard starting, dying at idle, no-start when hot. Before replacing the pump ($1,200+), make sure your lift pump is providing adequate pressure — a weak lift pump kills VP44s. I'd recommend a FASS lift pump system alongside the VP44 replacement.`;else r=`Good question about your <b>${trk}</b>. Can you give me more detail? When does it happen (cold vs warm, idle vs load), any codes, and how long it's been going on? You can also upload a photo of the issue or code reader.`;addMsg('bot',r)}
 function aiUpload(e){const files=e.target.files;if(!files.length)return;const c=document.getElementById('aiImgs');c.classList.remove('hid');[...files].forEach(f=>{const r=new FileReader();r.onload=ev=>{const d=document.createElement('div');d.className='auimg';d.innerHTML=`<img src="${ev.target.result}"><div class="ri" onclick="this.parentElement.remove();if(!document.getElementById('aiImgs').children.length)document.getElementById('aiImgs').classList.add('hid')">✕</div>`;c.appendChild(d)};r.readAsDataURL(f)});setTimeout(()=>{addMsg('usr','📷 [Photo uploaded]');setTimeout(()=>addMsg('bot',`Got the image. For your <b>${S.v.year} ${S.v.make} ${S.v.model}</b> with the <b>${S.v.engine}</b> — can you tell me what concerns you in this photo? I'll cross-reference with known issues for your engine.`),800)},500);e.target.value=''}
 
