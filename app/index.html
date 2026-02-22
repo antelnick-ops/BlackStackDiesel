@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Black Stack Diesel</title>
 <link rel="icon" type="image/x-icon" href="../favicon.ico">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Teko:wght@300;400;500;600;700&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -234,7 +234,8 @@ body{font-family:'Work Sans',sans-serif;background:#000;color:var(--t1);overflow
 // Supabase Init
 const SUPABASE_URL = 'https://jfjbilfsiebifzddveof.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamJpbGZzaWViaWZ6ZGR2ZW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2OTg4ODUsImV4cCI6MjA4NzI3NDg4NX0.bbTQ0l4HsHoKUzoKACBvbXJ0TbnUM5tltK4YLKyuMr8';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+var sb;
+try { sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON); } catch(e) { console.error('Supabase init failed:', e); }
 
 let authMode = 'signin'; // 'signin' or 'signup'
 let currentUser = null;
@@ -361,4 +362,11 @@ function renderProds(){if(!S.ef)return;const d=PDB[S.ef];const g=document.getEle
 function addCart(idx){const d=PDB[S.ef];let p=d.prods;if(S.cat!=='All')p=p.filter(x=>x.c===S.cat);const q=(document.getElementById('mSrch').value||'').toLowerCase();if(q)p=p.filter(x=>x.n.toLowerCase().includes(q)||x.b.toLowerCase().includes(q));if(p[idx]){S.cart.push({...p[idx]});updBadge();const b=document.getElementById('cBadge');b.style.transform='scale(1.4)';setTimeout(()=>b.style.transform='',200)}}
 function updBadge(){document.getElementById('cBadge').textContent=S.cart.length}
 function toggleCart(){document.getElementById('cDraw').classList.toggle('op');renderCart()}
-function renderCart(){const el=document.getElementById('cItems');if(!S.cart.length){el.innerHTML='<div class="ce">Your cart is empty</div>';document.getElementById('cTot').textContent='$0';return}el.innerHTML='';let t=0;S.cart.forEach((x,i)=>{t+=x.p;const d=document.createElement('div');d.className='cit';d.innerHTML=`<div class="cii">${x.i}</div><div class="cin"><h5>${x.n}</h5><p>${x.b}</p></div><div class="cip">$${x.p.toLocaleString()}</div><button class="crm" onclick="S.cart.splice(${i},1);updBadge();renderCart()">✕</button>`;el.appendChild(d)});document.getElem
+function renderCart(){const el=document.getElementById('cItems');if(!S.cart.length){el.innerHTML='<div class="ce">Your cart is empty</div>';document.getElementById('cTot').textContent='$0';return}el.innerHTML='';let t=0;S.cart.forEach((x,i)=>{t+=x.p;const d=document.createElement('div');d.className='cit';d.innerHTML=`<div class="cii">${x.i}</div><div class="cin"><h5>${x.n}</h5><p>${x.b}</p></div><div class="cip">$${x.p.toLocaleString()}</div><button class="crm" onclick="S.cart.splice(${i},1);updBadge();renderCart()">✕</button>`;el.appendChild(d)});document.getElementById('cTot').textContent='$'+t.toLocaleString()}
+function checkout(){if(!S.cart.length)return;alert('Checkout coming soon! Stripe Connect integration in progress.\n\nCart total: $'+S.cart.reduce((a,x)=>a+x.p,0).toLocaleString())}
+
+// Init
+initYears();
+</script>
+</body>
+</html>
