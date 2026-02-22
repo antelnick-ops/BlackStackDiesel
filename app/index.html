@@ -46,7 +46,7 @@ body{font-family:'Work Sans',sans-serif;background:#000;color:var(--t1);overflow
 .pwt{position:absolute;right:14px;top:34px;cursor:pointer;color:var(--t3)}.pwt svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8}
 
 /* Vehicle */
-#s-veh{padding:20px 22px 40px}
+#s-veh{padding:0}
 .vh{text-align:center;margin-bottom:24px}.vh h2{font-family:'Teko',sans-serif;font-size:28px;font-weight:600;letter-spacing:2px;text-transform:uppercase}.vh p{color:var(--t3);font-size:13px;margin-top:4px}
 .vsb{display:flex;gap:6px;margin-bottom:24px}.vs{flex:1;height:4px;border-radius:2px;background:var(--bg4);transition:.4s}.vs.dn{background:var(--amber)}.vs.cu{background:var(--amber);opacity:.5}
 .vsg{margin-bottom:16px}.vsg label{display:block;font-family:'Teko',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);margin-bottom:8px}
@@ -169,6 +169,11 @@ body{font-family:'Work Sans',sans-serif;background:#000;color:var(--t1);overflow
 
 <!-- VEHICLE SETUP -->
 <div class="scr" id="s-veh">
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;padding:16px 22px 0">
+<div onclick="handleSignOut()" style="width:36px;height:36px;background:var(--bg3);border:1px solid var(--bd2);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--t2);fill:none;stroke-width:2"><polyline points="15 18 9 12 15 6"/></svg></div>
+<div style="flex:1"></div>
+</div>
+<div style="padding:0 22px 40px">
 <div class="vh"><h2>Set Up Your Truck</h2><p>We'll only show parts that fit your rig</p></div>
 <div class="vsb"><div class="vs" id="vs1"></div><div class="vs" id="vs2"></div><div class="vs" id="vs3"></div><div class="vs" id="vs4"></div></div>
 <div class="vsg" id="vg-year"><label>Year</label><div class="vo" id="yearO"></div></div>
@@ -177,7 +182,8 @@ body{font-family:'Work Sans',sans-serif;background:#000;color:var(--t1);overflow
 <div class="vsg hid" id="vg-engine"><label>Engine</label><div class="vo" id="engineO"></div></div>
 <div class="vp hid" id="vprev"><div class="vpt">Your Vehicle</div><div class="vpn" id="vpn"></div><div class="vpe" id="vpen"></div><div class="vtg" id="vtags"></div></div>
 <button class="bp hid" id="vcon" onclick="confirmV()">Continue to BlackStack Diesel</button>
-</div>
+</div><!-- close inner padding div -->
+</div><!-- close s-veh -->
 
 <!-- AI -->
 <div class="scr" id="s-ai">
@@ -369,7 +375,7 @@ function stepBar(s){for(let i=1;i<=4;i++){const el=document.getElementById('vs'+
 function confirmV(){const v=S.v;const ch=`${v.year} ${v.make.charAt(0)}. ${v.model}`;document.getElementById('aiChip').textContent=ch;document.getElementById('mVehTxt').textContent=`Showing parts for: ${v.year} ${v.make} ${v.model}`;document.getElementById('pVeh').textContent=`${v.year} ${v.make} ${v.model}`;document.getElementById('pEng').textContent=v.engine;loadMkt();updateSugs();go('ai')}
 
 // AI
-function updateSugs(){const e=S.v.engine||'';const el=document.getElementById('aiSugs');let s=[];if(/cummins/i.test(e))s=['Killer dowel pin issue?','VP44 pump failure','White smoke cold start','Turbo lag / boost leak','Grid heater problem'];else if(/7\.3.*power stroke/i.test(e))s=['Hard start no start','CPS sensor failure','Turbo pedestal leak','HPOP losing pressure','Glow plug issues'];else if(/6\.0.*power stroke/i.test(e))s=['Head gasket blown?','EGR cooler failure','HPOP failure','Injector stiction','Oil cooler clogged'];else if(/6\.4.*power stroke/i.test(e))s=['DPF regen problems','Turbo actuator issue','Radiator cracked','Fuel dilution in oil'];else if(/6\.7.*power stroke/i.test(e))s=['CP4 pump failure?','Turbo vane sticking','DEF system warning','Coolant leak','DPF clogged'];else if(/duramax/i.test(e))s=['Injector balance rates','Allison shifting hard','White smoke at idle','Injector failure','Fuel filter light'];else s=['Check engine light','Loss of power','Hard starting','Exhaust smoke','Strange noise'];el.innerHTML='';s.forEach(t=>{const d=document.createElement('div');d.className='as';d.textContent=t;d.onclick=()=>{addMsg('usr',t);d.remove();setTimeout(()=>aiReply(t),600)};el.appendChild(d)})}
+function updateSugs(){const el=document.getElementById('aiSugs');if(!el)return;}
 function sendMsg(){const inp=document.getElementById('aiIn');const t=inp.value.trim();if(!t)return;addMsg('usr',t);inp.value='';setTimeout(()=>aiReply(t),600)}
 function addMsg(type,txt){const c=document.getElementById('aiChat');const d=document.createElement('div');d.className='am '+type;if(type==='bot')d.innerHTML=`<div class="bn">BlackStack AI</div>${txt}`;else d.textContent=txt;c.appendChild(d);d.scrollIntoView({behavior:'smooth',block:'end'})}
 function aiReply(msg){const v=S.v;const eng=v.engine||'your engine';const trk=`${v.year} ${v.make} ${v.model}`;const l=msg.toLowerCase();let r='';if(/smoke|white/.test(l))r=`On your <b>${trk}</b> with the <b>${eng}</b>, white exhaust smoke typically means coolant entering combustion. Common causes: head gasket failure, injector cup leak, or cracked head. Start with a coolant level check and compression test. Want me to find the right gasket kit?`;else if(/hard start|no start/.test(l))r=`Hard starting on the <b>${eng}</b> — does it crank but not fire, or slow crank? For your ${trk}, common causes: glow plug/grid heater failure, low fuel pressure (lift pump), or injector issues. If it starts easier warm, that usually rules out compression.`;else if(/power|turbo|lag/.test(l))r=`Loss of power on your <b>${trk}</b> could be turbo-related (boost leak, vanes sticking) or fuel delivery (clogged filter, failing lift pump). Start with a boost leak test and check your fuel filter. The ${eng} is known for this at higher mileage.`;else if(/check engine|code|light/.test(l))r=`For your <b>${trk}</b> — upload a photo of the code readout or tell me the specific code. Common codes on the <b>${eng}</b>: P0087 (fuel rail), P0401 (EGR flow), P2463 (DPF soot). I can give exact diagnostics with the code.`;else if(/head gasket|blown|overheat/.test(l))r=`Head gasket on the <b>${eng}</b> — classic signs: white smoke, mystery coolant loss, milky oil, overheating. For your ${trk}, I'd strongly recommend ARP head studs with the gasket — it's the definitive fix. Want me to pull up the parts?`;else if(/dowel pin|kdp/.test(l))r=`The killer dowel pin (KDP) is critical on your <b>${eng}</b>. If it hasn't been addressed, it's a ticking time bomb — the pin can drop into the gear train and destroy the engine. The fix is a $39 tab kit and a few hours of labor. Absolutely do this ASAP. Want me to find the kit?`;else if(/vp44|injection pump/.test(l))r=`VP44 failure is extremely common on the <b>${eng}</b>. Symptoms: hard starting, dying at idle, no-start when hot. Before replacing the pump ($1,200+), make sure your lift pump is providing adequate pressure — a weak lift pump kills VP44s. I'd recommend a FASS lift pump system alongside the VP44 replacement.`;else r=`Good question about your <b>${trk}</b>. Can you give me more detail? When does it happen (cold vs warm, idle vs load), any codes, and how long it's been going on? You can also upload a photo of the issue or code reader.`;addMsg('bot',r)}
