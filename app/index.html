@@ -170,7 +170,7 @@ body{font-family:'Work Sans',sans-serif;background:#000;color:var(--t1);overflow
 <!-- VEHICLE SETUP -->
 <div class="scr" id="s-veh">
 <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;padding:16px 22px 0">
-<div onclick="handleSignOut()" style="width:36px;height:36px;background:var(--bg3);border:1px solid var(--bd2);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--t2);fill:none;stroke-width:2"><polyline points="15 18 9 12 15 6"/></svg></div>
+<div onclick="vehBack()" style="width:36px;height:36px;background:var(--bg3);border:1px solid var(--bd2);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--t2);fill:none;stroke-width:2"><polyline points="15 18 9 12 15 6"/></svg></div>
 <div style="flex:1"></div>
 </div>
 <div style="padding:0 22px 40px">
@@ -361,7 +361,14 @@ function go(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove(
 function nav(el){document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));el.classList.add('on');document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.getElementById('s-'+el.dataset.s).classList.add('on')}
 
 // Vehicle setup
-function initYears(){const el=document.getElementById('yearO');['2025-2026','2020-2024','2015-2019','2010-2014','2005-2009','2000-2004','1994-1999'].forEach(d=>{const o=document.createElement('div');o.className='vop';o.textContent=d;o.onclick=()=>expandYears(d);el.appendChild(o)})}
+function vehBack(){
+  if(S.v.engine){S.v.engine=null;document.querySelectorAll('#engineO .vop').forEach(o=>o.classList.remove('sel'));hidePrev();stepBar(3);return}
+  if(S.v.model){S.v.model=null;S.v.engine=null;document.querySelectorAll('#modelO .vop').forEach(o=>o.classList.remove('sel'));hide(['engine']);hidePrev();stepBar(2);return}
+  if(S.v.make){S.v.make=null;S.v.model=null;S.v.engine=null;document.querySelectorAll('#makeO .vop').forEach(o=>o.classList.remove('sel'));hide(['model','engine']);hidePrev();stepBar(1);return}
+  if(S.v.year){S.v={year:null,make:null,model:null,engine:null};document.querySelectorAll('#yearO .vop').forEach(o=>o.classList.remove('sel'));hide(['make','model','engine']);hidePrev();stepBar(0);initYears();return}
+  handleSignOut();
+}
+function initYears(){const el=document.getElementById('yearO');el.innerHTML='';['2025-2026','2020-2024','2015-2019','2010-2014','2005-2009','2000-2004','1994-1999'].forEach(d=>{const o=document.createElement('div');o.className='vop';o.textContent=d;o.onclick=()=>expandYears(d);el.appendChild(o)})}
 function expandYears(range){const[s,e]=range.split('-').map(Number);const yrs=new Set();Object.values(DB).forEach(mk=>Object.values(mk).forEach(m=>m.y.filter(y=>y>=s&&y<=e).forEach(y=>yrs.add(y))));const el=document.getElementById('yearO');el.innerHTML='';[...yrs].sort((a,b)=>b-a).forEach(y=>{const o=document.createElement('div');o.className='vop';o.textContent=y;o.onclick=()=>pickYear(y,o);el.appendChild(o)})}
 function pickYear(y,el){S.v={year:y,make:null,model:null,engine:null};document.querySelectorAll('#yearO .vop').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');stepBar(1);const makes=new Set();Object.entries(DB).forEach(([mk,models])=>{Object.values(models).forEach(m=>{if(m.y.includes(y))makes.add(mk)})});renderOpts('make',[...makes]);show('make');hide(['model','engine']);hidePrev()}
 function renderOpts(t,opts){const el=document.getElementById(t+'O');el.innerHTML='';opts.forEach(o=>{const d=document.createElement('div');d.className='vop';d.textContent=o;d.onclick=()=>pickOpt(t,o,d);el.appendChild(d)})}
