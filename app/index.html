@@ -2,17 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#07070A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="BlackStack">
 <link rel="manifest" href="/app/manifest.json">
 <link rel="apple-touch-icon" href="/app/icon-192.png">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>
 <title>BlackStack Diesel</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
   --bg:#07070A;--c1:#0D0D12;--c2:#131318;--c3:#1A1A22;--c4:#25252F;
@@ -43,7 +44,7 @@ body{font-family:'Manrope',sans-serif;color:var(--t1)}
 
 .sbar{height:env(safe-area-inset-top,12px);min-height:12px;z-index:200;position:relative}
 
-.sw{height:calc(100% - env(safe-area-inset-top,12px));min-height:0;position:relative;overflow:hidden;z-index:1}
+.sw{height:calc(100dvh - env(safe-area-inset-top,12px));position:relative;overflow:hidden;z-index:1}
 .scr{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;opacity:0;pointer-events:none;transition:opacity .45s var(--ease),transform .45s var(--ease);transform:translateY(8px) scale(.985)}
 .scr::-webkit-scrollbar{display:none}
 .scr.on{opacity:1;pointer-events:auto;transform:translateY(0) scale(1)}
@@ -53,7 +54,7 @@ body{font-family:'Manrope',sans-serif;color:var(--t1)}
 .bnav-in{display:flex;align-items:center;justify-content:space-around;height:56px;background:rgba(7,7,10,.75);backdrop-filter:blur(40px) saturate(1.8);-webkit-backdrop-filter:blur(40px) saturate(1.8);border:1px solid rgba(255,255,255,.04);border-radius:100px;padding:0 8px}
 .ni{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 24px;border-radius:100px;position:relative;transition:.3s var(--ease)}
 .ni svg{width:20px;height:20px;stroke:var(--t4);fill:none;stroke-width:1.7;transition:.35s var(--ease)}
-.ni span{font-size:10.3px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:1.8px;transition:.35s var(--ease)}
+.ni span{font-size:9px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:1.8px;transition:.35s var(--ease)}
 .ni.on svg{stroke:var(--gold)}
 .ni.on span{color:var(--gold)}
 .ni.on::before{content:'';position:absolute;inset:0;border-radius:100px;background:rgba(237,174,10,.05);border:1px solid rgba(237,174,10,.08)}
@@ -62,28 +63,28 @@ body{font-family:'Manrope',sans-serif;color:var(--t1)}
 /* Shared */
 .g{background:var(--gl);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glb);border-radius:var(--r2)}
 .gs{background:var(--gl);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glb);border-radius:var(--r)}
-.btn-g{width:100%;height:54px;background:var(--goldg);border:none;border-radius:var(--r);font-family:'Manrope',sans-serif;font-size:16.1px;font-weight:700;letter-spacing:.3px;color:#0a0a0a;cursor:pointer;transition:.2s;position:relative;overflow:hidden;box-shadow:0 0 30px rgba(237,174,10,.12),inset 0 1px 0 rgba(255,255,255,.25)}
+.btn-g{width:100%;height:54px;background:var(--goldg);border:none;border-radius:var(--r);font-family:'Manrope',sans-serif;font-size:15px;font-weight:700;letter-spacing:.3px;color:#0a0a0a;cursor:pointer;transition:.2s;position:relative;overflow:hidden;box-shadow:0 0 30px rgba(237,174,10,.12),inset 0 1px 0 rgba(255,255,255,.25)}
 .btn-g:active{transform:scale(.97);box-shadow:none}
 .mono{font-family:'DM Mono',monospace}
 
 /* ========== LOGIN ========== */
 #s-login{display:flex;flex-direction:column;padding:40px 28px;justify-content:center;align-items:center}
-.l-logo{width:56px;height:56px;border-radius:18px;background:var(--goldg);display:flex;align-items:center;justify-content:center;font-size:29.9px;margin-bottom:20px;box-shadow:0 8px 40px rgba(237,174,10,.15);position:relative}
+.l-logo{width:56px;height:56px;border-radius:18px;background:var(--goldg);display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:20px;box-shadow:0 8px 40px rgba(237,174,10,.15);position:relative}
 .l-logo::after{content:'';position:absolute;inset:-6px;border-radius:24px;border:1px solid rgba(237,174,10,.08);pointer-events:none}
-.l-mark{font-size:29.9px;font-weight:800;letter-spacing:-.8px;margin-bottom:2px}
+.l-mark{font-size:30px;font-weight:800;letter-spacing:-.8px;margin-bottom:2px}
 .l-mark em{font-style:normal;color:var(--gold)}
-.l-sub{color:var(--t3);font-size:13.8px;margin-bottom:36px;letter-spacing:.4px;font-weight:500}
+.l-sub{color:var(--t3);font-size:14px;margin-bottom:36px;letter-spacing:.4px;font-weight:500}
 .fg{width:100%;margin-bottom:12px}
-.fl{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.8px;color:var(--t3);margin-bottom:6px}
-.fi{width:100%;height:52px;background:var(--gl);border:1px solid var(--glb);border-radius:12px;padding:0 16px;font-size:16.1px;color:var(--t1);font-family:'Manrope',sans-serif;outline:none;transition:.3s var(--ease)}
+.fl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.8px;color:var(--t3);margin-bottom:6px}
+.fi{width:100%;height:52px;background:var(--gl);border:1px solid var(--glb);border-radius:12px;padding:0 16px;font-size:16px;color:var(--t1);font-family:'Manrope',sans-serif;outline:none;transition:.3s var(--ease)}
 .fi:focus{border-color:rgba(237,174,10,.25);box-shadow:0 0 0 4px rgba(237,174,10,.04)}
 .fi::placeholder{color:var(--t3)}
-.sep{display:flex;align-items:center;gap:16px;width:100%;margin:22px 0}.sep::before,.sep::after{content:'';flex:1;height:1px;background:var(--glb)}.sep span{font-size:10.3px;color:var(--t3);text-transform:uppercase;letter-spacing:2.5px;font-weight:600}
+.sep{display:flex;align-items:center;gap:16px;width:100%;margin:22px 0}.sep::before,.sep::after{content:'';flex:1;height:1px;background:var(--glb)}.sep span{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:2.5px;font-weight:600}
 .soc{display:flex;gap:10px;width:100%}
-.soc-b{flex:1;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;font-size:13.8px;font-weight:600;color:var(--t2);transition:.2s}
+.soc-b{flex:1;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;font-size:14px;font-weight:600;color:var(--t2);transition:.2s}
 .soc-b:active{transform:scale(.95)}
 .soc-b svg{width:17px;height:17px}
-.l-ft{margin-top:24px;font-size:13.8px;color:var(--t3)}.l-ft a{color:var(--gold);text-decoration:none;font-weight:700}
+.l-ft{margin-top:24px;font-size:14px;color:var(--t3)}.l-ft a{color:var(--gold);text-decoration:none;font-weight:700}
 
 /* ========== VEHICLE ========== */
 #s-veh{padding:0}
@@ -93,84 +94,84 @@ body{font-family:'Manrope',sans-serif;color:var(--t1)}
 .v-back svg{width:20px;height:20px;stroke:var(--t2);fill:none;stroke-width:2}
 .v-body{padding:4px 24px 40px}
 .v-heading{text-align:center;margin-bottom:24px}
-.v-heading h2{font-size:23px;font-weight:800;letter-spacing:-.4px}
-.v-heading p{color:var(--t3);font-size:13.8px;margin-top:4px;font-weight:500}
+.v-heading h2{font-size:22px;font-weight:800;letter-spacing:-.4px}
+.v-heading p{color:var(--t3);font-size:14px;margin-top:4px;font-weight:500}
 .prog-bar{display:flex;gap:5px;margin-bottom:28px}
 .pb{flex:1;height:3px;border-radius:2px;background:var(--t4);transition:.6s var(--ease);position:relative;overflow:hidden}
 .pb.done{background:var(--gold)}
 .pb.done::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);animation:shim 2.5s ease infinite}
 @keyframes shim{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
 .pb.cur{background:rgba(237,174,10,.25)}
-.lbl{font-size:10.3px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--t3);margin-bottom:10px}
+.lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--t3);margin-bottom:10px}
 .pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
-.pill{padding:10px 20px;border-radius:12px;font-size:14.9px;font-weight:600;color:var(--t2);cursor:pointer;transition:all .3s var(--ease);white-space:nowrap;position:relative;background:var(--gl);border:1px solid var(--glb)}
+.pill{padding:11px 22px;border-radius:12px;font-size:15px;font-weight:600;color:var(--t2);cursor:pointer;transition:all .3s var(--ease);white-space:nowrap;position:relative;background:var(--gl);border:1px solid var(--glb)}
 .pill:active{transform:scale(.93)}
 .pill.sel{color:var(--gold);background:var(--goldgl);border-color:rgba(237,174,10,.2);box-shadow:0 0 20px rgba(237,174,10,.04)}
 .vprev{border-radius:var(--r2);padding:20px;margin-top:20px;position:relative;overflow:hidden}
 .vprev::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--goldg)}
-.vprev .vl{font-size:9.2px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:var(--t3);margin-bottom:8px}
-.vprev .vn{font-size:23px;font-weight:800;background:var(--goldg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-.3px}
-.vprev .ve{font-size:13.8px;color:var(--t2);margin-top:4px;font-weight:500}
+.vprev .vl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:var(--t3);margin-bottom:8px}
+.vprev .vn{font-size:20px;font-weight:800;background:var(--goldg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-.3px}
+.vprev .ve{font-size:12px;color:var(--t2);margin-top:4px;font-weight:500}
 .vprev .vt{display:flex;gap:6px;margin-top:12px}
-.vprev .tag{padding:4px 12px;border-radius:8px;font-size:10.3px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t2)}
+.vprev .tag{padding:4px 12px;border-radius:8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t2)}
 
 /* ========== AI ========== */
 #s-ai{padding:20px 24px calc(80px + env(safe-area-inset-bottom,6px))}
 .sec-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-.sec-h h2{font-size:20.7px;font-weight:800;letter-spacing:-.3px}
-.badge{padding:5px 14px;border-radius:100px;font-size:10.3px;font-weight:700;letter-spacing:.6px;color:var(--gold);background:var(--goldgl);border:1px solid var(--goldb)}
+.sec-h h2{font-size:20px;font-weight:800;letter-spacing:-.3px}
+.badge{padding:5px 14px;border-radius:100px;font-size:9px;font-weight:700;letter-spacing:.6px;color:var(--gold);background:var(--goldgl);border:1px solid var(--goldb)}
 .ai-lock{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;height:calc(100% - 100px)}
-.orb{width:96px;height:96px;border-radius:30px;display:flex;align-items:center;justify-content:center;font-size:50.6px;margin-bottom:28px;position:relative;background:var(--c1)}
+.orb{width:96px;height:96px;border-radius:30px;display:flex;align-items:center;justify-content:center;font-size:44px;margin-bottom:28px;position:relative;background:var(--c1)}
 .orb::before{content:'';position:absolute;inset:-2px;border-radius:32px;background:conic-gradient(from 180deg,var(--gold),transparent 25%,transparent 75%,var(--gold));opacity:.35;animation:spin 10s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .orb span{position:relative;z-index:1}
-.ai-t{font-size:20.7px;font-weight:800;background:var(--goldg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px}
-.ai-d{font-size:14.9px;color:var(--t2);line-height:1.8;max-width:270px;margin-bottom:22px;font-weight:400}
-.ai-j{font-size:13.8px;color:var(--t3);line-height:1.75;max-width:250px;font-style:italic;margin-bottom:30px;padding:16px 20px;border-radius:14px;background:var(--gl);border-left:2px solid rgba(237,174,10,.15);font-weight:400}
+.ai-t{font-size:20px;font-weight:800;background:var(--goldg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px}
+.ai-d{font-size:15px;color:var(--t2);line-height:1.8;max-width:270px;margin-bottom:22px;font-weight:400}
+.ai-j{font-size:14px;color:var(--t3);line-height:1.75;max-width:250px;font-style:italic;margin-bottom:30px;padding:16px 20px;border-radius:14px;background:var(--gl);border-left:2px solid rgba(237,174,10,.15);font-weight:400}
 .ai-soon{padding:10px 26px;border-radius:100px;display:flex;align-items:center;gap:10px;border:1px solid var(--goldb);background:var(--goldgl)}
 .ai-soon .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pul 2s ease infinite}
 @keyframes pul{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.15;transform:scale(.6)}}
-.ai-soon span{font-size:10.3px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:var(--t2)}
+.ai-soon span{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:var(--t2)}
 
 /* ========== MARKETPLACE ========== */
 #s-mkt{padding:14px 18px calc(80px + env(safe-area-inset-bottom,6px))}
 .mk-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding:0 2px}
-.mk-top h2{font-size:20.7px;font-weight:800;letter-spacing:-.3px}
+.mk-top h2{font-size:20px;font-weight:800;letter-spacing:-.3px}
 .cbtn{position:relative;width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .cbtn:active{transform:scale(.88)}
 .cbtn svg{width:19px;height:19px;stroke:var(--t2);fill:none;stroke-width:1.7}
-.cbdg{position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;background:var(--goldg);border-radius:100px;font-size:10.3px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);padding:0 4px;color:#0a0a0a}
-.vstrip{padding:10px 14px;border-radius:12px;display:flex;align-items:center;gap:9px;margin-bottom:14px;font-size:12.6px;font-weight:600;color:var(--gold)}
+.cbdg{position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;background:var(--goldg);border-radius:100px;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);padding:0 4px;color:#0a0a0a}
+.vstrip{padding:10px 14px;border-radius:12px;display:flex;align-items:center;gap:9px;margin-bottom:14px;font-size:13px;font-weight:600;color:var(--gold)}
 .vstrip svg{width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:2;flex-shrink:0}
 .cats{display:flex;gap:5px;overflow-x:auto;margin-bottom:12px;scrollbar-width:none;padding-bottom:2px}.cats::-webkit-scrollbar{display:none}
-.ct{padding:8px 16px;border-radius:100px;font-size:11.5px;font-weight:700;color:var(--t3);cursor:pointer;white-space:nowrap;transition:.25s var(--ease);background:var(--gl);border:1px solid var(--glb)}
+.ct{padding:9px 18px;border-radius:100px;font-size:12px;font-weight:700;color:var(--t3);cursor:pointer;white-space:nowrap;transition:.25s var(--ease);background:var(--gl);border:1px solid var(--glb)}
 .ct.on{color:var(--gold);background:var(--goldgl);border-color:rgba(237,174,10,.15)}
 .stg-row{display:flex;gap:6px;margin-bottom:10px}
-.stg{padding:6px 14px;border-radius:10px;font-size:10.3px;font-weight:800;letter-spacing:1px;color:var(--t3);cursor:pointer;transition:.25s var(--ease);text-transform:uppercase;background:var(--gl);border:1px solid var(--glb)}
+.stg{padding:6px 14px;border-radius:10px;font-size:9px;font-weight:800;letter-spacing:1px;color:var(--t3);cursor:pointer;transition:.25s var(--ease);text-transform:uppercase;background:var(--gl);border:1px solid var(--glb)}
 .stg.on{color:var(--gold);background:var(--goldgl);border-color:rgba(237,174,10,.15)}
 .dds{display:flex;gap:6px;margin-bottom:12px}
-.dd{flex:1;height:36px;background:var(--gl);border:1px solid var(--glb);border-radius:10px;padding:0 8px;font-size:11.5px;font-weight:600;color:var(--t2);font-family:'Manrope',sans-serif;outline:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M6 9l6 6 6-6' stroke='rgba(255,255,255,0.15)' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center;background-size:12px;padding-right:22px}
+.dd{flex:1;height:36px;background:var(--gl);border:1px solid var(--glb);border-radius:10px;padding:0 8px;font-size:10px;font-weight:600;color:var(--t2);font-family:'Manrope',sans-serif;outline:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M6 9l6 6 6-6' stroke='rgba(255,255,255,0.15)' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center;background-size:12px;padding-right:22px}
 .dd:focus{border-color:rgba(237,174,10,.2)}
 .dd option{background:#151519;color:#e2e2e2}
 .sbox{position:relative;margin-bottom:16px}
-.sbox input{width:100%;height:44px;background:var(--gl);border:1px solid var(--glb);border-radius:13px;padding:0 14px 0 42px;font-size:14.9px;color:var(--t1);outline:none;font-family:'Manrope',sans-serif;transition:.25s var(--ease)}
+.sbox input{width:100%;height:44px;background:var(--gl);border:1px solid var(--glb);border-radius:13px;padding:0 14px 0 42px;font-size:15px;color:var(--t1);outline:none;font-family:'Manrope',sans-serif;transition:.25s var(--ease)}
 .sbox input::placeholder{color:var(--t3);font-weight:500}
 .sbox input:focus{border-color:rgba(237,174,10,.15)}
 .sbox svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:17px;height:17px;stroke:var(--t3);fill:none;stroke-width:1.8}
 .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .pc{border-radius:var(--r2);overflow:hidden;cursor:pointer;transition:.25s var(--ease)}
 .pc:active{transform:scale(.965)}
-.pc-img{height:100px;background:rgba(255,255,255,.015);display:flex;align-items:center;justify-content:center;position:relative;font-size:39.1px;border-bottom:1px solid var(--glb)}
-.pc-fit{position:absolute;top:7px;left:7px;padding:3px 8px;border-radius:7px;font-size:9.2px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;background:rgba(52,211,153,.06);color:var(--grn);border:1px solid rgba(52,211,153,.1)}
-.pc-stg{position:absolute;top:7px;right:7px;padding:3px 8px;border-radius:7px;font-size:8px;font-weight:800;letter-spacing:.8px;text-transform:uppercase}
+.pc-img{height:100px;background:rgba(255,255,255,.015);display:flex;align-items:center;justify-content:center;position:relative;font-size:34px;border-bottom:1px solid var(--glb)}
+.pc-fit{position:absolute;top:7px;left:7px;padding:3px 8px;border-radius:7px;font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;background:rgba(52,211,153,.06);color:var(--grn);border:1px solid rgba(52,211,153,.1)}
+.pc-stg{position:absolute;top:7px;right:7px;padding:3px 8px;border-radius:7px;font-size:7px;font-weight:800;letter-spacing:.8px;text-transform:uppercase}
 .s1{background:rgba(96,165,250,.06);color:var(--blu);border:1px solid rgba(96,165,250,.1)}
 .s2{background:var(--goldgl);color:var(--gold);border:1px solid var(--goldb)}
 .s3{background:rgba(248,113,113,.06);color:var(--red);border:1px solid rgba(248,113,113,.1)}
 .pc-bd{padding:10px 12px 12px}
-.pc-br{font-size:9.2px;color:var(--t3);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:3px}
-.pc-bd h4{font-size:13.2px;font-weight:600;line-height:1.4;margin-bottom:8px;color:var(--t1)}
+.pc-br{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:3px}
+.pc-bd h4{font-size:13px;font-weight:600;line-height:1.4;margin-bottom:8px;color:var(--t1)}
 .pc-bt{display:flex;justify-content:space-between;align-items:center}
-.pc-pr{font-size:18.4px;font-weight:800;color:var(--gold);font-family:'DM Mono',monospace;letter-spacing:-.5px}
+.pc-pr{font-size:18px;font-weight:800;color:var(--gold);font-family:'DM Mono',monospace;letter-spacing:-.5px}
 .ab{width:32px;height:32px;background:var(--goldg);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;transition:.15s;box-shadow:0 2px 10px rgba(237,174,10,.1)}
 .ab:active{transform:scale(.8)}
 .ab svg{width:14px;height:14px;stroke:#0a0a0a;stroke-width:2.5;fill:none}
@@ -180,35 +181,35 @@ body{font-family:'Manrope',sans-serif;color:var(--t1)}
 .cd-bg{position:absolute;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);opacity:0;transition:.4s}.cd.op .cd-bg{opacity:1}
 .cd-sh{position:absolute;bottom:0;left:0;right:0;background:rgba(13,13,18,.96);backdrop-filter:blur(40px);border-radius:24px 24px 0 0;padding:20px 24px 36px;transform:translateY(100%);transition:.5s var(--ease);max-height:70%;overflow-y:auto;border:1px solid var(--glb);border-bottom:none}.cd.op .cd-sh{transform:translateY(0)}
 .cd-h{width:32px;height:3px;background:var(--t4);border-radius:2px;margin:0 auto 18px}
-.cd-t{font-size:17.2px;font-weight:800;margin-bottom:14px;letter-spacing:-.2px}
-.cd-e{text-align:center;padding:32px 0;color:var(--t3);font-size:13.8px;font-weight:500}
+.cd-t{font-size:17px;font-weight:800;margin-bottom:14px;letter-spacing:-.2px}
+.cd-e{text-align:center;padding:32px 0;color:var(--t3);font-size:12px;font-weight:500}
 .cd-tot{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-top:1px solid var(--glb);margin:14px 0}
-.cd-tot span{font-size:13.8px;color:var(--t2);font-weight:500}
-.cd-tot strong{font-size:23px;font-weight:800;font-family:'DM Mono',monospace;color:var(--gold)}
+.cd-tot span{font-size:12px;color:var(--t2);font-weight:500}
+.cd-tot strong{font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:var(--gold)}
 
 /* ========== PROFILE ========== */
 #s-pro{padding:20px 24px calc(80px + env(safe-area-inset-bottom,6px))}
 .p-head{text-align:center;padding:20px 0 8px}
-.p-av{width:76px;height:76px;border-radius:24px;background:var(--goldg);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:27.6px;font-weight:800;color:#0a0a0a;box-shadow:0 8px 36px rgba(237,174,10,.12);position:relative}
+.p-av{width:76px;height:76px;border-radius:24px;background:var(--goldg);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#0a0a0a;box-shadow:0 8px 36px rgba(237,174,10,.12);position:relative}
 .p-av::after{content:'';position:absolute;inset:-4px;border-radius:28px;border:1px solid rgba(237,174,10,.08)}
-.p-name{font-size:20.7px;font-weight:800;letter-spacing:-.3px}
-.p-email{font-size:12.6px;color:var(--t3);margin-top:3px;font-weight:500}
+.p-name{font-size:20px;font-weight:800;letter-spacing:-.3px}
+.p-email{font-size:11px;color:var(--t3);margin-top:3px;font-weight:500}
 .p-truck{border-radius:var(--r2);padding:16px;margin:22px 0 18px;display:flex;align-items:center;gap:12px}
-.p-trk-i{width:46px;height:46px;background:var(--goldgl);border:1px solid var(--goldb);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:25.3px;flex-shrink:0}
-.p-trk-t h4{font-size:14.9px;font-weight:700;background:var(--goldg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.p-trk-t p{font-size:11.5px;color:var(--t3);margin-top:2px;font-weight:500}
-.p-edit{margin-left:auto;padding:7px 16px;border-radius:10px;font-size:10.3px;font-weight:700;color:var(--t2);cursor:pointer;font-family:'Manrope',sans-serif;letter-spacing:.5px;text-transform:uppercase}
+.p-trk-i{width:46px;height:46px;background:var(--goldgl);border:1px solid var(--goldb);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.p-trk-t h4{font-size:15px;font-weight:700;background:var(--goldg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.p-trk-t p{font-size:10px;color:var(--t3);margin-top:2px;font-weight:500}
+.p-edit{margin-left:auto;padding:7px 16px;border-radius:10px;font-size:9px;font-weight:700;color:var(--t2);cursor:pointer;font-family:'Manrope',sans-serif;letter-spacing:.5px;text-transform:uppercase}
 .p-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:22px}
 .p-st{border-radius:var(--r);padding:14px 6px;text-align:center}
-.p-stv{font-size:20.7px;font-weight:800;font-family:'DM Mono',monospace;color:var(--gold)}
-.p-stl{font-size:9.2px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1.4px;margin-top:4px}
+.p-stv{font-size:18px;font-weight:800;font-family:'DM Mono',monospace;color:var(--gold)}
+.p-stl{font-size:8px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1.4px;margin-top:4px}
 .p-list{display:flex;flex-direction:column;gap:1px;border-radius:var(--r2);overflow:hidden}
 .p-row{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--gl);cursor:pointer;transition:.15s}
 .p-row:active{background:var(--glh)}
 .p-ri{width:36px;height:36px;border-radius:11px;background:rgba(255,255,255,.025);border:1px solid var(--glb);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .p-ri svg{width:16px;height:16px;stroke:var(--t2);fill:none;stroke-width:1.7}
-.p-row span{flex:1;font-size:14.9px;font-weight:500}.p-row .ch{color:var(--t4);font-size:17.2px}
-.so-btn{width:100%;height:48px;background:transparent;border:1px solid rgba(248,113,113,.1);border-radius:var(--r);margin-top:20px;font-family:'Manrope',sans-serif;font-size:13.8px;font-weight:700;color:var(--red);cursor:pointer;transition:.2s;letter-spacing:.3px}
+.p-row span{flex:1;font-size:15px;font-weight:500}.p-row .ch{color:var(--t4);font-size:15px}
+.so-btn{width:100%;height:48px;background:transparent;border:1px solid rgba(248,113,113,.1);border-radius:var(--r);margin-top:20px;font-family:'Manrope',sans-serif;font-size:14px;font-weight:700;color:var(--red);cursor:pointer;transition:.2s;letter-spacing:.3px}
 .so-btn:active{background:rgba(248,113,113,.04)}
 
 /* Desktop cap */
@@ -223,22 +224,24 @@ body{font-family:'Manrope',sans-serif;color:var(--t1)}
 .sub{position:absolute;inset:0;z-index:200;background:var(--bg);overflow-y:auto;scrollbar-width:none;transform:translateX(100%);transition:transform .35s var(--ease);pointer-events:none;padding:0 24px 40px}
 .sub::-webkit-scrollbar{display:none}
 .sub.open{transform:translateX(0);pointer-events:auto}
-.sub-top{display:flex;align-items:center;gap:12px;padding:env(safe-area-inset-top,16px) 0 16px}
+.sub-top{display:flex;align-items:center;gap:12px;padding:16px 0}
 .sub-top h3{font-size:18px;font-weight:800}
 .sub-back{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .sub-back:active{transform:scale(.85)}
 .sub-back svg{width:18px;height:18px;stroke:var(--t2);fill:none;stroke-width:2}
 .sub-empty{text-align:center;padding:60px 20px;color:var(--t3);font-size:15px;line-height:1.7}
-.sub-empty .sub-ico{font-size:44px;margin-bottom:16px;display:block}
+.sub-empty .si{font-size:44px;margin-bottom:16px;display:block}
 .sub-item{display:flex;align-items:center;gap:12px;padding:14px;border-radius:var(--r);margin-bottom:8px}
-.sub-item-txt h4{font-size:15px;font-weight:600}
-.sub-item-txt p{font-size:12px;color:var(--t3);margin-top:2px}
-.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px;border-radius:var(--r);margin-bottom:8px}
-.toggle-row span{font-size:15px;font-weight:500}
-.toggle{width:44px;height:26px;border-radius:13px;background:var(--t4);position:relative;cursor:pointer;transition:.3s}
-.toggle.on{background:var(--gold)}
-.toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.3s}
-.toggle.on::after{left:21px}
+.sub-item h4{font-size:15px;font-weight:600}
+.sub-item p{font-size:12px;color:var(--t3);margin-top:2px}
+.tog-row{display:flex;align-items:center;justify-content:space-between;padding:14px;border-radius:var(--r);margin-bottom:8px}
+.tog-row span{font-size:15px;font-weight:500}
+.tog{width:44px;height:26px;border-radius:13px;background:var(--t4);position:relative;cursor:pointer;transition:.3s}
+.tog.on{background:var(--gold)}
+.tog::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.3s}
+.tog.on::after{left:21px}
+/* Auth error */
+.auth-err{display:none;width:100%;padding:10px 14px;border-radius:10px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.15);color:var(--red);font-size:13px;font-weight:500;margin-bottom:12px;text-align:center}
 
 </style>
 </head>
@@ -253,7 +256,7 @@ body{font-family:'Manrope',sans-serif;color:var(--t1)}
 <div class="l-logo">⚡</div>
 <div class="l-mark">Black<em>Stack</em></div>
 <div class="l-sub">Diesel parts & diagnostics</div>
-<div id="authErr" style="display:none;width:100%;padding:10px 14px;border-radius:10px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.15);color:var(--red);font-size:13px;font-weight:500;margin-bottom:12px;text-align:center"></div>
+<div class="auth-err" id="authErr"></div>
 <div class="fg"><div class="fl">Email</div><input class="fi" id="authEmail" type="email" placeholder="you@email.com" autocomplete="email"></div>
 <div class="fg"><div class="fl">Password</div><input class="fi" id="authPass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
 <div id="confirmWrap" class="fg" style="display:none"><div class="fl">Confirm Password</div><input class="fi" id="authConfirm" type="password" placeholder="••••••••"></div>
@@ -287,16 +290,16 @@ body{font-family:'Manrope',sans-serif;color:var(--t1)}
 <div class="ai-lock">
 <div class="orb"><span>🔧</span></div>
 <div class="ai-t">Under The Hood</div>
-<div class="ai-d">Our AI is getting a full rebuild — new turbo, bigger injectors, and a custom tune. She'll be rollin' coal in no time.</div>
-<div class="ai-j">"Why did the diesel mechanic break up with the gas engine? Because she just couldn't handle the pressure."</div>
+<div class="ai-d">Our AI is getting a full rebuild — new turbo, bigger injectors, and a custom tune. She’ll be rollin’ coal in no time.</div>
+<div class="ai-j">“Why did the diesel mechanic break up with the gas engine? Because she just couldn’t handle the pressure.”</div>
 <div class="ai-soon"><div class="dot"></div><span>Coming Soon</span></div>
 </div>
 </div>
 
 <!-- MARKETPLACE -->
 <div class="scr" id="s-mkt">
-<div class="mk-top"><h2>Marketplace</h2><div class="cbtn gs" onclick="toggleCart()"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg><div class="cbdg">2</div></div></div>
-<div class="vstrip g"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span id="vsText">Parts for: 2006 Ford F-250</span></div>
+<div class="mk-top"><h2>Marketplace</h2><div class="cbtn gs" onclick="toggleCart()"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg><div class="cbdg">0</div></div></div>
+<div class="vstrip g"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span id="vsText">Select your vehicle first</span></div>
 <div class="cats"><div class="ct on">All</div><div class="ct">Injectors</div><div class="ct">Turbo</div><div class="ct">Head Studs</div><div class="ct">EGR</div><div class="ct">Fuel System</div><div class="ct">Engine</div></div>
 <div class="stg-row"><div class="stg">Stage 1</div><div class="stg on">Stage 2</div><div class="stg">Stage 3</div></div>
 <div class="dds">
@@ -317,12 +320,12 @@ body{font-family:'Manrope',sans-serif;color:var(--t1)}
 
 <!-- PROFILE -->
 <div class="scr" id="s-pro">
-<div class="p-head"><div class="p-av">NA</div><div class="p-name">Nicholas Antel</div><div class="p-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b7d9ded4dfd8dbd6c499d6d9c3d2dbf7d8c2c3dbd8d8dc99d4d8da">[email&#160;protected]</a></div></div>
-<div class="p-truck g"><div class="p-trk-i">🚛</div><div class="p-trk-t"><h4 id="pTrk">2006 Ford F-250</h4><p id="pEng">6.0L Power Stroke</p></div><button class="p-edit gs" onclick="resetVeh()">Edit</button></div>
+<div class="p-head"><div class="p-av" id="pAv">BS</div><div class="p-name" id="pName">BlackStack User</div><div class="p-email"><span id="pEmail">user@email.com</span></div></div>
+<div class="p-truck g"><div class="p-trk-i">🚛</div><div class="p-trk-t"><h4 id="pTrk">No vehicle set</h4><p id="pEng">Select your truck</p></div><button class="p-edit gs" onclick="resetVeh()">Edit</button></div>
 <div class="p-grid">
-<div class="p-st g"><div class="p-stv mono" id="statOrders">0</div><div class="p-stl">Orders</div></div>
-<div class="p-st g"><div class="p-stv mono" id="statSpent">$0</div><div class="p-stl">Spent</div></div>
-<div class="p-st g"><div class="p-stv mono" id="statChats">0</div><div class="p-stl">Chats</div></div>
+<div class="p-st g"><div class="p-stv mono">0</div><div class="p-stl">Orders</div></div>
+<div class="p-st g"><div class="p-stv mono">$0</div><div class="p-stl">Spent</div></div>
+<div class="p-st g"><div class="p-stv mono">0</div><div class="p-stl">Chats</div></div>
 </div>
 <div class="p-list">
 <div class="p-row" onclick="openSub('orders')"><div class="p-ri"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span>Order History</span><span class="ch">›</span></div>
@@ -332,37 +335,18 @@ body{font-family:'Manrope',sans-serif;color:var(--t1)}
 <div class="p-row" onclick="openSub('help')"><div class="p-ri"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><span>Help & Support</span><span class="ch">›</span></div>
 </div>
 <button class="so-btn" onclick="handleSignOut()">Sign Out</button>
-
-<!-- SUB: Order History -->
-<div class="sub" id="sub-orders"><div class="sub-top"><div class="sub-back gs" onclick="closeSub('orders')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><h3>Order History</h3></div><div class="sub-empty"><span class="sub-ico">📦</span>No orders yet<br>Your purchases will appear here</div></div>
-
-<!-- SUB: Payment -->
-<div class="sub" id="sub-payment"><div class="sub-top"><div class="sub-back gs" onclick="closeSub('payment')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><h3>Payment Methods</h3></div><div class="sub-empty"><span class="sub-ico">💳</span>No payment methods<br>Add one at checkout</div></div>
-
-<!-- SUB: Address -->
-<div class="sub" id="sub-address"><div class="sub-top"><div class="sub-back gs" onclick="closeSub('address')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><h3>Saved Addresses</h3></div><div class="sub-empty"><span class="sub-ico">📍</span>No saved addresses<br>Add one at checkout</div></div>
-
-<!-- SUB: Notifications -->
-<div class="sub" id="sub-notif"><div class="sub-top"><div class="sub-back gs" onclick="closeSub('notif')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><h3>Notifications</h3></div>
-<div class="toggle-row g"><span>Order Updates</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-<div class="toggle-row g"><span>Price Drops</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-<div class="toggle-row g"><span>New Products</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
-<div class="toggle-row g"><span>Promotions</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div></div>
-
-<!-- SUB: Help -->
-<div class="sub" id="sub-help"><div class="sub-top"><div class="sub-back gs" onclick="closeSub('help')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><h3>Help & Support</h3></div>
-<div class="sub-item g"><div style="font-size:22px;margin-right:4px">📧</div><div class="sub-item-txt"><h4>Email Us</h4><p>help@black-stack-diesel.com</p></div></div>
-<div class="sub-item g"><div style="font-size:22px;margin-right:4px">💬</div><div class="sub-item-txt"><h4>Live Chat</h4><p>Coming soon</p></div></div>
-<div class="sub-item g"><div style="font-size:22px;margin-right:4px">📖</div><div class="sub-item-txt"><h4>FAQ</h4><p>Common questions answered</p></div></div>
-<div class="sub-item g" style="margin-top:20px"><div style="font-size:22px;margin-right:4px">📱</div><div class="sub-item-txt"><h4>App Version</h4><p>v1.0.0 — BlackStack Diesel</p></div></div></div>
-
+<div class="sub" id="sub-orders"><div class="sub-top"><div class="sub-back gs" onclick="closeSub('orders')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><h3>Order History</h3></div><div class="sub-empty"><span class="si">📦</span>No orders yet<br>Your purchases will appear here</div></div>
+<div class="sub" id="sub-payment"><div class="sub-top"><div class="sub-back gs" onclick="closeSub('payment')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><h3>Payment Methods</h3></div><div class="sub-empty"><span class="si">💳</span>No payment methods<br>Add one at checkout</div></div>
+<div class="sub" id="sub-address"><div class="sub-top"><div class="sub-back gs" onclick="closeSub('address')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><h3>Saved Addresses</h3></div><div class="sub-empty"><span class="si">📍</span>No saved addresses<br>Add one at checkout</div></div>
+<div class="sub" id="sub-notif"><div class="sub-top"><div class="sub-back gs" onclick="closeSub('notif')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><h3>Notifications</h3></div><div class="tog-row g"><span>Order Updates</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div><div class="tog-row g"><span>Price Drops</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div><div class="tog-row g"><span>New Products</span><div class="tog" onclick="this.classList.toggle('on')"></div></div><div class="tog-row g"><span>Promotions</span><div class="tog" onclick="this.classList.toggle('on')"></div></div></div>
+<div class="sub" id="sub-help"><div class="sub-top"><div class="sub-back gs" onclick="closeSub('help')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><h3>Help & Support</h3></div><div class="sub-item g"><div style="font-size:22px;width:40px;text-align:center">📧</div><div><h4>Email Us</h4><p>help@black-stack-diesel.com</p></div></div><div class="sub-item g"><div style="font-size:22px;width:40px;text-align:center">💬</div><div><h4>Live Chat</h4><p>Coming soon</p></div></div><div class="sub-item g"><div style="font-size:22px;width:40px;text-align:center">📖</div><div><h4>FAQ</h4><p>Common questions answered</p></div></div><div class="sub-item g" style="margin-top:20px"><div style="font-size:22px;width:40px;text-align:center">📱</div><div><h4>App Version</h4><p>v1.0.0</p></div></div></div>
 </div>
 
 <!-- CART -->
 <div class="cd" id="cD"><div class="cd-bg" onclick="toggleCart()"></div><div class="cd-sh"><div class="cd-h"></div><div class="cd-t">Your Cart</div><div class="cd-e">Your cart is empty</div><div class="cd-tot"><span>Total</span><strong class="mono">$0</strong></div><button class="btn-g" onclick="alert('Checkout coming soon!')">Checkout</button></div></div>
 
 <!-- NAV -->
-<div class="bnav" id="bnav"><div class="bnav-in">
+<div class="bnav hid" id="bnav"><div class="bnav-in">
 <div class="ni" data-s="ai" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 01-1 1H9a1 1 0 01-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/><line x1="9" y1="21" x2="15" y2="21"/></svg><span>AI</span></div>
 <div class="ni on" data-s="mkt" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><span>Shop</span></div>
 <div class="ni" data-s="pro" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profile</span></div>
@@ -371,120 +355,46 @@ body{font-family:'Manrope',sans-serif;color:var(--t1)}
 </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-// === Supabase ===
-const sb=supabase.createClient('https://jfjbilfsiebifzddveof.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamJpbGZzaWViaWZ6ZGR2ZW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2OTg4ODUsImV4cCI6MjA4NzI3NDg4NX0.bbTQ0l4HsHoKUzoKACBvbXJ0TbnUM5tltK4YLKyuMr8');
-
-// === Vehicle DB ===
-const DB={Dodge:{"Ram 2500":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009],e:{"1994-1998":["5.9L 12V Cummins"],"1998-2002":["5.9L 24V Cummins ISB"],"2003-2007":["5.9L Cummins ISB 325"],"2007-2009":["6.7L Cummins ISB"]}},"Ram 3500":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009],e:{"1994-1998":["5.9L 12V Cummins"],"1998-2002":["5.9L 24V Cummins ISB"],"2003-2007":["5.9L Cummins ISB 325"],"2007-2009":["6.7L Cummins ISB"]}}},Ram:{"2500":{y:[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2010-2012":["6.7L Cummins ISB"],"2013-2018":["6.7L Cummins ISB 385"],"2019-2026":["6.7L Cummins HO 420"]}},"3500":{y:[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2010-2012":["6.7L Cummins ISB"],"2013-2018":["6.7L Cummins ISB 385"],"2019-2026":["6.7L Cummins HO 420"]}}},Ford:{"F-250":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1994-1997":["7.3L IDI Turbo Diesel"],"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-350":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1994-1997":["7.3L IDI Turbo Diesel"],"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-450":{y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-550":{y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"Excursion":{y:[2000,2001,2002,2003,2004,2005],e:{"2000-2003":["7.3L Power Stroke"],"2003-2005":["6.0L Power Stroke"]}}},Chevrolet:{"Silverado 2500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}},"Silverado 3500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}}},GMC:{"Sierra 2500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}},"Sierra 3500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}}}};
-
-const V={year:null,make:null,model:null,engine:null};
-let ym='r',isSignUp=false;
-
-// === Auth ===
-function showErr(m){const e=document.getElementById('authErr');e.textContent=m;e.style.display='block'}
+<script>
+var sb=supabase.createClient('https://jfjbilfsiebifzddveof.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamJpbGZzaWViaWZ6ZGR2ZW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2OTg4ODUsImV4cCI6MjA4NzI3NDg4NX0.bbTQ0l4HsHoKUzoKACBvbXJ0TbnUM5tltK4YLKyuMr8');
+var DB={Dodge:{"Ram 2500":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009],e:{"1994-1998":["5.9L 12V Cummins"],"1998-2002":["5.9L 24V Cummins ISB"],"2003-2007":["5.9L Cummins ISB 325"],"2007-2009":["6.7L Cummins ISB"]}},"Ram 3500":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009],e:{"1994-1998":["5.9L 12V Cummins"],"1998-2002":["5.9L 24V Cummins ISB"],"2003-2007":["5.9L Cummins ISB 325"],"2007-2009":["6.7L Cummins ISB"]}}},Ram:{"2500":{y:[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2010-2012":["6.7L Cummins ISB"],"2013-2018":["6.7L Cummins ISB 385"],"2019-2026":["6.7L Cummins HO 420"]}},"3500":{y:[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2010-2012":["6.7L Cummins ISB"],"2013-2018":["6.7L Cummins ISB 385"],"2019-2026":["6.7L Cummins HO 420"]}}},Ford:{"F-250":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1994-1997":["7.3L IDI Turbo Diesel"],"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-350":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1994-1997":["7.3L IDI Turbo Diesel"],"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-450":{y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-550":{y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"Excursion":{y:[2000,2001,2002,2003,2004,2005],e:{"2000-2003":["7.3L Power Stroke"],"2003-2005":["6.0L Power Stroke"]}}},Chevrolet:{"Silverado 2500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}},"Silverado 3500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}}},GMC:{"Sierra 2500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}},"Sierra 3500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}}}};
+var V={year:null,make:null,model:null,engine:null};
+var ym='r',isSignUp=false;
+function showErr(m){var e=document.getElementById('authErr');e.textContent=m;e.style.display='block'}
 function hideErr(){document.getElementById('authErr').style.display='none'}
 function toggleAuthMode(e){e.preventDefault();isSignUp=!isSignUp;hideErr();document.getElementById('authBtn').textContent=isSignUp?'Create Account':'Sign In';document.getElementById('confirmWrap').style.display=isSignUp?'block':'none';document.getElementById('authToggle').innerHTML=isSignUp?'Already have an account? <a href="#" onclick="toggleAuthMode(event)">Sign In</a>':'No account? <a href="#" onclick="toggleAuthMode(event)">Sign Up</a>'}
-
-async function handleAuth(){
-  hideErr();const email=document.getElementById('authEmail').value.trim(),pass=document.getElementById('authPass').value;
-  if(!email||!pass)return showErr('Please enter email and password');
-  if(isSignUp){if(pass!==document.getElementById('authConfirm').value)return showErr('Passwords do not match');if(pass.length<6)return showErr('Password must be at least 6 characters')}
-  const btn=document.getElementById('authBtn');btn.textContent=isSignUp?'Creating account…':'Signing in…';btn.style.opacity='.6';btn.style.pointerEvents='none';
-  try{
-    const res=isSignUp?await sb.auth.signUp({email,password:pass}):await sb.auth.signInWithPassword({email,password:pass});
-    if(res.error)throw res.error;
-    if(isSignUp&&!res.data.session){btn.textContent='Create Account';btn.style.opacity='1';btn.style.pointerEvents='auto';showErr('Check your email to confirm, then sign in.');isSignUp=false;document.getElementById('authBtn').textContent='Sign In';document.getElementById('confirmWrap').style.display='none';return}
-    onAuth(res.data.session.user);
-  }catch(err){showErr(err.message||'Authentication failed');btn.textContent=isSignUp?'Create Account':'Sign In';btn.style.opacity='1';btn.style.pointerEvents='auto'}
-}
-
-async function oAuth(p){hideErr();const{error}=await sb.auth.signInWithOAuth({provider:p,options:{redirectTo:location.origin+'/app/'}});if(error)showErr(error.message)}
-
-function onAuth(user){
-  const email=user.email||'',name=email.split('@')[0].split('.').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' '),initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  document.querySelector('.p-av').textContent=initials;document.querySelector('.p-name').textContent=name;document.getElementById('pEmail').textContent=email;
-  const saved=localStorage.getItem('bsd_vehicle');
-  if(saved){try{const sv=JSON.parse(saved);V.year=sv.year;V.make=sv.make;V.model=sv.model;V.engine=sv.engine;applyVehicle();go('mkt');showNav()}catch(e){go('veh')}}
-  else{go('veh')}
-}
-function applyVehicle(){document.getElementById('vsText').textContent=`Parts for: ${V.year} ${V.make} ${V.model}`;document.getElementById('aiBadge').textContent=`${String(V.year).slice(-2)}' ${V.make.charAt(0)}. ${V.model}`;document.getElementById('pTrk').textContent=`${V.year} ${V.make} ${V.model}`;document.getElementById('pEng').textContent=V.engine}
-
+async function handleAuth(){hideErr();var email=document.getElementById('authEmail').value.trim(),pass=document.getElementById('authPass').value;if(!email||!pass)return showErr('Please enter email and password');if(isSignUp){if(pass!==document.getElementById('authConfirm').value)return showErr('Passwords do not match');if(pass.length<6)return showErr('Password must be at least 6 characters')}var btn=document.getElementById('authBtn');btn.textContent=isSignUp?'Creating account...':'Signing in...';btn.style.opacity='.6';btn.style.pointerEvents='none';try{var res=isSignUp?await sb.auth.signUp({email:email,password:pass}):await sb.auth.signInWithPassword({email:email,password:pass});if(res.error)throw res.error;if(isSignUp&&!res.data.session){btn.textContent='Create Account';btn.style.opacity='1';btn.style.pointerEvents='auto';showErr('Check your email to confirm, then sign in.');isSignUp=false;document.getElementById('authBtn').textContent='Sign In';document.getElementById('confirmWrap').style.display='none';return}onAuth(res.data.session.user)}catch(err){showErr(err.message||'Authentication failed');btn.textContent=isSignUp?'Create Account':'Sign In';btn.style.opacity='1';btn.style.pointerEvents='auto'}}
+async function oAuth(p){hideErr();var r=await sb.auth.signInWithOAuth({provider:p,options:{redirectTo:location.origin+'/app/'}});if(r.error)showErr(r.error.message)}
+function onAuth(user){var email=user.email||'',name=email.split('@')[0].split('.').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1)}).join(' '),initials=name.split(' ').map(function(w){return w[0]}).join('').slice(0,2).toUpperCase();document.getElementById('pAv').textContent=initials;document.getElementById('pName').textContent=name;document.getElementById('pEmail').textContent=email;var saved=localStorage.getItem('bsd_vehicle');if(saved){try{var sv=JSON.parse(saved);V.year=sv.year;V.make=sv.make;V.model=sv.model;V.engine=sv.engine;applyVehicle();go('mkt');showNav()}catch(e){go('veh')}}else{go('veh')}}
+function applyVehicle(){document.getElementById('vsText').textContent='Parts for: '+V.year+' '+V.make+' '+V.model;document.getElementById('aiBadge').textContent=String(V.year).slice(-2)+"' "+V.make.charAt(0)+'. '+V.model;document.getElementById('pTrk').textContent=V.year+' '+V.make+' '+V.model;document.getElementById('pEng').textContent=V.engine}
 async function handleSignOut(){await sb.auth.signOut();localStorage.removeItem('bsd_vehicle');V.year=V.make=V.model=V.engine=null;document.getElementById('authEmail').value='';document.getElementById('authPass').value='';hideErr();hideNav();go('login')}
-async function checkSession(){try{const{data:{session}}=await sb.auth.getSession();if(session&&session.user)onAuth(session.user)}catch(e){}}
-
-// === Nav ===
-function go(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.getElementById('s-'+id).classList.add('on')}
-function nav(el){document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));el.classList.add('on');go(el.dataset.s)}
+async function checkSession(){try{var r=await sb.auth.getSession();if(r.data.session&&r.data.session.user)onAuth(r.data.session.user)}catch(e){}}
+function go(id){document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on')});document.getElementById('s-'+id).classList.add('on')}
+function nav(el){document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on')});el.classList.add('on');go(el.dataset.s)}
 function showNav(){document.getElementById('bnav').classList.remove('hid')}
 function hideNav(){document.getElementById('bnav').classList.add('hid')}
 function toggleCart(){document.getElementById('cD').classList.toggle('op')}
-
-// === Vehicle ===
-function uProg(s){for(let i=1;i<=4;i++){const e=document.getElementById('p'+i);e.className='pb';if(i<s)e.classList.add('done');else if(i===s)e.classList.add('cur')}}
+function uProg(s){for(var i=1;i<=4;i++){var e=document.getElementById('p'+i);e.className='pb';if(i<s)e.classList.add('done');else if(i===s)e.classList.add('cur')}}
 function sG(id){document.getElementById('vg-'+id).classList.remove('hid')}
 function hG(id){document.getElementById('vg-'+id).classList.add('hid')}
 function hPrev(){document.getElementById('vprev').classList.add('hid');document.getElementById('vBtn').classList.add('hid')}
-function sPrev(){document.getElementById('vpN').textContent=`${V.year} ${V.make} ${V.model}`;document.getElementById('vpE').textContent=V.engine;document.getElementById('vpT').innerHTML=`<div class="tag gs">🏋️ Diesel</div><div class="tag gs">${V.engine.split(' ')[0]}</div>`;document.getElementById('vprev').classList.remove('hid');document.getElementById('vBtn').classList.remove('hid')}
-function mkPill(txt,fn){const d=document.createElement('div');d.className='pill';d.textContent=txt;d.onclick=()=>{d.parentElement.querySelectorAll('.pill').forEach(x=>x.classList.remove('sel'));d.classList.add('sel');fn(txt)};return d}
-function initYrs(){ym='r';const e=document.getElementById('yearP');e.innerHTML='';['2025-2026','2020-2024','2015-2019','2010-2014','2005-2009','2000-2004','1994-1999'].forEach(r=>{e.appendChild(mkPill(r,()=>expYrs(r)))})}
-function expYrs(rng){ym='i';const[s,e]=rng.split('-').map(Number);const yrs=new Set();Object.values(DB).forEach(mk=>Object.values(mk).forEach(m=>m.y.filter(y=>y>=s&&y<=e).forEach(y=>yrs.add(y))));const el=document.getElementById('yearP');el.innerHTML='';const bk=document.createElement('div');bk.className='pill';bk.textContent='\u2190 All Years';bk.style.color='var(--gold)';bk.onclick=()=>{V.year=V.make=V.model=V.engine=null;hG('make');hG('model');hG('engine');hPrev();uProg(1);initYrs()};el.appendChild(bk);[...yrs].sort((a,b)=>b-a).forEach(y=>{el.appendChild(mkPill(String(y),t=>{V.year=parseInt(t);V.make=V.model=V.engine=null;hG('model');hG('engine');hPrev();uProg(2);ldMakes();sG('make')}))})}
-function ldMakes(){const el=document.getElementById('makeP');el.innerHTML='';const ms=new Set();Object.entries(DB).forEach(([mk,mds])=>{Object.values(mds).forEach(m=>{if(m.y.includes(V.year))ms.add(mk)})});[...ms].sort().forEach(mk=>{el.appendChild(mkPill(mk,t=>{V.make=t;V.model=V.engine=null;hG('engine');hPrev();uProg(3);ldModels();sG('model')}))})}
-function ldModels(){const el=document.getElementById('modelP');el.innerHTML='';Object.keys(DB[V.make]).filter(m=>DB[V.make][m].y.includes(V.year)).forEach(m=>{el.appendChild(mkPill(m,t=>{V.model=t;V.engine=null;hPrev();uProg(4);ldEngs();sG('engine')}))})}
-function ldEngs(){const el=document.getElementById('engineP');el.innerHTML='';const md=DB[V.make][V.model];let engs=[];Object.entries(md.e).forEach(([r,es])=>{const[s,e]=r.split('-').map(Number);if(V.year>=s&&V.year<=e)engs=engs.concat(es)});[...new Set(engs)].forEach(eng=>{el.appendChild(mkPill(eng,t=>{V.engine=t;sPrev()}))})}
-function vehBack(){if(V.engine){V.engine=null;document.querySelectorAll('#engineP .pill').forEach(o=>o.classList.remove('sel'));hPrev();uProg(4);return}if(V.model){V.model=V.engine=null;hG('engine');hPrev();document.querySelectorAll('#modelP .pill').forEach(o=>o.classList.remove('sel'));uProg(3);return}if(V.make){V.make=V.model=V.engine=null;hG('model');hG('engine');hPrev();document.querySelectorAll('#makeP .pill').forEach(o=>o.classList.remove('sel'));uProg(2);return}if(V.year){V.year=V.make=V.model=V.engine=null;hG('make');hG('model');hG('engine');hPrev();uProg(1);if(ym==='i')initYrs();else document.querySelectorAll('#yearP .pill').forEach(o=>o.classList.remove('sel'));return}handleSignOut()}
+function sPrev(){document.getElementById('vpN').textContent=V.year+' '+V.make+' '+V.model;document.getElementById('vpE').textContent=V.engine;document.getElementById('vpT').innerHTML='<div class="tag gs">Diesel</div><div class="tag gs">'+V.engine.split(' ')[0]+'</div>';document.getElementById('vprev').classList.remove('hid');document.getElementById('vBtn').classList.remove('hid')}
+function mkPill(txt,fn){var d=document.createElement('div');d.className='pill';d.textContent=txt;d.onclick=function(){d.parentElement.querySelectorAll('.pill').forEach(function(x){x.classList.remove('sel')});d.classList.add('sel');fn(txt)};return d}
+function initYrs(){ym='r';var e=document.getElementById('yearP');e.innerHTML='';['2025-2026','2020-2024','2015-2019','2010-2014','2005-2009','2000-2004','1994-1999'].forEach(function(r){e.appendChild(mkPill(r,function(){expYrs(r)}))})}
+function expYrs(rng){ym='i';var p=rng.split('-').map(Number),s=p[0],e=p[1];var yrs=new Set();Object.values(DB).forEach(function(mk){Object.values(mk).forEach(function(m){m.y.filter(function(y){return y>=s&&y<=e}).forEach(function(y){yrs.add(y)})})});var el=document.getElementById('yearP');el.innerHTML='';var bk=document.createElement('div');bk.className='pill';bk.textContent='\u2190 All Years';bk.style.color='var(--gold)';bk.onclick=function(){V.year=V.make=V.model=V.engine=null;hG('make');hG('model');hG('engine');hPrev();uProg(1);initYrs()};el.appendChild(bk);Array.from(yrs).sort(function(a,b){return b-a}).forEach(function(y){el.appendChild(mkPill(String(y),function(t){V.year=parseInt(t);V.make=V.model=V.engine=null;hG('model');hG('engine');hPrev();uProg(2);ldMakes();sG('make')}))})}
+function ldMakes(){var el=document.getElementById('makeP');el.innerHTML='';var ms=new Set();Object.entries(DB).forEach(function(e){var mk=e[0],mds=e[1];Object.values(mds).forEach(function(m){if(m.y.includes(V.year))ms.add(mk)})});Array.from(ms).sort().forEach(function(mk){el.appendChild(mkPill(mk,function(t){V.make=t;V.model=V.engine=null;hG('engine');hPrev();uProg(3);ldModels();sG('model')}))})}
+function ldModels(){var el=document.getElementById('modelP');el.innerHTML='';Object.keys(DB[V.make]).filter(function(m){return DB[V.make][m].y.includes(V.year)}).forEach(function(m){el.appendChild(mkPill(m,function(t){V.model=t;V.engine=null;hPrev();uProg(4);ldEngs();sG('engine')}))})}
+function ldEngs(){var el=document.getElementById('engineP');el.innerHTML='';var md=DB[V.make][V.model];var engs=[];Object.entries(md.e).forEach(function(e){var p=e[0].split('-').map(Number);if(V.year>=p[0]&&V.year<=p[1])engs=engs.concat(e[1])});Array.from(new Set(engs)).forEach(function(eng){el.appendChild(mkPill(eng,function(t){V.engine=t;sPrev()}))})}
+function vehBack(){if(V.engine){V.engine=null;document.querySelectorAll('#engineP .pill').forEach(function(o){o.classList.remove('sel')});hPrev();uProg(4);return}if(V.model){V.model=V.engine=null;hG('engine');hPrev();document.querySelectorAll('#modelP .pill').forEach(function(o){o.classList.remove('sel')});uProg(3);return}if(V.make){V.make=V.model=V.engine=null;hG('model');hG('engine');hPrev();document.querySelectorAll('#makeP .pill').forEach(function(o){o.classList.remove('sel')});uProg(2);return}if(V.year){V.year=V.make=V.model=V.engine=null;hG('make');hG('model');hG('engine');hPrev();uProg(1);if(ym==='i')initYrs();else document.querySelectorAll('#yearP .pill').forEach(function(o){o.classList.remove('sel')});return}handleSignOut()}
 function confirmV(){localStorage.setItem('bsd_vehicle',JSON.stringify({year:V.year,make:V.make,model:V.model,engine:V.engine}));applyVehicle();go('mkt');showNav()}
 function resetVeh(){V.year=V.make=V.model=V.engine=null;localStorage.removeItem('bsd_vehicle');uProg(1);initYrs();hG('make');hG('model');hG('engine');hPrev();go('veh');hideNav()}
-
-// === Profile Sub-screens ===
 function openSub(id){document.getElementById('sub-'+id).classList.add('open')}
 function closeSub(id){document.getElementById('sub-'+id).classList.remove('open')}
-
-// === Init ===
 uProg(1);initYrs();checkSession();
-document.getElementById('authPass').addEventListener('keydown',e=>{if(e.key==='Enter')handleAuth()});
-document.querySelectorAll('.ct').forEach(c=>c.onclick=()=>{document.querySelectorAll('.ct').forEach(x=>x.classList.remove('on'));c.classList.add('on')});
-document.querySelectorAll('.stg').forEach(b=>b.onclick=()=>b.classList.toggle('on'));
-if('serviceWorker' in navigator){navigator.serviceWorker.register('/app/sw.js').catch(()=>{})}
-</script><script>
-const DB={Dodge:{"Ram 2500":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009],e:{"1994-1998":["5.9L 12V Cummins"],"1998-2002":["5.9L 24V Cummins ISB"],"2003-2007":["5.9L Cummins ISB 325"],"2007-2009":["6.7L Cummins ISB"]}},"Ram 3500":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009],e:{"1994-1998":["5.9L 12V Cummins"],"1998-2002":["5.9L 24V Cummins ISB"],"2003-2007":["5.9L Cummins ISB 325"],"2007-2009":["6.7L Cummins ISB"]}}},Ram:{"2500":{y:[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2010-2012":["6.7L Cummins ISB"],"2013-2018":["6.7L Cummins ISB 385"],"2019-2026":["6.7L Cummins HO 420"]}},"3500":{y:[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2010-2012":["6.7L Cummins ISB"],"2013-2018":["6.7L Cummins ISB 385"],"2019-2026":["6.7L Cummins HO 420"]}}},Ford:{"F-250":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1994-1997":["7.3L IDI Turbo Diesel"],"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-350":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1994-1997":["7.3L IDI Turbo Diesel"],"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-450":{y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-550":{y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"Excursion":{y:[2000,2001,2002,2003,2004,2005],e:{"2000-2003":["7.3L Power Stroke"],"2003-2005":["6.0L Power Stroke"]}}},Chevrolet:{"Silverado 2500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}},"Silverado 3500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}}},GMC:{"Sierra 2500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}},"Sierra 3500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}}}};
-
-const V={year:null,make:null,model:null,engine:null};
-let ym='r';
-
-function go(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.getElementById('s-'+id).classList.add('on')}
-function nav(el){document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));el.classList.add('on');go(el.dataset.s)}
-function showNav(){document.getElementById('bnav').classList.remove('hid')}
-function hideNav(){document.getElementById('bnav').classList.add('hid')}
-function toggleCart(){document.getElementById('cD').classList.toggle('op')}
-
-function uProg(s){for(let i=1;i<=4;i++){const e=document.getElementById('p'+i);e.className='pb';if(i<s)e.classList.add('done');else if(i===s)e.classList.add('cur')}}
-function sG(id){document.getElementById('vg-'+id).classList.remove('hid')}
-function hG(id){document.getElementById('vg-'+id).classList.add('hid')}
-function hPrev(){document.getElementById('vprev').classList.add('hid');document.getElementById('vBtn').classList.add('hid')}
-function sPrev(){document.getElementById('vpN').textContent=`${V.year} ${V.make} ${V.model}`;document.getElementById('vpE').textContent=V.engine;document.getElementById('vpT').innerHTML=`<div class="tag gs">🏋️ Diesel</div><div class="tag gs">${V.engine.split(' ')[0]}</div>`;document.getElementById('vprev').classList.remove('hid');document.getElementById('vBtn').classList.remove('hid')}
-
-function mkPill(txt,fn){const d=document.createElement('div');d.className='pill';d.textContent=txt;d.onclick=()=>{d.parentElement.querySelectorAll('.pill').forEach(x=>x.classList.remove('sel'));d.classList.add('sel');fn(txt)};return d}
-
-function initYrs(){ym='r';const e=document.getElementById('yearP');e.innerHTML='';['2025-2026','2020-2024','2015-2019','2010-2014','2005-2009','2000-2004','1994-1999'].forEach(r=>{e.appendChild(mkPill(r,()=>expYrs(r)))})}
-
-function expYrs(rng){ym='i';const[s,e]=rng.split('-').map(Number);const yrs=new Set();Object.values(DB).forEach(mk=>Object.values(mk).forEach(m=>m.y.filter(y=>y>=s&&y<=e).forEach(y=>yrs.add(y))));const el=document.getElementById('yearP');el.innerHTML='';const bk=document.createElement('div');bk.className='pill';bk.textContent='← All Years';bk.style.color='var(--gold)';bk.style.fontSize='11px';bk.onclick=()=>{V.year=V.make=V.model=V.engine=null;hG('make');hG('model');hG('engine');hPrev();uProg(1);initYrs()};el.appendChild(bk);[...yrs].sort((a,b)=>b-a).forEach(y=>{el.appendChild(mkPill(String(y),t=>{V.year=parseInt(t);V.make=V.model=V.engine=null;hG('model');hG('engine');hPrev();uProg(2);ldMakes();sG('make')}))})}
-
-function ldMakes(){const el=document.getElementById('makeP');el.innerHTML='';const ms=new Set();Object.entries(DB).forEach(([mk,mds])=>{Object.values(mds).forEach(m=>{if(m.y.includes(V.year))ms.add(mk)})});[...ms].sort().forEach(mk=>{el.appendChild(mkPill(mk,t=>{V.make=t;V.model=V.engine=null;hG('engine');hPrev();uProg(3);ldModels();sG('model')}))})}
-
-function ldModels(){const el=document.getElementById('modelP');el.innerHTML='';Object.keys(DB[V.make]).filter(m=>DB[V.make][m].y.includes(V.year)).forEach(m=>{el.appendChild(mkPill(m,t=>{V.model=t;V.engine=null;hPrev();uProg(4);ldEngs();sG('engine')}))})}
-
-function ldEngs(){const el=document.getElementById('engineP');el.innerHTML='';const md=DB[V.make][V.model];let engs=[];Object.entries(md.e).forEach(([r,es])=>{const[s,e]=r.split('-').map(Number);if(V.year>=s&&V.year<=e)engs=engs.concat(es)});[...new Set(engs)].forEach(eng=>{el.appendChild(mkPill(eng,t=>{V.engine=t;sPrev()}))})}
-
-function vehBack(){if(V.engine){V.engine=null;document.querySelectorAll('#engineP .pill').forEach(o=>o.classList.remove('sel'));hPrev();uProg(4);return}if(V.model){V.model=V.engine=null;hG('engine');hPrev();document.querySelectorAll('#modelP .pill').forEach(o=>o.classList.remove('sel'));uProg(3);return}if(V.make){V.make=V.model=V.engine=null;hG('model');hG('engine');hPrev();document.querySelectorAll('#makeP .pill').forEach(o=>o.classList.remove('sel'));uProg(2);return}if(V.year){V.year=V.make=V.model=V.engine=null;hG('make');hG('model');hG('engine');hPrev();uProg(1);if(ym==='i')initYrs();else document.querySelectorAll('#yearP .pill').forEach(o=>o.classList.remove('sel'));return}go('login')}
-
-function confirmV(){document.getElementById('vsText').textContent=`Parts for: ${V.year} ${V.make} ${V.model}`;document.getElementById('aiBadge').textContent=`${String(V.year).slice(-2)}' ${V.make.charAt(0)}. ${V.model}`;document.getElementById('pTrk').textContent=`${V.year} ${V.make} ${V.model}`;document.getElementById('pEng').textContent=V.engine;go('mkt');showNav()}
-function resetVeh(){V.year=V.make=V.model=V.engine=null;uProg(1);initYrs();hG('make');hG('model');hG('engine');hPrev();go('veh');hideNav()}
-
-uProg(1);initYrs();
-document.querySelectorAll('.ct').forEach(c=>c.onclick=()=>{document.querySelectorAll('.ct').forEach(x=>x.classList.remove('on'));c.classList.add('on')});
-document.querySelectorAll('.stg').forEach(b=>b.onclick=()=>b.classList.toggle('on'));
-if('serviceWorker' in navigator){navigator.serviceWorker.register('/app/sw.js').catch(()=>{})}
+document.getElementById('authPass').addEventListener('keydown',function(e){if(e.key==='Enter')handleAuth()});
+document.querySelectorAll('.ct').forEach(function(c){c.onclick=function(){document.querySelectorAll('.ct').forEach(function(x){x.classList.remove('on')});c.classList.add('on')}});
+document.querySelectorAll('.stg').forEach(function(b){b.onclick=function(){b.classList.toggle('on')}});
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/app/sw.js').catch(function(){})}
 </script>
 </body>
 </html>
