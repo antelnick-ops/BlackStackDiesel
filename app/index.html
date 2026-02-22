@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="BlackStack">
 <link rel="manifest" href="/app/manifest.json">
 <link rel="apple-touch-icon" href="/app/icon-192.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <title>BlackStack Diesel</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -232,19 +233,21 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 <div class="sw">
 
 <!-- LOGIN -->
-<div class="scr" id="s-login">
+<div class="scr on" id="s-login">
 <div class="l-logo">⚡</div>
 <div class="l-mark">Black<em>Stack</em></div>
 <div class="l-sub">Diesel parts & diagnostics</div>
-<div class="fg"><div class="fl">Email</div><input class="fi" placeholder="you@email.com"></div>
-<div class="fg"><div class="fl">Password</div><input class="fi" type="password" placeholder="••••••••"></div>
-<button class="btn-g" onclick="go('veh')">Sign In</button>
+<div id="authErr" style="display:none;width:100%;padding:10px 14px;border-radius:10px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.15);color:var(--red);font-size:12px;font-weight:500;margin-bottom:12px;text-align:center"></div>
+<div class="fg"><div class="fl">Email</div><input class="fi" id="authEmail" type="email" placeholder="you@email.com" autocomplete="email"></div>
+<div class="fg"><div class="fl">Password</div><input class="fi" id="authPass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+<div id="confirmWrap" class="fg" style="display:none"><div class="fl">Confirm Password</div><input class="fi" id="authConfirm" type="password" placeholder="••••••••"></div>
+<button class="btn-g" id="authBtn" onclick="handleAuth()">Sign In</button>
 <div class="sep"><span>or</span></div>
 <div class="soc">
-<div class="soc-b gs"><svg viewBox="0 0 24 24" fill="#4285F4"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Google</div>
-<div class="soc-b gs"><svg viewBox="0 0 24 24" fill="#fff"><path d="M16.37 1.43c0 1.14-.5 2.27-1.18 3.08-.74.9-1.99 1.57-2.99 1.57-.18 0-.36-.02-.53-.06.02-.15.03-.32.03-.48 0-1.08.47-2.24 1.18-3.05C13.61 1.73 14.97 1 16.37 1l.03.43zm3.13 17.81c-.68 1.34-1.47 2.58-2.67 2.58-.93 0-1.24-.6-2.37-.6-1.15 0-1.5.58-2.38.6-1.14.03-2-1.32-2.69-2.66-1.44-2.72-1.6-5.93-.7-7.63.63-1.2 1.77-1.95 2.98-1.95 1.11 0 1.81.6 2.73.6.89 0 1.43-.6 2.72-.6 1.06 0 2.06.58 2.68 1.58-2.36 1.3-1.97 4.68.38 5.58-.46 1.17-.68 1.69-1.37 2.72l-.31.38z"/></svg>Apple</div>
+<div class="soc-b gs" onclick="oAuth('google')"><svg viewBox="0 0 24 24" fill="#4285F4"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Google</div>
+<div class="soc-b gs" onclick="oAuth('apple')"><svg viewBox="0 0 24 24" fill="#fff"><path d="M16.37 1.43c0 1.14-.5 2.27-1.18 3.08-.74.9-1.99 1.57-2.99 1.57-.18 0-.36-.02-.53-.06.02-.15.03-.32.03-.48 0-1.08.47-2.24 1.18-3.05C13.61 1.73 14.97 1 16.37 1l.03.43zm3.13 17.81c-.68 1.34-1.47 2.58-2.67 2.58-.93 0-1.24-.6-2.37-.6-1.15 0-1.5.58-2.38.6-1.14.03-2-1.32-2.69-2.66-1.44-2.72-1.6-5.93-.7-7.63.63-1.2 1.77-1.95 2.98-1.95 1.11 0 1.81.6 2.73.6.89 0 1.43-.6 2.72-.6 1.06 0 2.06.58 2.68 1.58-2.36 1.3-1.97 4.68.38 5.58-.46 1.17-.68 1.69-1.37 2.72l-.31.38z"/></svg>Apple</div>
 </div>
-<div class="l-ft">No account? <a href="#">Sign Up</a></div>
+<div class="l-ft" id="authToggle">No account? <a href="#" onclick="toggleAuthMode(event)">Sign Up</a></div>
 </div>
 
 <!-- VEHICLE -->
@@ -275,7 +278,7 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 </div>
 
 <!-- MARKETPLACE -->
-<div class="scr on" id="s-mkt">
+<div class="scr" id="s-mkt">
 <div class="mk-top"><h2>Marketplace</h2><div class="cbtn gs" onclick="toggleCart()"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg><div class="cbdg">2</div></div></div>
 <div class="vstrip g"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span id="vsText">Parts for: 2006 Ford F-250</span></div>
 <div class="cats"><div class="ct on">All</div><div class="ct">Injectors</div><div class="ct">Turbo</div><div class="ct">Head Studs</div><div class="ct">EGR</div><div class="ct">Fuel System</div><div class="ct">Engine</div></div>
@@ -298,7 +301,7 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 
 <!-- PROFILE -->
 <div class="scr" id="s-pro">
-<div class="p-head"><div class="p-av">NA</div><div class="p-name">Nicholas Antel</div><div class="p-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e08e8983888f8c8193ce818e94858ca08f95948c8f8f8bce838f8d">[email&#160;protected]</a></div></div>
+<div class="p-head"><div class="p-av">NA</div><div class="p-name">Nicholas Antel</div><div class="p-email"><span id="pEmail">nicholas.antel@outlook.com</span></div></div>
 <div class="p-truck g"><div class="p-trk-i">🚛</div><div class="p-trk-t"><h4 id="pTrk">2006 Ford F-250</h4><p id="pEng">6.0L Power Stroke</p></div><button class="p-edit gs" onclick="resetVeh()">Edit</button></div>
 <div class="p-grid">
 <div class="p-st g"><div class="p-stv mono">7</div><div class="p-stl">Orders</div></div>
@@ -312,7 +315,7 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 <div class="p-row"><div class="p-ri"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div><span>Notifications</span><span class="ch">›</span></div>
 <div class="p-row"><div class="p-ri"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><span>Help & Support</span><span class="ch">›</span></div>
 </div>
-<button class="so-btn" onclick="go('login');hideNav()">Sign Out</button>
+<button class="so-btn" onclick="handleSignOut()">Sign Out</button>
 </div>
 
 <!-- CART -->
@@ -328,18 +331,109 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
+// === Supabase Init ===
+const sb=supabase.createClient('https://jfjbilfsiebifzddveof.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamJpbGZzaWViaWZ6ZGR2ZW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2OTg4ODUsImV4cCI6MjA4NzI3NDg4NX0.bbTQ0l4HsHoKUzoKACBvbXJ0TbnUM5tltK4YLKyuMr8');
+
+// === Vehicle DB ===
 const DB={Dodge:{"Ram 2500":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009],e:{"1994-1998":["5.9L 12V Cummins"],"1998-2002":["5.9L 24V Cummins ISB"],"2003-2007":["5.9L Cummins ISB 325"],"2007-2009":["6.7L Cummins ISB"]}},"Ram 3500":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009],e:{"1994-1998":["5.9L 12V Cummins"],"1998-2002":["5.9L 24V Cummins ISB"],"2003-2007":["5.9L Cummins ISB 325"],"2007-2009":["6.7L Cummins ISB"]}}},Ram:{"2500":{y:[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2010-2012":["6.7L Cummins ISB"],"2013-2018":["6.7L Cummins ISB 385"],"2019-2026":["6.7L Cummins HO 420"]}},"3500":{y:[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2010-2012":["6.7L Cummins ISB"],"2013-2018":["6.7L Cummins ISB 385"],"2019-2026":["6.7L Cummins HO 420"]}}},Ford:{"F-250":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1994-1997":["7.3L IDI Turbo Diesel"],"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-350":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1994-1997":["7.3L IDI Turbo Diesel"],"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-450":{y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-550":{y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"Excursion":{y:[2000,2001,2002,2003,2004,2005],e:{"2000-2003":["7.3L Power Stroke"],"2003-2005":["6.0L Power Stroke"]}}},Chevrolet:{"Silverado 2500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}},"Silverado 3500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}}},GMC:{"Sierra 2500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}},"Sierra 3500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}}}};
 
+// === State ===
 const V={year:null,make:null,model:null,engine:null};
 let ym='r';
+let isSignUp=false;
 
+// === Auth ===
+function showErr(msg){const e=document.getElementById('authErr');e.textContent=msg;e.style.display='block'}
+function hideErr(){document.getElementById('authErr').style.display='none'}
+
+function toggleAuthMode(e){
+  e.preventDefault();
+  isSignUp=!isSignUp;
+  hideErr();
+  document.getElementById('authBtn').textContent=isSignUp?'Create Account':'Sign In';
+  document.getElementById('confirmWrap').style.display=isSignUp?'block':'none';
+  document.getElementById('authToggle').innerHTML=isSignUp
+    ?'Already have an account? <a href="#" onclick="toggleAuthMode(event)">Sign In</a>'
+    :'No account? <a href="#" onclick="toggleAuthMode(event)">Sign Up</a>';
+}
+
+async function handleAuth(){
+  hideErr();
+  const email=document.getElementById('authEmail').value.trim();
+  const pass=document.getElementById('authPass').value;
+  if(!email||!pass)return showErr('Please enter email and password');
+  if(isSignUp){
+    const confirm=document.getElementById('authConfirm').value;
+    if(pass!==confirm)return showErr('Passwords do not match');
+    if(pass.length<6)return showErr('Password must be at least 6 characters');
+  }
+  const btn=document.getElementById('authBtn');
+  btn.textContent=isSignUp?'Creating account…':'Signing in…';
+  btn.style.opacity='.6';btn.style.pointerEvents='none';
+  try{
+    let res;
+    if(isSignUp){
+      res=await sb.auth.signUp({email,password:pass});
+    }else{
+      res=await sb.auth.signInWithPassword({email,password:pass});
+    }
+    if(res.error)throw res.error;
+    if(isSignUp&&!res.data.session){
+      btn.textContent='Create Account';btn.style.opacity='1';btn.style.pointerEvents='auto';
+      showErr('Check your email to confirm your account, then sign in.');
+      isSignUp=false;
+      document.getElementById('authBtn').textContent='Sign In';
+      document.getElementById('confirmWrap').style.display='none';
+      document.getElementById('authToggle').innerHTML='No account? <a href="#" onclick="toggleAuthMode(event)">Sign Up</a>';
+      return;
+    }
+    onAuth(res.data.session.user);
+  }catch(err){
+    showErr(err.message||'Authentication failed');
+    btn.textContent=isSignUp?'Create Account':'Sign In';
+    btn.style.opacity='1';btn.style.pointerEvents='auto';
+  }
+}
+
+async function oAuth(provider){
+  hideErr();
+  const{error}=await sb.auth.signInWithOAuth({provider,options:{redirectTo:window.location.origin+'/app/'}});
+  if(error)showErr(error.message);
+}
+
+function onAuth(user){
+  const email=user.email||'';
+  const name=email.split('@')[0].split('.').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+  const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.querySelector('.p-av').textContent=initials;
+  document.querySelector('.p-name').textContent=name;
+  document.getElementById('pEmail').textContent=email;
+  go('veh');
+}
+
+async function handleSignOut(){
+  await sb.auth.signOut();
+  document.getElementById('authEmail').value='';
+  document.getElementById('authPass').value='';
+  hideErr();hideNav();go('login');
+}
+
+async function checkSession(){
+  try{
+    const{data:{session}}=await sb.auth.getSession();
+    if(session&&session.user){onAuth(session.user)}
+  }catch(e){console.log('No session')}
+}
+
+// === Nav ===
 function go(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.getElementById('s-'+id).classList.add('on')}
 function nav(el){document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));el.classList.add('on');go(el.dataset.s)}
 function showNav(){document.getElementById('bnav').classList.remove('hid')}
 function hideNav(){document.getElementById('bnav').classList.add('hid')}
 function toggleCart(){document.getElementById('cD').classList.toggle('op')}
 
+// === Vehicle Setup ===
 function uProg(s){for(let i=1;i<=4;i++){const e=document.getElementById('p'+i);e.className='pb';if(i<s)e.classList.add('done');else if(i===s)e.classList.add('cur')}}
 function sG(id){document.getElementById('vg-'+id).classList.remove('hid')}
 function hG(id){document.getElementById('vg-'+id).classList.add('hid')}
@@ -358,17 +452,23 @@ function ldModels(){const el=document.getElementById('modelP');el.innerHTML='';O
 
 function ldEngs(){const el=document.getElementById('engineP');el.innerHTML='';const md=DB[V.make][V.model];let engs=[];Object.entries(md.e).forEach(([r,es])=>{const[s,e]=r.split('-').map(Number);if(V.year>=s&&V.year<=e)engs=engs.concat(es)});[...new Set(engs)].forEach(eng=>{el.appendChild(mkPill(eng,t=>{V.engine=t;sPrev()}))})}
 
-function vehBack(){if(V.engine){V.engine=null;document.querySelectorAll('#engineP .pill').forEach(o=>o.classList.remove('sel'));hPrev();uProg(4);return}if(V.model){V.model=V.engine=null;hG('engine');hPrev();document.querySelectorAll('#modelP .pill').forEach(o=>o.classList.remove('sel'));uProg(3);return}if(V.make){V.make=V.model=V.engine=null;hG('model');hG('engine');hPrev();document.querySelectorAll('#makeP .pill').forEach(o=>o.classList.remove('sel'));uProg(2);return}if(V.year){V.year=V.make=V.model=V.engine=null;hG('make');hG('model');hG('engine');hPrev();uProg(1);if(ym==='i')initYrs();else document.querySelectorAll('#yearP .pill').forEach(o=>o.classList.remove('sel'));return}go('login')}
+function vehBack(){if(V.engine){V.engine=null;document.querySelectorAll('#engineP .pill').forEach(o=>o.classList.remove('sel'));hPrev();uProg(4);return}if(V.model){V.model=V.engine=null;hG('engine');hPrev();document.querySelectorAll('#modelP .pill').forEach(o=>o.classList.remove('sel'));uProg(3);return}if(V.make){V.make=V.model=V.engine=null;hG('model');hG('engine');hPrev();document.querySelectorAll('#makeP .pill').forEach(o=>o.classList.remove('sel'));uProg(2);return}if(V.year){V.year=V.make=V.model=V.engine=null;hG('make');hG('model');hG('engine');hPrev();uProg(1);if(ym==='i')initYrs();else document.querySelectorAll('#yearP .pill').forEach(o=>o.classList.remove('sel'));return}handleSignOut()}
 
 function confirmV(){document.getElementById('vsText').textContent=`Parts for: ${V.year} ${V.make} ${V.model}`;document.getElementById('aiBadge').textContent=`${String(V.year).slice(-2)}' ${V.make.charAt(0)}. ${V.model}`;document.getElementById('pTrk').textContent=`${V.year} ${V.make} ${V.model}`;document.getElementById('pEng').textContent=V.engine;go('mkt');showNav()}
 function resetVeh(){V.year=V.make=V.model=V.engine=null;uProg(1);initYrs();hG('make');hG('model');hG('engine');hPrev();go('veh');hideNav()}
 
-uProg(1);initYrs();
+// === Init ===
+uProg(1);initYrs();checkSession();
+
+// Enter key submits login
+document.getElementById('authPass').addEventListener('keydown',e=>{if(e.key==='Enter')handleAuth()});
+
+// Marketplace interactions
 document.querySelectorAll('.ct').forEach(c=>c.onclick=()=>{document.querySelectorAll('.ct').forEach(x=>x.classList.remove('on'));c.classList.add('on')});
 document.querySelectorAll('.stg').forEach(b=>b.onclick=()=>b.classList.toggle('on'));
 
-// Register Service Worker for PWA
-if('serviceWorker' in navigator){navigator.serviceWorker.register('/app/sw.js').then(()=>console.log('SW registered')).catch(e=>console.log('SW failed',e))}
+// PWA Service Worker
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/app/sw.js').catch(()=>{})}
 </script>
 </body>
 </html>
