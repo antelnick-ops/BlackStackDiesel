@@ -4,28 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sell on Black Stack Diesel — Vendor Portal</title>
-<meta name="description" content="List your diesel truck parts on Black Stack Diesel. Commission-only, no upfront fees. Reach diesel truck owners who already know their exact vehicle.">
-<meta property="og:title" content="Sell on Black Stack Diesel — Vendor Portal">
-<meta property="og:description" content="List your diesel parts on the marketplace built for diesel trucks. Commission-only. No inventory risk. No upfront fees.">
+<meta name="description" content="List your diesel truck parts on Black Stack Diesel. Commission-only, no upfront fees.">
 <link rel="icon" type="image/x-icon" href="../favicon.ico">
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Archivo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#08090B;--bg2:#0E1014;--bg3:#151820;--bg4:#1C2029;
-  --ember:#FF6B2C;--ember2:#E85A1E;--ember-glow:rgba(255,107,44,.1);
-  --amber:#F5A623;--smoke:#2A2D35;
-  --t1:#F2EDE6;--t2:#A0A4B0;--t3:#5E6270;
-  --bd:rgba(255,255,255,.06);
-  --green:#34C759;--red:#E84545;
-}
+:root{--bg:#08090B;--bg2:#0E1014;--bg3:#151820;--bg4:#1C2029;--ember:#FF6B2C;--ember2:#E85A1E;--ember-glow:rgba(255,107,44,.1);--amber:#F5A623;--smoke:#2A2D35;--t1:#F2EDE6;--t2:#A0A4B0;--t3:#5E6270;--bd:rgba(255,255,255,.06);--green:#34C759;--red:#E84545;--blue:#4A9EFF}
 html{scroll-behavior:smooth}
 body{font-family:'Archivo',sans-serif;background:var(--bg);color:var(--t1);overflow-x:hidden;-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
 body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.4}
 
-/* NAV */
+/* ============ SHARED ============ */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(to bottom,rgba(8,9,11,.95),transparent);backdrop-filter:blur(10px)}
 .nav-logo{display:flex;align-items:center;gap:12px}
 .nav-brand{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;letter-spacing:3px;text-transform:uppercase}
@@ -33,11 +24,34 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:fl
 .nav-links{display:flex;gap:24px;align-items:center}
 .nav-links a{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--t2);transition:.2s}
 .nav-links a:hover{color:var(--ember)}
-.nav-cta{padding:10px 24px;background:var(--ember);border-radius:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#fff;transition:.2s}
+.nav-cta{padding:10px 24px;background:var(--ember);border-radius:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#fff;transition:.2s;cursor:pointer;border:none}
 .nav-cta:hover{background:var(--ember2);transform:translateY(-1px)}
+.fg{margin-bottom:14px;text-align:left}
+.fg label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:6px}
+.fi{width:100%;height:46px;background:var(--bg);border:2px solid var(--smoke);border-radius:10px;padding:0 14px;font-size:14px;color:var(--t1);font-family:'Archivo',sans-serif;outline:none;transition:.2s}
+.fi:focus{border-color:var(--ember);box-shadow:0 0 0 3px var(--ember-glow)}
+.fi::placeholder{color:var(--t3)}
+textarea.fi{height:100px;padding:12px 14px;resize:vertical}
+select.fi{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%235E6270' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:18px}
+.form-btn{width:100%;height:52px;background:var(--ember);border:none;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#fff;cursor:pointer;transition:.2s;margin-top:8px}
+.form-btn:hover{background:var(--ember2);transform:translateY(-1px);box-shadow:0 6px 24px rgba(255,107,44,.3)}
+.form-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.form-err{color:var(--red);font-size:12px;text-align:center;margin-bottom:8px;display:none}
+.badge{display:inline-block;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.badge-pending{background:rgba(245,166,35,.15);color:var(--amber)}
+.badge-new{background:rgba(74,158,255,.15);color:var(--blue)}
+.badge-shipped{background:rgba(52,199,89,.15);color:var(--green)}
+.badge-active{background:rgba(52,199,89,.15);color:var(--green)}
+footer{padding:48px 40px;border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+.footer-brand{display:flex;align-items:center;gap:10px}
+.footer-brand span{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--t3)}
+.footer-links{display:flex;gap:24px}
+.footer-links a{font-size:13px;color:var(--t3);transition:.2s}
+.footer-links a:hover{color:var(--ember)}
+.footer-legal{font-size:11px;color:var(--t3);width:100%;text-align:center;margin-top:20px}
 
-/* HERO */
-.hero{min-height:80vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:140px 40px 80px}
+/* ============ PITCH PAGE ============ */
+#pitchPage .hero{min-height:80vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:140px 40px 80px}
 .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 40%,rgba(255,107,44,.06),transparent 60%),radial-gradient(ellipse at 70% 60%,rgba(245,166,35,.04),transparent 50%)}
 .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse at center,black 30%,transparent 70%)}
 .hero-content{max-width:800px;text-align:center;position:relative;z-index:2}
@@ -50,21 +64,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:fl
 .btn-main:hover{background:var(--ember2);transform:translateY(-2px);box-shadow:0 8px 32px rgba(255,107,44,.3)}
 .btn-ghost{padding:16px 40px;background:transparent;border:2px solid var(--smoke);border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:var(--t2);cursor:pointer;transition:.2s;display:inline-block}
 .btn-ghost:hover{border-color:var(--t2);color:var(--t1)}
-
-/* STATS */
 .stats-bar{display:flex;justify-content:center;gap:48px;padding:40px;border-top:1px solid var(--bd);border-bottom:1px solid var(--bd);background:var(--bg2)}
 .stat{text-align:center}
 .stat-val{font-family:'Rajdhani',sans-serif;font-size:42px;font-weight:700;color:var(--ember)}
 .stat-lbl{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--t3);margin-top:4px}
-
-/* SECTIONS */
 section{padding:100px 40px}
 .container{max-width:1100px;margin:0 auto}
 .section-label{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:4px;color:var(--ember);margin-bottom:16px}
 .section-title{font-family:'Rajdhani',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:700;text-transform:uppercase;letter-spacing:1px;line-height:1.1;margin-bottom:20px}
 .section-desc{font-size:17px;color:var(--t2);max-width:560px;line-height:1.65;font-weight:300}
-
-/* WHY SELL */
 .why{background:var(--bg2)}
 .why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px}
 .why-card{background:var(--bg3);border:1px solid var(--bd);border-radius:16px;padding:32px 24px;position:relative;overflow:hidden;transition:.3s}
@@ -74,19 +82,15 @@ section{padding:100px 40px}
 .why-icon{width:48px;height:48px;background:var(--ember-glow);border:1px solid rgba(255,107,44,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;font-size:22px}
 .why-card h3{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
 .why-card p{font-size:14px;color:var(--t2);line-height:1.6}
-
-/* HOW IT WORKS */
 .how-steps{display:flex;gap:32px;margin-top:48px;counter-reset:step}
 .step{flex:1;position:relative;padding:32px 24px;background:var(--bg3);border:1px solid var(--bd);border-radius:16px}
 .step::before{counter-increment:step;content:counter(step);font-family:'Rajdhani',sans-serif;font-size:48px;font-weight:700;color:var(--ember);opacity:.3;position:absolute;top:16px;right:20px;line-height:1}
 .step h3{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;margin-top:8px}
 .step p{font-size:14px;color:var(--t2);line-height:1.6}
 .step-icon{font-size:28px}
-
-/* COMMISSION */
 .comm{background:var(--bg2)}
 .comm-box{background:var(--bg3);border:1px solid var(--bd);border-radius:20px;padding:48px;margin-top:40px;display:flex;gap:48px;align-items:center}
-.comm-left{flex:1}
+.comm-left{flex:1;text-align:center}
 .comm-rate{font-family:'Rajdhani',sans-serif;font-size:72px;font-weight:700;color:var(--ember);line-height:1}
 .comm-rate span{font-size:32px;color:var(--t3);font-weight:500}
 .comm-sub{font-size:14px;color:var(--t2);margin-top:8px}
@@ -95,32 +99,13 @@ section{padding:100px 40px}
 .comm-item:last-child{border:none}
 .comm-check{color:var(--green);font-size:18px}
 .comm-item span{font-size:14px;color:var(--t2)}
-
-/* LOGIN SECTION */
-.vendor-login-section{padding:80px 40px;border-bottom:1px solid var(--bd)}
+.login-section{padding:80px 40px;border-bottom:1px solid var(--bd)}
 .login-box{max-width:420px;margin:0 auto;background:var(--bg3);border:1px solid var(--bd);border-radius:20px;padding:40px;text-align:center}
 .login-box h2{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
 .login-box p{font-size:14px;color:var(--t3);margin-bottom:24px}
-.form-group{margin-bottom:14px;text-align:left}
-.form-group label{display:block;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:6px}
-.form-input{width:100%;height:48px;background:var(--bg);border:2px solid var(--smoke);border-radius:10px;padding:0 16px;font-size:15px;color:var(--t1);font-family:'Archivo',sans-serif;outline:none;transition:.2s}
-.form-input:focus{border-color:var(--ember);box-shadow:0 0 0 3px var(--ember-glow)}
-.form-input::placeholder{color:var(--t3)}
-textarea.form-input{height:100px;padding:12px 16px;resize:vertical}
-select.form-input{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%235E6270' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:18px}
-.form-btn{width:100%;height:52px;background:var(--ember);border:none;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#fff;cursor:pointer;transition:.2s;margin-top:8px}
-.form-btn:hover{background:var(--ember2);transform:translateY(-1px);box-shadow:0 6px 24px rgba(255,107,44,.3)}
-.form-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
-.form-err{color:var(--red);font-size:12px;text-align:center;margin-bottom:8px;display:none}
-.form-success{display:none;padding:20px;background:rgba(52,199,89,.1);border:1px solid rgba(52,199,89,.2);border-radius:12px;color:var(--green);font-weight:600;text-align:center}
-.form-divider{display:flex;align-items:center;gap:16px;margin:20px 0;color:var(--t3);font-size:12px;text-transform:uppercase;letter-spacing:2px}
-.form-divider::before,.form-divider::after{content:'';flex:1;height:1px;background:var(--bd)}
 .form-switch{font-size:13px;color:var(--t3);margin-top:16px}
 .form-switch a{color:var(--ember);cursor:pointer;font-weight:600}
-.form-switch a:hover{text-decoration:underline}
-
-/* APPLICATION FORM */
-.apply{position:relative;overflow:hidden}
+.apply-section{position:relative;overflow:hidden}
 .apply-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:800px;height:400px;background:radial-gradient(ellipse,rgba(255,107,44,.06),transparent 70%);pointer-events:none}
 .apply-form{max-width:640px;margin:40px auto 0;background:var(--bg3);border:1px solid var(--bd);border-radius:20px;padding:40px}
 .apply-form h3{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px}
@@ -131,32 +116,75 @@ select.form-input{appearance:none;cursor:pointer;background-image:url("data:imag
 .checkbox-item input[type="checkbox"]{appearance:none;width:18px;height:18px;background:var(--bg);border:2px solid var(--smoke);border-radius:4px;cursor:pointer;transition:.2s;flex-shrink:0}
 .checkbox-item input[type="checkbox"]:checked{background:var(--ember);border-color:var(--ember)}
 .checkbox-item input[type="checkbox"]:checked::after{content:'✓';display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;width:100%;height:100%}
+.form-success{display:none;padding:20px;background:rgba(52,199,89,.1);border:1px solid rgba(52,199,89,.2);border-radius:12px;color:var(--green);font-weight:600;text-align:center}
 
-/* FOOTER */
-footer{padding:48px 40px;border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
-.footer-brand{display:flex;align-items:center;gap:10px}
-.footer-brand span{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--t3)}
-.footer-links{display:flex;gap:24px}
-.footer-links a{font-size:13px;color:var(--t3);transition:.2s}
-.footer-links a:hover{color:var(--ember)}
-.footer-legal{font-size:11px;color:var(--t3);width:100%;text-align:center;margin-top:20px}
+/* ============ VENDOR DASHBOARD ============ */
+#vendorDash{display:none}
+.dash-topbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:16px 32px;border-bottom:1px solid var(--bd);background:rgba(14,16,20,.95);backdrop-filter:blur(10px)}
+.dash-topbar-left{display:flex;align-items:center;gap:12px}
+.dash-topbar-left img{width:32px;height:32px;border-radius:8px}
+.dash-topbar-left span{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:2px}
+.dash-topbar-left em{font-style:normal;color:var(--ember)}
+.dash-topbar-right{display:flex;align-items:center;gap:16px}
+.dash-user{font-size:12px;color:var(--t3)}
+.btn-sm{padding:8px 16px;background:var(--smoke);border:none;border-radius:8px;font-size:12px;font-weight:600;color:var(--t2);cursor:pointer;transition:.2s}
+.btn-sm:hover{background:var(--bg4);color:var(--t1)}
 
-/* TABS */
-.tab-toggle{display:flex;gap:0;max-width:420px;margin:0 auto 32px;background:var(--bg);border:1px solid var(--bd);border-radius:12px;overflow:hidden}
-.tab-btn{flex:1;padding:14px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--t3);background:transparent;border:none;cursor:pointer;transition:.2s}
-.tab-btn.active{background:var(--ember);color:#fff}
-.tab-content{display:none}
-.tab-content.active{display:block}
+.dash-tabs{position:fixed;top:65px;left:0;right:0;z-index:99;display:flex;padding:0 32px;background:var(--bg2);border-bottom:1px solid var(--bd);overflow-x:auto}
+.dash-tab{padding:14px 24px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--t3);cursor:pointer;border-bottom:3px solid transparent;transition:.2s;white-space:nowrap}
+.dash-tab.active{color:var(--ember);border-bottom-color:var(--ember)}
+.dash-tab:hover{color:var(--t1)}
+
+.dash-content{padding:140px 32px 32px}
+.dash-panel{display:none}
+.dash-panel.active{display:block}
+
+.dash-stats{display:flex;gap:16px;margin-bottom:32px;flex-wrap:wrap}
+.dash-stat{flex:1;min-width:140px;background:var(--bg3);border:1px solid var(--bd);border-radius:14px;padding:20px 24px;position:relative;overflow:hidden}
+.dash-stat .dv{font-family:'Rajdhani',sans-serif;font-size:36px;font-weight:700}
+.dash-stat .dl{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--t3);margin-top:2px}
+.dash-stat.ember .dv{color:var(--ember)}.dash-stat.green .dv{color:var(--green)}.dash-stat.blue .dv{color:var(--blue)}.dash-stat.amber .dv{color:var(--amber)}
+.dash-stat::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px}
+.dash-stat.ember::after{background:var(--ember)}.dash-stat.green::after{background:var(--green)}.dash-stat.blue::after{background:var(--blue)}.dash-stat.amber::after{background:var(--amber)}
+
+.card{background:var(--bg3);border:1px solid var(--bd);border-radius:14px;overflow:hidden}
+.card-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--bd)}
+.card-header h3{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:2px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;padding:12px 16px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--t3);border-bottom:1px solid var(--bd);font-weight:600;background:var(--bg2)}
+.tbl td{padding:12px 16px;border-bottom:1px solid var(--bd);color:var(--t2)}
+.tbl tr:hover td{background:rgba(255,255,255,.02)}
+
+.empty-state{text-align:center;padding:60px 20px;color:var(--t3)}
+.empty-state .icon{font-size:48px;margin-bottom:12px;opacity:.5}
+.empty-state h4{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--t2);margin-bottom:8px}
+.empty-state p{font-size:13px;line-height:1.6;max-width:400px;margin:0 auto}
+
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;padding:20px}
+.product-card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:20px;transition:.2s}
+.product-card:hover{border-color:rgba(255,107,44,.15)}
+.product-card h4{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.product-card .price{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:var(--ember)}
+.product-card .meta{font-size:11px;color:var(--t3);margin-top:8px}
+
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.settings-card{background:var(--bg3);border:1px solid var(--bd);border-radius:14px;padding:24px}
+.settings-card h3{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px}
+
+.btn-action{padding:8px 18px;background:var(--ember);border:none;border-radius:8px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#fff;cursor:pointer;transition:.2s}
+.btn-action:hover{background:var(--ember2)}
 
 @media(max-width:900px){
   nav{padding:16px 20px}.nav-links a:not(.nav-cta){display:none}
-  .hero{padding:120px 20px 60px}
   section{padding:60px 20px}
   .why-grid{grid-template-columns:1fr}
   .how-steps{flex-direction:column}
   .comm-box{flex-direction:column;padding:32px 24px}
   .stats-bar{flex-wrap:wrap;gap:24px}
   .form-row{grid-template-columns:1fr}
+  .dash-content{padding:130px 16px 16px}
+  .dash-stats .dash-stat{min-width:calc(50% - 8px)}
+  .settings-grid{grid-template-columns:1fr}
 }
 @media(max-width:600px){
   .hero h1{font-size:36px}
@@ -167,8 +195,12 @@ footer{padding:48px 40px;border-top:1px solid var(--bd);display:flex;justify-con
 </head>
 <body>
 
-<!-- NAV -->
-<nav>
+<!-- ============================================================ -->
+<!-- PITCH PAGE (shown to non-logged-in visitors)                  -->
+<!-- ============================================================ -->
+<div id="pitchPage">
+
+<nav id="pitchNav">
   <div class="nav-logo">
     <a href="/" style="display:flex;align-items:center;gap:12px">
       <img src="../logo.png" alt="BlackStack Diesel" style="width:40px;height:40px;border-radius:8px;object-fit:contain">
@@ -178,14 +210,12 @@ footer{padding:48px 40px;border-top:1px solid var(--bd);display:flex;justify-con
   <div class="nav-links">
     <a href="#why">Why Sell</a>
     <a href="#how">How It Works</a>
-    <a href="#apply" class="nav-cta">Apply Now</a>
+    <a href="#login-section" class="nav-cta">Vendor Login</a>
   </div>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-grid"></div>
+  <div class="hero-bg"></div><div class="hero-grid"></div>
   <div class="hero-content">
     <div class="hero-badge">Vendor Portal</div>
     <h1>Sell on<br><em>Black Stack Diesel</em></h1>
@@ -197,7 +227,6 @@ footer{padding:48px 40px;border-top:1px solid var(--bd);display:flex;justify-con
   </div>
 </section>
 
-<!-- STATS -->
 <div class="stats-bar">
   <div class="stat"><div class="stat-val">0%</div><div class="stat-lbl">Upfront Cost</div></div>
   <div class="stat"><div class="stat-val">12%</div><div class="stat-lbl">Commission Only</div></div>
@@ -205,133 +234,86 @@ footer{padding:48px 40px;border-top:1px solid var(--bd);display:flex;justify-con
   <div class="stat"><div class="stat-val">30+</div><div class="stat-lbl">Years of Trucks</div></div>
 </div>
 
-<!-- WHY SELL -->
 <section class="why" id="why">
-  <div class="container">
-    <div style="text-align:center;margin-bottom:48px">
-      <div class="section-label">Why Sell With Us</div>
-      <div class="section-title">Your Parts. Our Customers. Zero Risk.</div>
-      <div class="section-desc" style="margin:0 auto">Every customer on Black Stack Diesel has already entered their exact truck — year, make, model, engine. They only see parts that fit. That means higher conversion, fewer returns, and zero tire-kickers.</div>
-    </div>
+  <div class="container" style="text-align:center">
+    <div class="section-label">Why Sell With Us</div>
+    <div class="section-title">Your Parts. Our Customers. Zero Risk.</div>
+    <div class="section-desc" style="margin:0 auto">Every customer on Black Stack Diesel has already entered their exact truck. They only see parts that fit.</div>
     <div class="why-grid">
-      <div class="why-card"><div class="why-icon">💰</div><h3>Commission Only</h3><p>No monthly fees, no listing fees, no signup cost. We only make money when you make money. 12% on the part price — that's it.</p></div>
-      <div class="why-card"><div class="why-icon">🎯</div><h3>Pre-Qualified Buyers</h3><p>Every customer has entered their exact vehicle. They're not browsing — they know their truck and they're ready to buy parts that fit.</p></div>
-      <div class="why-card"><div class="why-icon">⚡</div><h3>Instant Payouts</h3><p>Get paid the moment you confirm shipment. No Net 30, no waiting. Funds hit your account via Stripe Connect instantly.</p></div>
-      <div class="why-card"><div class="why-icon">🚛</div><h3>You Handle Shipping</h3><p>Set your own shipping rates. Ship directly to the customer. We route the order and address to you — you handle fulfillment your way.</p></div>
-      <div class="why-card"><div class="why-icon">🧠</div><h3>AI-Powered Matching</h3><p>Our AI diagnostics recommend parts for specific engine problems. Your injectors get suggested when a customer describes symptoms that need them.</p></div>
-      <div class="why-card"><div class="why-icon">📊</div><h3>Vendor Dashboard</h3><p>Track orders, view payouts, manage inventory, and see real-time analytics on your sales — all in one place.</p></div>
+      <div class="why-card"><div class="why-icon">💰</div><h3>Commission Only</h3><p>No monthly fees, no listing fees, no signup cost. 12% on the part price — that's it.</p></div>
+      <div class="why-card"><div class="why-icon">🎯</div><h3>Pre-Qualified Buyers</h3><p>Every customer has entered their exact vehicle. They're ready to buy parts that fit.</p></div>
+      <div class="why-card"><div class="why-icon">⚡</div><h3>Instant Payouts</h3><p>Get paid the moment you confirm shipment via Stripe Connect.</p></div>
+      <div class="why-card"><div class="why-icon">🚛</div><h3>You Handle Shipping</h3><p>Set your own shipping rates. Ship directly to the customer.</p></div>
+      <div class="why-card"><div class="why-icon">🧠</div><h3>AI-Powered Matching</h3><p>Our AI recommends your parts when customers describe symptoms.</p></div>
+      <div class="why-card"><div class="why-icon">📊</div><h3>Vendor Dashboard</h3><p>Track orders, view payouts, manage inventory — all in one place.</p></div>
     </div>
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
-<section class="how" id="how">
-  <div class="container">
-    <div style="text-align:center;margin-bottom:16px">
-      <div class="section-label">How It Works</div>
-      <div class="section-title">From Application to First Sale</div>
-    </div>
+<section id="how">
+  <div class="container" style="text-align:center">
+    <div class="section-label">How It Works</div>
+    <div class="section-title">From Application to First Sale</div>
     <div class="how-steps">
-      <div class="step"><div class="step-icon">📋</div><h3>Apply</h3><p>Fill out the vendor application below. Tell us about your business and what you sell. We review every application within 48 hours.</p></div>
-      <div class="step"><div class="step-icon">📦</div><h3>List Your Parts</h3><p>Upload your inventory via CSV or connect your existing system. Map products to engine fitment and set your pricing and shipping rates.</p></div>
-      <div class="step"><div class="step-icon">🔔</div><h3>Get Orders</h3><p>When a customer buys your part, you get an instant notification with the order details and shipping address. Ship it out.</p></div>
-      <div class="step"><div class="step-icon">💵</div><h3>Get Paid Instantly</h3><p>Confirm shipment with a tracking number and get paid immediately. 12% commission is deducted automatically. The rest is yours.</p></div>
+      <div class="step"><div class="step-icon">📋</div><h3>Apply</h3><p>Fill out the vendor application below. We review within 48 hours.</p></div>
+      <div class="step"><div class="step-icon">📦</div><h3>List Parts</h3><p>Upload your inventory via CSV or manual entry. Map products to fitment.</p></div>
+      <div class="step"><div class="step-icon">🔔</div><h3>Get Orders</h3><p>Customer buys your part — you get instant notification with shipping address.</p></div>
+      <div class="step"><div class="step-icon">💵</div><h3>Get Paid</h3><p>Confirm shipment with tracking. Get paid immediately. 12% deducted automatically.</p></div>
     </div>
   </div>
 </section>
 
-<!-- COMMISSION BREAKDOWN -->
 <section class="comm" id="pricing">
-  <div class="container">
-    <div style="text-align:center;margin-bottom:16px">
-      <div class="section-label">Transparent Pricing</div>
-      <div class="section-title">Simple. No Surprises.</div>
-    </div>
+  <div class="container" style="text-align:center">
+    <div class="section-label">Transparent Pricing</div>
+    <div class="section-title">Simple. No Surprises.</div>
     <div class="comm-box">
-      <div class="comm-left" style="text-align:center">
-        <div class="comm-rate">12<span>%</span></div>
-        <div class="comm-sub">Commission per sale on part price</div>
-      </div>
+      <div class="comm-left"><div class="comm-rate">12<span>%</span></div><div class="comm-sub">Commission per sale on part price</div></div>
       <div class="comm-right">
         <div class="comm-item"><span class="comm-check">✓</span><span>No monthly fees or subscriptions</span></div>
         <div class="comm-item"><span class="comm-check">✓</span><span>No listing fees — list unlimited products</span></div>
         <div class="comm-item"><span class="comm-check">✓</span><span>Commission on part price only, not shipping</span></div>
         <div class="comm-item"><span class="comm-check">✓</span><span>Instant payout when shipment confirmed</span></div>
-        <div class="comm-item"><span class="comm-check">✓</span><span>You set your own product and shipping prices</span></div>
+        <div class="comm-item"><span class="comm-check">✓</span><span>You set your own prices and shipping rates</span></div>
         <div class="comm-item"><span class="comm-check">✓</span><span>Stripe processing fees included in commission</span></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- VENDOR LOGIN -->
-<section class="vendor-login-section" id="login-section">
+<section class="login-section" id="login-section">
   <div class="login-box">
     <h2>Vendor Login</h2>
     <p>Access your dashboard, orders, and payouts</p>
     <div class="form-err" id="loginErr"></div>
-    <div class="form-group">
-      <label>Email</label>
-      <input class="form-input" type="email" id="loginEmail" placeholder="you@company.com">
-    </div>
-    <div class="form-group">
-      <label>Password</label>
-      <input class="form-input" type="password" id="loginPw" placeholder="••••••••">
-    </div>
-    <button class="form-btn" id="loginBtn" onclick="handleVendorLogin()">Sign In</button>
+    <div class="fg"><label>Email</label><input class="fi" type="email" id="loginEmail" placeholder="you@company.com"></div>
+    <div class="fg"><label>Password</label><input class="fi" type="password" id="loginPw" placeholder="••••••••" onkeydown="if(event.key==='Enter')vendorLogin()"></div>
+    <button class="form-btn" onclick="vendorLogin()">Sign In</button>
     <div class="form-switch">Don't have an account? <a href="#apply">Apply to sell</a></div>
   </div>
 </section>
 
-<!-- APPLICATION FORM -->
-<section class="apply" id="apply">
+<section class="apply-section" id="apply">
   <div class="apply-glow"></div>
   <div class="container" style="text-align:center">
     <div class="section-label">Get Started</div>
     <div class="section-title">Apply to Sell on Black Stack Diesel</div>
-    <div class="section-desc" style="margin:0 auto">Fill out the form below and our team will review your application within 48 hours. No commitment — just tell us about your business.</div>
+    <div class="section-desc" style="margin:0 auto">Fill out the form below. We review every application within 48 hours.</div>
   </div>
   <div class="apply-form" id="applyForm">
-    <h3>Vendor Application</h3>
-    <p>All fields marked * are required</p>
+    <h3>Vendor Application</h3><p>All fields marked * are required</p>
     <div class="form-err" id="applyErr"></div>
     <div class="form-row">
-      <div class="form-group">
-        <label>Business Name *</label>
-        <input class="form-input" type="text" id="appBiz" placeholder="Your Company LLC" required>
-      </div>
-      <div class="form-group">
-        <label>Contact Name *</label>
-        <input class="form-input" type="text" id="appName" placeholder="John Smith" required>
-      </div>
+      <div class="fg"><label>Business Name *</label><input class="fi" type="text" id="appBiz" placeholder="Your Company LLC"></div>
+      <div class="fg"><label>Contact Name *</label><input class="fi" type="text" id="appName" placeholder="John Smith"></div>
     </div>
     <div class="form-row">
-      <div class="form-group">
-        <label>Email *</label>
-        <input class="form-input" type="email" id="appEmail" placeholder="you@company.com" required>
-      </div>
-      <div class="form-group">
-        <label>Phone</label>
-        <input class="form-input" type="tel" id="appPhone" placeholder="(555) 555-5555">
-      </div>
+      <div class="fg"><label>Email *</label><input class="fi" type="email" id="appEmail" placeholder="you@company.com"></div>
+      <div class="fg"><label>Phone</label><input class="fi" type="tel" id="appPhone" placeholder="(555) 555-5555"></div>
     </div>
-    <div class="form-group">
-      <label>Website</label>
-      <input class="form-input" type="url" id="appWeb" placeholder="https://yoursite.com">
-    </div>
-    <div class="form-group">
-      <label>Business Type *</label>
-      <select class="form-input" id="appType">
-        <option value="">Select your business type...</option>
-        <option value="distributor">Distributor / Wholesaler</option>
-        <option value="manufacturer">Manufacturer</option>
-        <option value="retailer">Retailer / Dealer</option>
-        <option value="shop">Diesel Shop / Installer</option>
-        <option value="other">Other</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Product Categories (select all that apply)</label>
+    <div class="fg"><label>Website</label><input class="fi" type="url" id="appWeb" placeholder="https://yoursite.com"></div>
+    <div class="fg"><label>Business Type *</label><select class="fi" id="appType"><option value="">Select...</option><option value="distributor">Distributor / Wholesaler</option><option value="manufacturer">Manufacturer</option><option value="retailer">Retailer / Dealer</option><option value="shop">Diesel Shop / Installer</option><option value="other">Other</option></select></div>
+    <div class="fg"><label>Product Categories</label>
       <div class="checkbox-grid">
         <label class="checkbox-item"><input type="checkbox" value="Injectors"> Injectors</label>
         <label class="checkbox-item"><input type="checkbox" value="Turbos"> Turbos</label>
@@ -347,48 +329,311 @@ footer{padding:48px 40px;border-top:1px solid var(--bd);display:flex;justify-con
         <label class="checkbox-item"><input type="checkbox" value="Other"> Other</label>
       </div>
     </div>
-    <div class="form-group">
-      <label>Estimated Number of SKUs</label>
-      <select class="form-input" id="appSkus">
-        <option value="">How many products do you sell?</option>
-        <option value="1-50">1 – 50</option>
-        <option value="51-200">51 – 200</option>
-        <option value="201-1000">201 – 1,000</option>
-        <option value="1000+">1,000+</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Anything else we should know?</label>
-      <textarea class="form-input" id="appMsg" placeholder="Tell us about your business, brands you carry, etc."></textarea>
-    </div>
+    <div class="fg"><label>Estimated SKUs</label><select class="fi" id="appSkus"><option value="">How many products?</option><option value="1-50">1 – 50</option><option value="51-200">51 – 200</option><option value="201-1000">201 – 1,000</option><option value="1000+">1,000+</option></select></div>
+    <div class="fg"><label>Anything else?</label><textarea class="fi" id="appMsg" placeholder="Tell us about your business..."></textarea></div>
     <button class="form-btn" id="applyBtn" onclick="handleApply()">Submit Application</button>
   </div>
   <div class="form-success" id="applySuccess" style="max-width:640px;margin:40px auto 0">
     <div style="font-size:28px;margin-bottom:8px">🎉</div>
     <div style="font-size:20px;margin-bottom:8px">Application Received!</div>
-    <div style="font-weight:400;color:var(--t2)">Thanks for your interest in selling on Black Stack Diesel. Our team will review your application and get back to you within 48 hours.</div>
+    <div style="font-weight:400;color:var(--t2)">We'll review your application and get back to you within 48 hours.</div>
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
-  <div class="footer-brand">
-    <img src="../logo.png" alt="BlackStack Diesel" style="width:32px;height:32px;border-radius:6px;object-fit:contain">
-    <span>Black Stack Diesel</span>
-  </div>
-  <div class="footer-links">
-    <a href="/">Home</a>
-    <a href="#why">Why Sell</a>
-    <a href="#apply">Apply</a>
-    <a href="mailto:contact@black-stack-diesel.com">Contact</a>
-  </div>
+  <div class="footer-brand"><img src="../logo.png" alt="BSD" style="width:32px;height:32px;border-radius:6px;object-fit:contain"><span>Black Stack Diesel</span></div>
+  <div class="footer-links"><a href="/">Home</a><a href="#why">Why Sell</a><a href="#apply">Apply</a><a href="mailto:help@black-stack-diesel.com">Contact</a></div>
   <div class="footer-legal">© 2026 Dynamic Innovative Solutions LLC. All rights reserved. Black Stack Diesel™</div>
 </footer>
 
-<script>
-const SUPABASE_URL='https://jfjbilfsiebifzddveof.supabase.co';
-const SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamJpbGZzaWViaWZ6ZGR2ZW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2OTg4ODUsImV4cCI6MjA4NzI3NDg4NX0.bbTQ0l4HsHoKUzoKACBvbXJ0TbnUM5tltK4YLKyuMr8';
+</div><!-- end pitchPage -->
 
+
+<!-- ============================================================ -->
+<!-- VENDOR DASHBOARD (shown after login)                          -->
+<!-- ============================================================ -->
+<div id="vendorDash">
+
+  <div class="dash-topbar">
+    <div class="dash-topbar-left">
+      <img src="../logo.png" alt="BSD">
+      <span>Black<em>Stack</em> Vendor</span>
+    </div>
+    <div class="dash-topbar-right">
+      <span class="dash-user" id="dashUser"></span>
+      <button class="btn-sm" onclick="vendorLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="dash-tabs">
+    <div class="dash-tab active" onclick="dashTab('overview',this)">Overview</div>
+    <div class="dash-tab" onclick="dashTab('orders',this)">Orders</div>
+    <div class="dash-tab" onclick="dashTab('products',this)">Products</div>
+    <div class="dash-tab" onclick="dashTab('payouts',this)">Payouts</div>
+    <div class="dash-tab" onclick="dashTab('settings',this)">Settings</div>
+  </div>
+
+  <div class="dash-content">
+
+    <!-- OVERVIEW -->
+    <div class="dash-panel active" id="dp-overview">
+      <div class="dash-stats">
+        <div class="dash-stat green"><div class="dv">$0.00</div><div class="dl">Total Earnings</div></div>
+        <div class="dash-stat ember"><div class="dv">0</div><div class="dl">Total Orders</div></div>
+        <div class="dash-stat blue"><div class="dv">0</div><div class="dl">Products Listed</div></div>
+        <div class="dash-stat amber"><div class="dv">$0.00</div><div class="dl">Pending Payout</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="card">
+          <div class="card-header"><h3>Recent Orders</h3></div>
+          <div class="empty-state"><div class="icon">📦</div><h4>No Orders Yet</h4><p>When customers buy your parts, orders will appear here. Make sure your products are listed and priced competitively.</p></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Quick Actions</h3></div>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
+            <button class="btn-action" onclick="dashTab('products',document.querySelectorAll('.dash-tab')[2])" style="width:100%;height:48px;font-size:14px">➕ Add New Product</button>
+            <button class="btn-action" onclick="dashTab('orders',document.querySelectorAll('.dash-tab')[1])" style="width:100%;height:48px;font-size:14px;background:var(--smoke);color:var(--t2)">📋 View All Orders</button>
+            <button class="btn-action" onclick="dashTab('settings',document.querySelectorAll('.dash-tab')[4])" style="width:100%;height:48px;font-size:14px;background:var(--smoke);color:var(--t2)">⚙️ Update Profile</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="dash-panel" id="dp-orders">
+      <div class="dash-stats">
+        <div class="dash-stat amber"><div class="dv">0</div><div class="dl">Pending</div></div>
+        <div class="dash-stat blue"><div class="dv">0</div><div class="dl">Processing</div></div>
+        <div class="dash-stat green"><div class="dv">0</div><div class="dl">Shipped</div></div>
+        <div class="dash-stat ember"><div class="dv">0</div><div class="dl">Total</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>All Orders</h3></div>
+        <div class="empty-state"><div class="icon">📦</div><h4>No Orders Yet</h4><p>Orders will appear here when customers purchase your parts. You'll receive a notification with the order details and shipping address.</p></div>
+      </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="dash-panel" id="dp-products">
+      <div class="dash-stats">
+        <div class="dash-stat blue"><div class="dv" id="productCount">0</div><div class="dl">Total Products</div></div>
+        <div class="dash-stat green"><div class="dv">0</div><div class="dl">Active</div></div>
+        <div class="dash-stat amber"><div class="dv">0</div><div class="dl">Draft</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>Your Products</h3>
+          <button class="btn-action" onclick="showAddProduct()">+ Add Product</button>
+        </div>
+        <div id="productList">
+          <div class="empty-state"><div class="icon">🔧</div><h4>No Products Listed</h4><p>Start by adding your first product. You can add parts one at a time or upload a CSV with your entire catalog.</p></div>
+        </div>
+      </div>
+
+      <!-- ADD PRODUCT FORM (hidden by default) -->
+      <div class="card" id="addProductForm" style="display:none;margin-top:20px">
+        <div class="card-header"><h3>Add New Product</h3><button class="btn-sm" onclick="hideAddProduct()">✕ Cancel</button></div>
+        <div style="padding:24px">
+          <div class="form-err" id="productErr"></div>
+          <div class="form-row">
+            <div class="fg"><label>Product Name *</label><input class="fi" type="text" id="prodName" placeholder="FASS Titanium Signature 150GPH"></div>
+            <div class="fg"><label>Brand</label><input class="fi" type="text" id="prodBrand" placeholder="FASS Fuel Systems"></div>
+          </div>
+          <div class="form-row">
+            <div class="fg"><label>Price *</label><input class="fi" type="number" id="prodPrice" placeholder="549.99" step="0.01"></div>
+            <div class="fg"><label>Shipping Cost *</label><input class="fi" type="number" id="prodShip" placeholder="29.99" step="0.01"></div>
+          </div>
+          <div class="form-row">
+            <div class="fg"><label>Part Number / SKU</label><input class="fi" type="text" id="prodSku" placeholder="TS-F14-165G"></div>
+            <div class="fg"><label>Stock Quantity</label><input class="fi" type="number" id="prodStock" placeholder="25"></div>
+          </div>
+          <div class="form-row">
+            <div class="fg"><label>Category</label><select class="fi" id="prodCat"><option value="">Select...</option><option>Injectors</option><option>Turbos</option><option>Fuel Systems</option><option>Exhaust</option><option>Engine Parts</option><option>Transmission</option><option>Filters / Fluids</option><option>Electrical</option><option>DPF / DEF / Emissions</option><option>Suspension / Lift</option><option>Accessories</option></select></div>
+            <div class="fg"><label>Condition</label><select class="fi" id="prodCondition"><option value="new">New</option><option value="remanufactured">Remanufactured</option><option value="used">Used</option></select></div>
+          </div>
+          <div class="fg"><label>Fitment (trucks this fits)</label><input class="fi" type="text" id="prodFit" placeholder="2003-2007 Dodge Ram 2500/3500 5.9L Cummins"></div>
+          <div class="fg"><label>Description</label><textarea class="fi" id="prodDesc" placeholder="Describe the product, features, what's included..."></textarea></div>
+          <button class="form-btn" onclick="saveProduct()">Save Product</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYOUTS -->
+    <div class="dash-panel" id="dp-payouts">
+      <div class="dash-stats">
+        <div class="dash-stat green"><div class="dv">$0.00</div><div class="dl">Total Earned</div></div>
+        <div class="dash-stat ember"><div class="dv">$0.00</div><div class="dl">Commission Paid</div></div>
+        <div class="dash-stat blue"><div class="dv">$0.00</div><div class="dl">Net Payouts</div></div>
+        <div class="dash-stat amber"><div class="dv">—</div><div class="dl">Stripe Status</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Payout History</h3></div>
+        <div class="empty-state">
+          <div class="icon">💵</div>
+          <h4>No Payouts Yet</h4>
+          <p>Your payout history will appear here once you complete your first sale and confirm shipment. Payouts are instant via Stripe Connect.</p>
+          <br>
+          <button class="btn-action" style="opacity:.5;cursor:not-allowed">Connect Stripe Account (Coming Soon)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="dash-panel" id="dp-settings">
+      <div class="settings-grid">
+        <div class="settings-card">
+          <h3>Business Information</h3>
+          <div class="fg"><label>Business Name</label><input class="fi" type="text" id="setBiz" disabled></div>
+          <div class="fg"><label>Contact Name</label><input class="fi" type="text" id="setContact" disabled></div>
+          <div class="fg"><label>Email</label><input class="fi" type="email" id="setEmail" disabled></div>
+          <div class="fg"><label>Phone</label><input class="fi" type="tel" id="setPhone"></div>
+          <div class="fg"><label>Website</label><input class="fi" type="url" id="setWeb"></div>
+          <button class="form-btn" onclick="saveSettings()" style="margin-top:4px">Save Changes</button>
+        </div>
+        <div class="settings-card">
+          <h3>Account</h3>
+          <div style="padding:8px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--bd)">
+              <div><div style="font-size:13px;color:var(--t1);font-weight:600">Commission Rate</div><div style="font-size:12px;color:var(--t3)">Applied to each sale</div></div>
+              <div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:var(--ember)">12%</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--bd)">
+              <div><div style="font-size:13px;color:var(--t1);font-weight:600">Payout Speed</div><div style="font-size:12px;color:var(--t3)">After shipment confirmed</div></div>
+              <div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:var(--green)">Instant</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--bd)">
+              <div><div style="font-size:13px;color:var(--t1);font-weight:600">Stripe Connect</div><div style="font-size:12px;color:var(--t3)">Payment processing</div></div>
+              <span class="badge badge-pending">Not Connected</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0">
+              <div><div style="font-size:13px;color:var(--t1);font-weight:600">Account Status</div><div style="font-size:12px;color:var(--t3)">Vendor account</div></div>
+              <span class="badge badge-active">Active</span>
+            </div>
+          </div>
+          <h3 style="margin-top:24px">Change Password</h3>
+          <div class="fg"><label>New Password</label><input class="fi" type="password" id="setNewPw" placeholder="••••••••"></div>
+          <div class="fg"><label>Confirm Password</label><input class="fi" type="password" id="setConfPw" placeholder="••••••••"></div>
+          <button class="form-btn" onclick="changePassword()">Update Password</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- end vendorDash -->
+
+
+<script>
+var SUPA_URL='https://jfjbilfsiebifzddveof.supabase.co';
+var SUPA_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamJpbGZzaWViaWZ6ZGR2ZW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2OTg4ODUsImV4cCI6MjA4NzI3NDg4NX0.bbTQ0l4HsHoKUzoKACBvbXJ0TbnUM5tltK4YLKyuMr8';
+var sb=supabase.createClient(SUPA_URL,SUPA_ANON);
+var vendorData=null;
+
+// ===== CHECK SESSION ON LOAD =====
+(async function(){
+  var r=await sb.auth.getSession();
+  if(r.data.session){
+    var user=r.data.session.user;
+    var meta=user.user_metadata||{};
+    if(meta.role==='vendor'){
+      await loadVendorDash(user);
+    }
+  }
+})();
+
+// ===== VENDOR LOGIN =====
+async function vendorLogin(){
+  var email=document.getElementById('loginEmail').value.trim();
+  var pw=document.getElementById('loginPw').value;
+  var errEl=document.getElementById('loginErr');
+  if(!email||!pw){errEl.textContent='Enter email and password.';errEl.style.display='block';return}
+  errEl.style.display='none';
+  var r=await sb.auth.signInWithPassword({email:email,password:pw});
+  if(r.error){errEl.textContent=r.error.message;errEl.style.display='block';return}
+  var meta=r.data.user.user_metadata||{};
+  if(meta.role!=='vendor'){errEl.textContent='This account is not a vendor account.';errEl.style.display='block';await sb.auth.signOut();return}
+  await loadVendorDash(r.data.user);
+}
+
+async function vendorLogout(){
+  await sb.auth.signOut();
+  vendorData=null;
+  document.getElementById('vendorDash').style.display='none';
+  document.getElementById('pitchPage').style.display='block';
+  window.scrollTo(0,0);
+}
+
+async function loadVendorDash(user){
+  // Get vendor data
+  var r=await sb.from('vendors').select('*').eq('email',user.email).single();
+  if(r.data)vendorData=r.data;
+
+  // Switch views
+  document.getElementById('pitchPage').style.display='none';
+  document.getElementById('vendorDash').style.display='block';
+
+  // Fill dashboard
+  var name=vendorData?vendorData.business_name:(user.user_metadata.business_name||user.email);
+  document.getElementById('dashUser').textContent=name;
+
+  // Fill settings
+  if(vendorData){
+    document.getElementById('setBiz').value=vendorData.business_name||'';
+    document.getElementById('setContact').value=vendorData.contact_name||'';
+    document.getElementById('setEmail').value=vendorData.email||'';
+    document.getElementById('setPhone').value=vendorData.phone||'';
+    document.getElementById('setWeb').value=vendorData.website||'';
+  }
+  window.scrollTo(0,0);
+}
+
+// ===== DASHBOARD TABS =====
+function dashTab(id,el){
+  document.querySelectorAll('.dash-tab').forEach(function(t){t.classList.remove('active')});
+  document.querySelectorAll('.dash-panel').forEach(function(p){p.classList.remove('active')});
+  el.classList.add('active');
+  document.getElementById('dp-'+id).classList.add('active');
+}
+
+// ===== PRODUCTS =====
+function showAddProduct(){document.getElementById('addProductForm').style.display='block';document.getElementById('addProductForm').scrollIntoView({behavior:'smooth'})}
+function hideAddProduct(){document.getElementById('addProductForm').style.display='none'}
+
+function saveProduct(){
+  var name=document.getElementById('prodName').value.trim();
+  var price=document.getElementById('prodPrice').value;
+  var ship=document.getElementById('prodShip').value;
+  var errEl=document.getElementById('productErr');
+  if(!name||!price||!ship){errEl.textContent='Name, price, and shipping cost are required.';errEl.style.display='block';return}
+  errEl.style.display='none';
+
+  // For now, show success (product table coming when we build the products DB)
+  alert('Product saved! (Product database integration coming soon. For now, your product details have been captured.)');
+  hideAddProduct();
+}
+
+// ===== SETTINGS =====
+async function saveSettings(){
+  if(!vendorData)return;
+  var phone=document.getElementById('setPhone').value.trim();
+  var web=document.getElementById('setWeb').value.trim();
+  var r=await sb.from('vendors').update({phone:phone||null,website:web||null}).eq('id',vendorData.id);
+  if(r.error){alert('Error saving: '+r.error.message);return}
+  alert('Settings saved!');
+}
+
+async function changePassword(){
+  var pw=document.getElementById('setNewPw').value;
+  var conf=document.getElementById('setConfPw').value;
+  if(!pw||pw.length<8){alert('Password must be at least 8 characters.');return}
+  if(pw!==conf){alert('Passwords do not match.');return}
+  var r=await sb.auth.updateUser({password:pw});
+  if(r.error){alert('Error: '+r.error.message);return}
+  alert('Password updated successfully!');
+  document.getElementById('setNewPw').value='';
+  document.getElementById('setConfPw').value='';
+}
+
+// ===== APPLICATION FORM =====
 async function handleApply(){
   var biz=document.getElementById('appBiz').value.trim();
   var name=document.getElementById('appName').value.trim();
@@ -398,50 +643,21 @@ async function handleApply(){
   var type=document.getElementById('appType').value;
   var skus=document.getElementById('appSkus').value;
   var msg=document.getElementById('appMsg').value.trim();
-  var cats=[];
-  document.querySelectorAll('.checkbox-grid input:checked').forEach(function(c){cats.push(c.value)});
-
+  var cats=[];document.querySelectorAll('.checkbox-grid input:checked').forEach(function(c){cats.push(c.value)});
   var errEl=document.getElementById('applyErr');
   if(!biz||!name||!email||!type){errEl.textContent='Please fill in all required fields.';errEl.style.display='block';return}
   errEl.style.display='none';
-
-  var btn=document.getElementById('applyBtn');
-  btn.textContent='Submitting...';btn.disabled=true;
-
+  var btn=document.getElementById('applyBtn');btn.textContent='Submitting...';btn.disabled=true;
   try{
-    var res=await fetch(SUPABASE_URL+'/rest/v1/vendor_applications',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON,'Prefer':'return=minimal'},
-      body:JSON.stringify({
-        business_name:biz,contact_name:name,email:email,phone:phone||null,
-        website:web||null,business_type:type,product_categories:cats,
-        estimated_skus:skus||null,message:msg||null
-      })
-    });
-    if(res.ok){
-      document.getElementById('applyForm').style.display='none';
-      document.getElementById('applySuccess').style.display='block';
-    }else if(res.status===409){
-      errEl.textContent='This email has already submitted an application.';errEl.style.display='block';
-      btn.textContent='Submit Application';btn.disabled=false;
-    }else{throw new Error('fail')}
-  }catch(err){
-    errEl.textContent='Something went wrong. Please try again.';errEl.style.display='block';
-    btn.textContent='Submit Application';btn.disabled=false;
-  }
+    var res=await fetch(SUPA_URL+'/rest/v1/vendor_applications',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_ANON,'Prefer':'return=minimal'},body:JSON.stringify({business_name:biz,contact_name:name,email:email,phone:phone||null,website:web||null,business_type:type,product_categories:cats,estimated_skus:skus||null,message:msg||null})});
+    if(res.ok){document.getElementById('applyForm').style.display='none';document.getElementById('applySuccess').style.display='block'}
+    else if(res.status===409){errEl.textContent='This email has already submitted an application.';errEl.style.display='block';btn.textContent='Submit Application';btn.disabled=false}
+    else{throw new Error('fail')}
+  }catch(e){errEl.textContent='Something went wrong. Please try again.';errEl.style.display='block';btn.textContent='Submit Application';btn.disabled=false}
 }
 
-function handleVendorLogin(){
-  var email=document.getElementById('loginEmail').value.trim();
-  var pw=document.getElementById('loginPw').value;
-  var errEl=document.getElementById('loginErr');
-  if(!email||!pw){errEl.textContent='Please enter email and password.';errEl.style.display='block';return}
-  errEl.textContent='Vendor dashboard coming soon. We\'ll notify you when it\'s ready.';
-  errEl.style.display='block';
-  errEl.style.color='var(--amber)';
-}
-
-document.querySelectorAll('a[href^="#"]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth'})})});
+// Smooth scroll for pitch page links
+document.querySelectorAll('#pitchPage a[href^="#"]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth'})})});
 </script>
 </body>
 </html>
