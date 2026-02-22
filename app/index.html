@@ -183,6 +183,18 @@ body{font-family:'Manrope',sans-serif;color:var(--t1)}
 .cd-h{width:32px;height:3px;background:var(--t4);border-radius:2px;margin:0 auto 18px}
 .cd-t{font-size:17px;font-weight:800;margin-bottom:14px;letter-spacing:-.2px}
 .cd-e{text-align:center;padding:32px 0;color:var(--t3);font-size:12px;font-weight:500}
+.cd-items{display:flex;flex-direction:column;gap:10px;max-height:40vh;overflow-y:auto;scrollbar-width:none}
+.cd-items::-webkit-scrollbar{display:none}
+.ci{display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--r);background:var(--gl);border:1px solid var(--glb)}
+.ci-img{width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,.02);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.ci-info{flex:1;min-width:0}
+.ci-info h4{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci-info p{font-size:11px;color:var(--t3);margin-top:2px}
+.ci-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.ci-price{font-size:15px;font-weight:800;font-family:'DM Mono',monospace;color:var(--gold)}
+.ci-rm{width:26px;height:26px;border-radius:8px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}
+.ci-rm:active{transform:scale(.8)}
+.ci-rm svg{width:12px;height:12px;stroke:var(--red);fill:none;stroke-width:2.5}
 .cd-tot{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-top:1px solid var(--glb);margin:14px 0}
 .cd-tot span{font-size:12px;color:var(--t2);font-weight:500}
 .cd-tot strong{font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:var(--gold)}
@@ -309,12 +321,12 @@ body{font-family:'Manrope',sans-serif;color:var(--t1)}
 </div>
 <div class="sbox"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Search parts…"></div>
 <div class="pgrid">
-<div class="pc g"><div class="pc-img">💉<div class="pc-fit">✓ Fits</div><div class="pc-stg s2">STG 2</div></div><div class="pc-bd"><div class="pc-br">Alliant Power</div><h4>Reman Injector Set (8)</h4><div class="pc-bt"><div class="pc-pr mono">$2,495</div><button class="ab"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
-<div class="pc g"><div class="pc-img">🌀<div class="pc-fit">✓ Fits</div><div class="pc-stg s2">STG 2</div></div><div class="pc-bd"><div class="pc-br">Garrett</div><h4>GT3782VA Turbo Reman</h4><div class="pc-bt"><div class="pc-pr mono">$795</div><button class="ab"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
-<div class="pc g"><div class="pc-img">🔩<div class="pc-fit">✓ Fits</div><div class="pc-stg s3">STG 3</div></div><div class="pc-bd"><div class="pc-br">ARP</div><h4>Head Stud Kit</h4><div class="pc-bt"><div class="pc-pr mono">$449</div><button class="ab"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
-<div class="pc g"><div class="pc-img">🔧<div class="pc-fit">✓ Fits</div><div class="pc-stg s2">STG 2</div></div><div class="pc-bd"><div class="pc-br">Sinister Diesel</div><h4>EGR Delete Kit</h4><div class="pc-bt"><div class="pc-pr mono">$289</div><button class="ab"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
-<div class="pc g"><div class="pc-img">⛽<div class="pc-fit">✓ Fits</div><div class="pc-stg s2">STG 2</div></div><div class="pc-bd"><div class="pc-br">Motorcraft</div><h4>HPOP Pump</h4><div class="pc-bt"><div class="pc-pr mono">$845</div><button class="ab"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
-<div class="pc g"><div class="pc-img">🔧<div class="pc-fit">✓ Fits</div><div class="pc-stg s1">STG 1</div></div><div class="pc-bd"><div class="pc-br">Dorman</div><h4>Oil Cooler</h4><div class="pc-bt"><div class="pc-pr mono">$219</div><button class="ab"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
+<div class="pc g"><div class="pc-img">💉<div class="pc-fit">✓ Fits</div><div class="pc-stg s2">STG 2</div></div><div class="pc-bd"><div class="pc-br">Alliant Power</div><h4>Reman Injector Set (8)</h4><div class="pc-bt"><div class="pc-pr mono">$2,495</div><button class="ab" onclick="addToCart('inj','Reman Injector Set (8)','Alliant Power',2495,'💉')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
+<div class="pc g"><div class="pc-img">🌀<div class="pc-fit">✓ Fits</div><div class="pc-stg s2">STG 2</div></div><div class="pc-bd"><div class="pc-br">Garrett</div><h4>GT3782VA Turbo Reman</h4><div class="pc-bt"><div class="pc-pr mono">$795</div><button class="ab" onclick="addToCart('turbo','GT3782VA Turbo Reman','Garrett',795,'🌀')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
+<div class="pc g"><div class="pc-img">🔩<div class="pc-fit">✓ Fits</div><div class="pc-stg s3">STG 3</div></div><div class="pc-bd"><div class="pc-br">ARP</div><h4>Head Stud Kit</h4><div class="pc-bt"><div class="pc-pr mono">$449</div><button class="ab" onclick="addToCart('studs','Head Stud Kit','ARP',449,'🔩')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
+<div class="pc g"><div class="pc-img">🔧<div class="pc-fit">✓ Fits</div><div class="pc-stg s2">STG 2</div></div><div class="pc-bd"><div class="pc-br">Sinister Diesel</div><h4>EGR Delete Kit</h4><div class="pc-bt"><div class="pc-pr mono">$289</div><button class="ab" onclick="addToCart('egr','EGR Delete Kit','Sinister Diesel',289,'🔧')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
+<div class="pc g"><div class="pc-img">⛽<div class="pc-fit">✓ Fits</div><div class="pc-stg s2">STG 2</div></div><div class="pc-bd"><div class="pc-br">Motorcraft</div><h4>HPOP Pump</h4><div class="pc-bt"><div class="pc-pr mono">$845</div><button class="ab" onclick="addToCart('hpop','HPOP Pump','Motorcraft',845,'⛽')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
+<div class="pc g"><div class="pc-img">🔧<div class="pc-fit">✓ Fits</div><div class="pc-stg s1">STG 1</div></div><div class="pc-bd"><div class="pc-br">Dorman</div><h4>Oil Cooler</h4><div class="pc-bt"><div class="pc-pr mono">$219</div><button class="ab" onclick="addToCart('cooler','Oil Cooler','Dorman',219,'🔧')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
 </div>
 </div>
 
@@ -343,7 +355,7 @@ body{font-family:'Manrope',sans-serif;color:var(--t1)}
 </div>
 
 <!-- CART -->
-<div class="cd" id="cD"><div class="cd-bg" onclick="toggleCart()"></div><div class="cd-sh"><div class="cd-h"></div><div class="cd-t">Your Cart</div><div class="cd-e">Your cart is empty</div><div class="cd-tot"><span>Total</span><strong class="mono">$0</strong></div><button class="btn-g" onclick="alert('Checkout coming soon!')">Checkout</button></div></div>
+<div class="cd" id="cD"><div class="cd-bg" onclick="toggleCart()"></div><div class="cd-sh"><div class="cd-h"></div><div class="cd-t">Your Cart <span id="cartCount" style="color:var(--t3);font-size:13px;font-weight:500"></span></div><div id="cartItems"></div><div class="cd-tot"><span>Total</span><strong class="mono" id="cartTotal">$0</strong></div><button class="btn-g" id="checkoutBtn" onclick="doCheckout()">Checkout</button></div></div>
 
 <!-- NAV -->
 <div class="bnav hid" id="bnav"><div class="bnav-in">
@@ -390,6 +402,53 @@ function confirmV(){localStorage.setItem('bsd_vehicle',JSON.stringify({year:V.ye
 function resetVeh(){V.year=V.make=V.model=V.engine=null;localStorage.removeItem('bsd_vehicle');uProg(1);initYrs();hG('make');hG('model');hG('engine');hPrev();go('veh');hideNav()}
 function openSub(id){document.getElementById('sub-'+id).classList.add('open')}
 function closeSub(id){document.getElementById('sub-'+id).classList.remove('open')}
+
+// === Cart ===
+var cart=[];
+function addToCart(id,name,brand,price,emoji){
+  var existing=cart.find(function(c){return c.id===id});
+  if(existing){existing.qty++;} else {cart.push({id:id,name:name,brand:brand,price:price,emoji:emoji,qty:1})}
+  renderCart();
+  // Brief flash on the button
+  document.getElementById('cD').classList.add('op');
+}
+function removeFromCart(id){
+  var idx=cart.findIndex(function(c){return c.id===id});
+  if(idx>-1){if(cart[idx].qty>1){cart[idx].qty--}else{cart.splice(idx,1)}}
+  renderCart();
+}
+function renderCart(){
+  var el=document.getElementById('cartItems');
+  var badge=document.querySelector('.cbdg');
+  var totalEl=document.getElementById('cartTotal');
+  var countEl=document.getElementById('cartCount');
+  var total=0,count=0;
+  cart.forEach(function(c){total+=c.price*c.qty;count+=c.qty});
+  badge.textContent=count;
+  countEl.textContent=count>0?'('+count+' items)':'';
+  if(cart.length===0){
+    el.innerHTML='<div class="cd-e">Your cart is empty</div>';
+    totalEl.textContent='$0';
+    return;
+  }
+  var html='<div class="cd-items">';
+  cart.forEach(function(c){
+    html+='<div class="ci"><div class="ci-img">'+c.emoji+'</div><div class="ci-info"><h4>'+c.name+'</h4><p>'+c.brand+(c.qty>1?' × '+c.qty:'')+'</p></div><div class="ci-right"><div class="ci-price">$'+((c.price*c.qty).toLocaleString())+'</div><div class="ci-rm" onclick="removeFromCart(\''+c.id+'\')"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div></div>';
+  });
+  html+='</div>';
+  el.innerHTML=html;
+  totalEl.textContent='$'+(total.toLocaleString());
+}
+function doCheckout(){
+  if(cart.length===0)return;
+  alert('Checkout coming soon! Your total: $'+cart.reduce(function(s,c){return s+c.price*c.qty},0).toLocaleString());
+}
+renderCart();
 uProg(1);initYrs();checkSession();
 document.getElementById('authPass').addEventListener('keydown',function(e){if(e.key==='Enter')handleAuth()});
-document.querySelectorAll('.ct').forEach(function(c){c.
+document.querySelectorAll('.ct').forEach(function(c){c.onclick=function(){document.querySelectorAll('.ct').forEach(function(x){x.classList.remove('on')});c.classList.add('on')}});
+document.querySelectorAll('.stg').forEach(function(b){b.onclick=function(){b.classList.toggle('on')}});
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/app/sw.js').catch(function(){})}
+</script>
+</body>
+</html>

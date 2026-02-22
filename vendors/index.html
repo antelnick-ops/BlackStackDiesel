@@ -42,6 +42,12 @@ select.fi{appearance:none;cursor:pointer;background-image:url("data:image/svg+xm
 .badge-new{background:rgba(74,158,255,.15);color:var(--blue)}
 .badge-shipped{background:rgba(52,199,89,.15);color:var(--green)}
 .badge-active{background:rgba(52,199,89,.15);color:var(--green)}
+.dist-card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:20px;cursor:pointer;transition:.2s}
+.dist-card:hover{border-color:rgba(255,107,44,.15)}
+.dist-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.dist-top strong{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.dist-card p{font-size:12px;color:var(--t3);line-height:1.5}
+.dist-fields{margin-top:14px;border-top:1px solid var(--bd);padding-top:14px}
 footer{padding:48px 40px;border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
 .footer-brand{display:flex;align-items:center;gap:10px}
 .footer-brand span{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--t3)}
@@ -256,7 +262,7 @@ section{padding:100px 40px}
     <div class="section-title">From Application to First Sale</div>
     <div class="how-steps">
       <div class="step"><div class="step-icon">📋</div><h3>Apply</h3><p>Fill out the vendor application below. We review within 48 hours.</p></div>
-      <div class="step"><div class="step-icon">📦</div><h3>List Parts</h3><p>Upload your inventory via CSV or manual entry. Map products to fitment.</p></div>
+      <div class="step"><div class="step-icon">📦</div><h3>Import Catalog</h3><p>Upload your inventory via CSV, connect your API, or sync with major diesel distributors.</p></div>
       <div class="step"><div class="step-icon">🔔</div><h3>Get Orders</h3><p>Customer buys your part — you get instant notification with shipping address.</p></div>
       <div class="step"><div class="step-icon">💵</div><h3>Get Paid</h3><p>Confirm shipment with tracking. Get paid immediately. 12% deducted automatically.</p></div>
     </div>
@@ -391,7 +397,7 @@ section{padding:100px 40px}
         <div class="card">
           <div class="card-header"><h3>Quick Actions</h3></div>
           <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
-            <button class="btn-action" onclick="dashTab('products',document.querySelectorAll('.dash-tab')[2])" style="width:100%;height:48px;font-size:14px">➕ Add New Product</button>
+            <button class="btn-action" onclick="dashTab('products',document.querySelectorAll('.dash-tab')[2])" style="width:100%;height:48px;font-size:14px">📥 Import Inventory</button>
             <button class="btn-action" onclick="dashTab('orders',document.querySelectorAll('.dash-tab')[1])" style="width:100%;height:48px;font-size:14px;background:var(--smoke);color:var(--t2)">📋 View All Orders</button>
             <button class="btn-action" onclick="dashTab('settings',document.querySelectorAll('.dash-tab')[4])" style="width:100%;height:48px;font-size:14px;background:var(--smoke);color:var(--t2)">⚙️ Update Profile</button>
           </div>
@@ -413,47 +419,164 @@ section{padding:100px 40px}
       </div>
     </div>
 
-    <!-- PRODUCTS -->
+    <!-- PRODUCTS / INVENTORY -->
     <div class="dash-panel" id="dp-products">
       <div class="dash-stats">
         <div class="dash-stat blue"><div class="dv" id="productCount">0</div><div class="dl">Total Products</div></div>
-        <div class="dash-stat green"><div class="dv">0</div><div class="dl">Active</div></div>
-        <div class="dash-stat amber"><div class="dv">0</div><div class="dl">Draft</div></div>
+        <div class="dash-stat green"><div class="dv" id="activeCount">0</div><div class="dl">Active</div></div>
+        <div class="dash-stat amber"><div class="dv" id="syncStatus">—</div><div class="dl">Last Sync</div></div>
       </div>
-      <div class="card">
-        <div class="card-header">
-          <h3>Your Products</h3>
-          <button class="btn-action" onclick="showAddProduct()">+ Add Product</button>
+
+      <!-- IMPORT METHODS -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px">
+
+        <!-- CSV UPLOAD -->
+        <div class="card" style="cursor:pointer" onclick="document.getElementById('csvFile').click()">
+          <div style="padding:28px;text-align:center">
+            <div style="font-size:36px;margin-bottom:12px">📄</div>
+            <h3 style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">CSV Upload</h3>
+            <p style="font-size:13px;color:var(--t2);line-height:1.6">Upload a spreadsheet of your entire catalog. Map columns on the next screen.</p>
+            <div style="margin-top:16px;padding:8px 20px;border-radius:8px;background:var(--ember);color:#fff;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:2px;display:inline-block">Upload CSV</div>
+          </div>
         </div>
-        <div id="productList">
-          <div class="empty-state"><div class="icon">🔧</div><h4>No Products Listed</h4><p>Start by adding your first product. You can add parts one at a time or upload a CSV with your entire catalog.</p></div>
+        <input type="file" id="csvFile" accept=".csv,.tsv,.txt" style="display:none" onchange="handleCSV(this)">
+
+        <!-- API INTEGRATION -->
+        <div class="card">
+          <div style="padding:28px;text-align:center">
+            <div style="font-size:36px;margin-bottom:12px">🔗</div>
+            <h3 style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">API Integration</h3>
+            <p style="font-size:13px;color:var(--t2);line-height:1.6">Push products directly from your system using your unique API key and our REST endpoint.</p>
+            <div style="margin-top:16px;padding:8px 20px;border-radius:8px;background:var(--smoke);color:var(--t1);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:2px;display:inline-block;cursor:pointer" onclick="showApiPanel()">View API Key</div>
+          </div>
+        </div>
+
+        <!-- DISTRIBUTOR SYNC -->
+        <div class="card">
+          <div style="padding:28px;text-align:center">
+            <div style="font-size:36px;margin-bottom:12px">🔄</div>
+            <h3 style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Distributor Sync</h3>
+            <p style="font-size:13px;color:var(--t2);line-height:1.6">Auto-sync inventory from APG, Meyer, Turn 14, or other diesel parts distributors.</p>
+            <div style="margin-top:16px;padding:8px 20px;border-radius:8px;background:var(--smoke);color:var(--t1);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:2px;display:inline-block;cursor:pointer" onclick="showDistPanel()">Connect</div>
+          </div>
         </div>
       </div>
 
-      <!-- ADD PRODUCT FORM (hidden by default) -->
-      <div class="card" id="addProductForm" style="display:none;margin-top:20px">
-        <div class="card-header"><h3>Add New Product</h3><button class="btn-sm" onclick="hideAddProduct()">✕ Cancel</button></div>
+      <!-- CSV MAPPING (hidden until CSV uploaded) -->
+      <div class="card" id="csvMapper" style="display:none;margin-bottom:20px">
+        <div class="card-header"><h3>Map CSV Columns</h3><button class="btn-sm" onclick="cancelCSV()">✕ Cancel</button></div>
         <div style="padding:24px">
-          <div class="form-err" id="productErr"></div>
-          <div class="form-row">
-            <div class="fg"><label>Product Name *</label><input class="fi" type="text" id="prodName" placeholder="FASS Titanium Signature 150GPH"></div>
-            <div class="fg"><label>Brand</label><input class="fi" type="text" id="prodBrand" placeholder="FASS Fuel Systems"></div>
+          <p style="font-size:13px;color:var(--t2);margin-bottom:16px">We detected <strong id="csvRowCount">0</strong> rows. Map your columns to our fields:</p>
+          <div class="form-err" id="csvErr"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" id="csvMapFields">
+            <!-- Populated dynamically -->
           </div>
-          <div class="form-row">
-            <div class="fg"><label>Price *</label><input class="fi" type="number" id="prodPrice" placeholder="549.99" step="0.01"></div>
-            <div class="fg"><label>Shipping Cost *</label><input class="fi" type="number" id="prodShip" placeholder="29.99" step="0.01"></div>
+          <div style="margin-top:16px;padding:14px;border-radius:10px;background:rgba(74,158,255,.06);border:1px solid rgba(74,158,255,.12)">
+            <p style="font-size:12px;color:var(--blue)"><strong>Required columns:</strong> product_name, price. <strong>Recommended:</strong> sku, brand, category, stock_qty, fitment, description, condition, shipping_cost, image_url, weight</p>
           </div>
-          <div class="form-row">
-            <div class="fg"><label>Part Number / SKU</label><input class="fi" type="text" id="prodSku" placeholder="TS-F14-165G"></div>
-            <div class="fg"><label>Stock Quantity</label><input class="fi" type="number" id="prodStock" placeholder="25"></div>
+          <button class="form-btn" onclick="importCSV()" id="csvImportBtn">Import Products</button>
+        </div>
+      </div>
+
+      <!-- API PANEL (hidden) -->
+      <div class="card" id="apiPanel" style="display:none;margin-bottom:20px">
+        <div class="card-header"><h3>API Integration</h3><button class="btn-sm" onclick="hideApiPanel()">✕ Close</button></div>
+        <div style="padding:24px">
+          <div style="margin-bottom:20px">
+            <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--t3);display:block;margin-bottom:6px">Your Vendor API Key</label>
+            <div style="display:flex;gap:8px">
+              <input class="fi" type="text" id="apiKeyField" readonly style="font-family:monospace;font-size:13px;letter-spacing:.5px;color:var(--ember)">
+              <button class="btn-action" style="flex-shrink:0;white-space:nowrap" onclick="copyApiKey()">📋 Copy</button>
+            </div>
+            <p style="font-size:11px;color:var(--t3);margin-top:6px">Keep this key secret. It authenticates all API requests for your account.</p>
           </div>
-          <div class="form-row">
-            <div class="fg"><label>Category</label><select class="fi" id="prodCat"><option value="">Select...</option><option>Injectors</option><option>Turbos</option><option>Fuel Systems</option><option>Exhaust</option><option>Engine Parts</option><option>Transmission</option><option>Filters / Fluids</option><option>Electrical</option><option>DPF / DEF / Emissions</option><option>Suspension / Lift</option><option>Accessories</option></select></div>
-            <div class="fg"><label>Condition</label><select class="fi" id="prodCondition"><option value="new">New</option><option value="remanufactured">Remanufactured</option><option value="used">Used</option></select></div>
+          <div style="margin-bottom:20px">
+            <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--t3);display:block;margin-bottom:6px">API Endpoint</label>
+            <div style="padding:14px;border-radius:10px;background:var(--bg);border:1px solid var(--smoke);font-family:monospace;font-size:13px;color:var(--t1)">POST https://black-stack-diesel.com/api/v1/products</div>
           </div>
-          <div class="fg"><label>Fitment (trucks this fits)</label><input class="fi" type="text" id="prodFit" placeholder="2003-2007 Dodge Ram 2500/3500 5.9L Cummins"></div>
-          <div class="fg"><label>Description</label><textarea class="fi" id="prodDesc" placeholder="Describe the product, features, what's included..."></textarea></div>
-          <button class="form-btn" onclick="saveProduct()">Save Product</button>
+          <div style="margin-bottom:20px">
+            <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--t3);display:block;margin-bottom:10px">Example Request</label>
+            <pre style="padding:16px;border-radius:10px;background:var(--bg);border:1px solid var(--smoke);font-size:12px;color:var(--t2);overflow-x:auto;line-height:1.7;white-space:pre-wrap">curl -X POST https://black-stack-diesel.com/api/v1/products \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "products": [
+      {
+        "product_name": "FASS Titanium 150GPH",
+        "sku": "TS-F14-150G",
+        "brand": "FASS Fuel Systems",
+        "price": 549.99,
+        "shipping_cost": 29.99,
+        "stock_qty": 25,
+        "category": "Fuel Systems",
+        "condition": "new",
+        "fitment": "2003-2007 Dodge Ram 5.9L Cummins",
+        "description": "Titanium Signature Series...",
+        "image_url": "https://...",
+        "weight_lbs": 12.5
+      }
+    ]
+  }'</pre>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--t3);display:block;margin-bottom:10px">Bulk Actions</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <div style="padding:10px 16px;border-radius:8px;background:var(--bg);border:1px solid var(--smoke);font-size:12px;color:var(--t2)"><strong>POST</strong> /products — Create / update products</div>
+              <div style="padding:10px 16px;border-radius:8px;background:var(--bg);border:1px solid var(--smoke);font-size:12px;color:var(--t2)"><strong>PATCH</strong> /products/:sku — Update stock / price</div>
+              <div style="padding:10px 16px;border-radius:8px;background:var(--bg);border:1px solid var(--smoke);font-size:12px;color:var(--t2)"><strong>DELETE</strong> /products/:sku — Remove listing</div>
+              <div style="padding:10px 16px;border-radius:8px;background:var(--bg);border:1px solid var(--smoke);font-size:12px;color:var(--t2)"><strong>GET</strong> /products — List your products</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DISTRIBUTOR PANEL (hidden) -->
+      <div class="card" id="distPanel" style="display:none;margin-bottom:20px">
+        <div class="card-header"><h3>Distributor Sync</h3><button class="btn-sm" onclick="hideDistPanel()">✕ Close</button></div>
+        <div style="padding:24px">
+          <p style="font-size:13px;color:var(--t2);margin-bottom:20px">Connect your distributor account to auto-import and sync inventory. Pricing, stock levels, and fitment data update automatically.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" id="distList">
+            <div class="dist-card" onclick="connectDist('apg')">
+              <div class="dist-top"><strong>APG Wholesale</strong><span class="badge badge-new">Ready</span></div>
+              <p>Auto-sync diesel parts catalog. Requires dealer account.</p>
+              <div class="dist-fields" id="dist-apg" style="display:none">
+                <div class="fg"><label>Dealer Account #</label><input class="fi" type="text" id="apgAcct" placeholder="APG-XXXXXX"></div>
+                <div class="fg"><label>API Key</label><input class="fi" type="text" id="apgKey" placeholder="Your APG API key"></div>
+                <button class="form-btn" onclick="saveDist('apg')" style="margin-top:4px">Connect APG</button>
+              </div>
+            </div>
+            <div class="dist-card" onclick="connectDist('meyer')">
+              <div class="dist-top"><strong>Meyer Distributing</strong><span class="badge badge-pending">Coming Soon</span></div>
+              <p>Truck accessories and performance parts.</p>
+            </div>
+            <div class="dist-card" onclick="connectDist('turn14')">
+              <div class="dist-top"><strong>Turn 14 Distribution</strong><span class="badge badge-pending">Coming Soon</span></div>
+              <p>Performance diesel parts from 800+ brands.</p>
+            </div>
+            <div class="dist-card" onclick="connectDist('custom')">
+              <div class="dist-top"><strong>Custom / Other</strong><span class="badge badge-new">Ready</span></div>
+              <p>Connect any system that exports CSV, XML, or JSON feeds.</p>
+              <div class="dist-fields" id="dist-custom" style="display:none">
+                <div class="fg"><label>Feed URL</label><input class="fi" type="url" id="customFeedUrl" placeholder="https://your-system.com/feed.csv"></div>
+                <div class="fg"><label>Feed Format</label><select class="fi" id="customFeedFmt"><option value="csv">CSV</option><option value="json">JSON</option><option value="xml">XML</option></select></div>
+                <div class="fg"><label>Sync Frequency</label><select class="fi" id="customFeedFreq"><option value="daily">Daily</option><option value="12h">Every 12 Hours</option><option value="6h">Every 6 Hours</option><option value="hourly">Hourly</option></select></div>
+                <button class="form-btn" onclick="saveDist('custom')" style="margin-top:4px">Save Feed</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRODUCT LIST TABLE -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Your Products</h3>
+          <div style="display:flex;gap:8px">
+            <input class="fi" type="text" id="prodSearch" placeholder="Search SKU or name..." style="width:240px;height:38px;font-size:13px" oninput="filterProducts()">
+          </div>
+        </div>
+        <div id="productList">
+          <div class="empty-state"><div class="icon">🔧</div><h4>No Products Listed</h4><p>Import your catalog using CSV, API, or distributor sync above to get started.</p></div>
         </div>
       </div>
     </div>
@@ -594,21 +717,109 @@ function dashTab(id,el){
   document.getElementById('dp-'+id).classList.add('active');
 }
 
-// ===== PRODUCTS =====
-function showAddProduct(){document.getElementById('addProductForm').style.display='block';document.getElementById('addProductForm').scrollIntoView({behavior:'smooth'})}
-function hideAddProduct(){document.getElementById('addProductForm').style.display='none'}
+// ===== CSV UPLOAD =====
+var csvData=null,csvHeaders=[];
+function handleCSV(input){
+  var file=input.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var lines=e.target.result.split('\n').filter(function(l){return l.trim()});
+    if(lines.length<2){alert('CSV needs at least a header row and one data row.');return}
+    var delim=lines[0].indexOf('\t')>-1?'\t':',';
+    csvHeaders=lines[0].split(delim).map(function(h){return h.trim().replace(/^"|"$/g,'')});
+    csvData=[];
+    for(var i=1;i<lines.length;i++){
+      var vals=lines[i].split(delim).map(function(v){return v.trim().replace(/^"|"$/g,'')});
+      if(vals.length>=2)csvData.push(vals);
+    }
+    document.getElementById('csvRowCount').textContent=csvData.length;
+    var bsdFields=['product_name','sku','brand','price','shipping_cost','stock_qty','category','condition','fitment','description','image_url','weight_lbs'];
+    var mapHTML='';
+    bsdFields.forEach(function(f){
+      var opts='<option value="">— Skip —</option>';
+      csvHeaders.forEach(function(h,i){
+        var sel=(h.toLowerCase().replace(/[\s_-]+/g,'_')===f||h.toLowerCase().indexOf(f.replace('_',' '))>-1)?'selected':'';
+        opts+='<option value="'+i+'" '+sel+'>'+h+'</option>';
+      });
+      var req=f==='product_name'||f==='price'?' *':'';
+      mapHTML+='<div class="fg"><label>'+f.replace(/_/g,' ')+req+'</label><select class="fi" id="csvMap_'+f+'">'+opts+'</select></div>';
+    });
+    document.getElementById('csvMapFields').innerHTML=mapHTML;
+    document.getElementById('csvMapper').style.display='block';
+    document.getElementById('csvMapper').scrollIntoView({behavior:'smooth'});
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+function cancelCSV(){csvData=null;csvHeaders=[];document.getElementById('csvMapper').style.display='none'}
+function importCSV(){
+  var nameIdx=document.getElementById('csvMap_product_name').value;
+  var priceIdx=document.getElementById('csvMap_price').value;
+  if(nameIdx===''||priceIdx===''){document.getElementById('csvErr').textContent='Product name and price are required.';document.getElementById('csvErr').style.display='block';return}
+  document.getElementById('csvErr').style.display='none';
+  var bsdFields=['product_name','sku','brand','price','shipping_cost','stock_qty','category','condition','fitment','description','image_url','weight_lbs'];
+  var mapping={};
+  bsdFields.forEach(function(f){var v=document.getElementById('csvMap_'+f).value;if(v!=='')mapping[f]=parseInt(v)});
+  var products=[];
+  csvData.forEach(function(row){
+    var p={};
+    Object.keys(mapping).forEach(function(f){p[f]=row[mapping[f]]||null});
+    if(p.price)p.price=parseFloat(p.price)||0;
+    if(p.shipping_cost)p.shipping_cost=parseFloat(p.shipping_cost)||0;
+    if(p.stock_qty)p.stock_qty=parseInt(p.stock_qty)||0;
+    if(p.weight_lbs)p.weight_lbs=parseFloat(p.weight_lbs)||0;
+    if(p.product_name&&p.price>0)products.push(p);
+  });
+  if(products.length===0){document.getElementById('csvErr').textContent='No valid products found. Ensure name and price columns are mapped.';document.getElementById('csvErr').style.display='block';return}
+  // For now show success — Supabase insert comes after table creation
+  var btn=document.getElementById('csvImportBtn');btn.textContent='Importing...';btn.disabled=true;
+  setTimeout(function(){
+    alert(products.length+' products ready for import! (Database tables will be wired next.)');
+    console.log('CSV products:',products);
+    cancelCSV();
+    btn.textContent='Import Products';btn.disabled=false;
+  },800);
+}
 
-function saveProduct(){
-  var name=document.getElementById('prodName').value.trim();
-  var price=document.getElementById('prodPrice').value;
-  var ship=document.getElementById('prodShip').value;
-  var errEl=document.getElementById('productErr');
-  if(!name||!price||!ship){errEl.textContent='Name, price, and shipping cost are required.';errEl.style.display='block';return}
-  errEl.style.display='none';
+// ===== API PANEL =====
+function showApiPanel(){
+  document.getElementById('apiPanel').style.display='block';
+  var key=vendorData?'bsd_'+vendorData.id.replace(/-/g,'').slice(0,24):'bsd_login_first';
+  document.getElementById('apiKeyField').value=key;
+  document.getElementById('apiPanel').scrollIntoView({behavior:'smooth'});
+}
+function hideApiPanel(){document.getElementById('apiPanel').style.display='none'}
+function copyApiKey(){
+  var el=document.getElementById('apiKeyField');
+  el.select();el.setSelectionRange(0,99999);
+  navigator.clipboard.writeText(el.value).then(function(){alert('API key copied!')});
+}
 
-  // For now, show success (product table coming when we build the products DB)
-  alert('Product saved! (Product database integration coming soon. For now, your product details have been captured.)');
-  hideAddProduct();
+// ===== DISTRIBUTOR PANEL =====
+function showDistPanel(){document.getElementById('distPanel').style.display='block';document.getElementById('distPanel').scrollIntoView({behavior:'smooth'})}
+function hideDistPanel(){document.getElementById('distPanel').style.display='none'}
+function connectDist(id){
+  var el=document.getElementById('dist-'+id);
+  if(el){el.style.display=el.style.display==='none'?'block':'none'}
+}
+function saveDist(id){
+  if(id==='apg'){
+    var acct=document.getElementById('apgAcct').value.trim();
+    var key=document.getElementById('apgKey').value.trim();
+    if(!acct||!key){alert('Please enter your APG account number and API key.');return}
+    alert('APG connection saved! Sync will begin once the product database is ready.');
+  }else if(id==='custom'){
+    var url=document.getElementById('customFeedUrl').value.trim();
+    if(!url){alert('Please enter your feed URL.');return}
+    alert('Custom feed saved! Auto-sync will begin once the product database is ready.');
+  }
+}
+
+// ===== PRODUCT SEARCH =====
+function filterProducts(){
+  // Will wire to Supabase query once products table exists
+  var q=document.getElementById('prodSearch').value.trim().toLowerCase();
+  console.log('Search:',q);
 }
 
 // ===== SETTINGS =====
@@ -657,7 +868,8 @@ async function handleApply(){
 }
 
 // Smooth scroll for pitch page links
-document.querySelectorAll('#pitchPage a[href^="#"]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth'})})});
+document.querySelectorAll('#pitchPage a[href^="#"]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth'})})}
+);
 </script>
 </body>
 </html>
