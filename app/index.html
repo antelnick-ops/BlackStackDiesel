@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#07070A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BlackStack">
+<link rel="manifest" href="/app/manifest.json">
+<link rel="apple-touch-icon" href="/app/icon-192.png">
 <title>BlackStack Diesel</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -292,7 +298,7 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 
 <!-- PROFILE -->
 <div class="scr" id="s-pro">
-<div class="p-head"><div class="p-av">NA</div><div class="p-name">Nicholas Antel</div><div class="p-email">nicholas.antel@outlook.com</div></div>
+<div class="p-head"><div class="p-av">NA</div><div class="p-name">Nicholas Antel</div><div class="p-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e08e8983888f8c8193ce818e94858ca08f95948c8f8f8bce838f8d">[email&#160;protected]</a></div></div>
 <div class="p-truck g"><div class="p-trk-i">🚛</div><div class="p-trk-t"><h4 id="pTrk">2006 Ford F-250</h4><p id="pEng">6.0L Power Stroke</p></div><button class="p-edit gs" onclick="resetVeh()">Edit</button></div>
 <div class="p-grid">
 <div class="p-st g"><div class="p-stv mono">7</div><div class="p-stl">Orders</div></div>
@@ -322,7 +328,7 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 const DB={Dodge:{"Ram 2500":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009],e:{"1994-1998":["5.9L 12V Cummins"],"1998-2002":["5.9L 24V Cummins ISB"],"2003-2007":["5.9L Cummins ISB 325"],"2007-2009":["6.7L Cummins ISB"]}},"Ram 3500":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009],e:{"1994-1998":["5.9L 12V Cummins"],"1998-2002":["5.9L 24V Cummins ISB"],"2003-2007":["5.9L Cummins ISB 325"],"2007-2009":["6.7L Cummins ISB"]}}},Ram:{"2500":{y:[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2010-2012":["6.7L Cummins ISB"],"2013-2018":["6.7L Cummins ISB 385"],"2019-2026":["6.7L Cummins HO 420"]}},"3500":{y:[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2010-2012":["6.7L Cummins ISB"],"2013-2018":["6.7L Cummins ISB 385"],"2019-2026":["6.7L Cummins HO 420"]}}},Ford:{"F-250":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1994-1997":["7.3L IDI Turbo Diesel"],"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-350":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1994-1997":["7.3L IDI Turbo Diesel"],"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-450":{y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-550":{y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"Excursion":{y:[2000,2001,2002,2003,2004,2005],e:{"2000-2003":["7.3L Power Stroke"],"2003-2005":["6.0L Power Stroke"]}}},Chevrolet:{"Silverado 2500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}},"Silverado 3500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}}},GMC:{"Sierra 2500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}},"Sierra 3500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}}}};
 
 const V={year:null,make:null,model:null,engine:null};
@@ -360,6 +366,9 @@ function resetVeh(){V.year=V.make=V.model=V.engine=null;uProg(1);initYrs();hG('m
 uProg(1);initYrs();
 document.querySelectorAll('.ct').forEach(c=>c.onclick=()=>{document.querySelectorAll('.ct').forEach(x=>x.classList.remove('on'));c.classList.add('on')});
 document.querySelectorAll('.stg').forEach(b=>b.onclick=()=>b.classList.toggle('on'));
+
+// Register Service Worker for PWA
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/app/sw.js').then(()=>console.log('SW registered')).catch(e=>console.log('SW failed',e))}
 </script>
 </body>
 </html>

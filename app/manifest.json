@@ -1,0 +1,24 @@
+{
+  "name": "BlackStack Diesel",
+  "short_name": "BlackStack",
+  "description": "Diesel truck parts & AI diagnostics",
+  "start_url": "/app/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#07070A",
+  "theme_color": "#EDAE0A",
+  "icons": [
+    {
+      "src": "/app/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/app/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
