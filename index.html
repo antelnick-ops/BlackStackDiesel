@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TDGHS7EY89"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-TDGHS7EY89');</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Black Stack Diesel — AI Diagnostics & Parts for Diesel Trucks</title>
@@ -9,15 +11,6 @@
 <meta property="og:description" content="AI-powered diagnostics and parts for diesel trucks. Built by truck people, for truck people.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://black-stack-diesel.com">
-<meta property="og:image" content="https://www.black-stack-diesel.com/logo.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Black Stack Diesel — AI Diagnostics & Parts for Diesel Trucks">
-<meta name="twitter:description" content="AI-powered diagnostics and parts for diesel trucks. Built by truck people, for truck people.">
-<meta name="twitter:image" content="https://www.black-stack-diesel.com/logo.png">
-<meta name="robots" content="index, follow">
-<meta name="theme-color" content="#FF6B2C">
-<link rel="canonical" href="https://www.black-stack-diesel.com/">
-<meta name="keywords" content="diesel truck parts, diesel diagnostics, Cummins parts, Power Stroke parts, Duramax parts, diesel truck app, AI diagnostics, Ram 2500, F-250, Silverado, diesel mechanic, truck parts marketplace">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Archivo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -167,7 +160,6 @@ footer{padding:48px 40px;border-top:1px solid var(--bd);display:flex;justify-con
     <a href="#features">Features</a>
     <a href="#app">App</a>
     <a href="#engines">Engines</a>
-    <a href="/vendors/">Sell With Us</a>
     <a href="#signup" class="nav-cta">Get Early Access</a>
   </div>
 </nav>
@@ -265,9 +257,9 @@ footer{padding:48px 40px;border-top:1px solid var(--bd);display:flex;justify-con
     <div class="section-label">Early Access</div>
     <div class="section-title">Be First to Know When We Launch.</div>
     <div class="section-desc">Drop your email and we'll let you know the second Black Stack Diesel goes live. No spam, just diesel.</div>
-    <form class="email-form" id="emailForm" method="post" action="javascript:void(0)">
-      <input class="email-input" type="email" name="email" placeholder="you@email.com" required>
-      <button class="email-submit" type="button" id="emailBtn">Notify Me</button>
+    <form class="email-form" id="emailForm" onsubmit="handleSignup(event)">
+      <input class="email-input" type="email" placeholder="you@email.com" required>
+      <button class="email-submit" type="submit">Notify Me</button>
     </form>
     <div class="email-note">We respect your inbox. Unsubscribe anytime.</div>
     <div class="email-success" id="emailSuccess">You're on the list. We'll be in touch soon.</div>
@@ -282,7 +274,7 @@ footer{padding:48px 40px;border-top:1px solid var(--bd);display:flex;justify-con
     <a href="#features">Features</a>
     <a href="#engines">Engines</a>
     <a href="#signup">Early Access</a>
-    <a href="mailto:contact@black-stack-diesel.com">Contact</a>
+    <a href="/cdn-cgi/l/email-protection#30535f5e4451534470525c51535b1d434451535b1d54595543555c1e535f5d">Contact</a>
     <div class="footer-social">
       <a href="https://www.facebook.com/profile.php?id=61588485453942" target="_blank" rel="noopener" aria-label="Facebook">
         <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
@@ -291,11 +283,8 @@ footer{padding:48px 40px;border-top:1px solid var(--bd);display:flex;justify-con
   </div>
   <div class="footer-legal">© 2026 Dynamic Innovative Solutions LLC. All rights reserved. Black Stack Diesel™</div>
 </footer>
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 const observer=new IntersectionObserver(e=>{e.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}})},{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
-document.getElementById('emailBtn').onclick=async function(){var email=document.querySelector('.email-input').value.trim();if(!email)return;this.textContent='Sending...';this.disabled=true;try{var res=await fetch('https://jfjbilfsiebifzddveof.supabase.co/rest/v1/waitlist',{method:'POST',headers:{'Content-Type':'application/json','apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamJpbGZzaWViaWZ6ZGR2ZW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2OTg4ODUsImV4cCI6MjA4NzI3NDg4NX0.bbTQ0l4HsHoKUzoKACBvbXJ0TbnUM5tltK4YLKyuMr8','Prefer':'return=minimal'},body:JSON.stringify({email:email})});if(res.ok){document.getElementById('emailForm').style.display='none';document.querySelector('.email-note').style.display='none';var s=document.getElementById('emailSuccess');s.textContent='Thanks for staying in touch! We will notify you the second BlackStack Diesel goes live.';s.style.display='block'}else if(res.status===409){var s=document.getElementById('emailSuccess');s.textContent='You are already on the list!';s.style.display='block'}else{throw new Error('fail')}}catch(err){this.textContent='Notify Me';this.disabled=false;alert('Something went wrong. Please try again.')}};
-document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth'})})});
-</script>
-</body>
-</html>
+function handleSignup(e){e.preventDefault();document.getElementById('emailForm').style.display='none';document.querySelector('.email-note').style.display='none';document.getElementById('emailSuccess').style.display='block'}
+document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener
