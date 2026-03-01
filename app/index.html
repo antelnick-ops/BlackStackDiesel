@@ -314,22 +314,16 @@ body{font-family:'Manrope',sans-serif;color:var(--t1)}
 <div class="scr" id="s-mkt">
 <div class="mk-top"><h2>Marketplace</h2><div class="cbtn gs" onclick="toggleCart()"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg><div class="cbdg">0</div></div></div>
 <div class="vstrip g"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span id="vsText">Select your vehicle first</span></div>
-<div class="cats"><div class="ct on">All</div><div class="ct">Injectors</div><div class="ct">Turbo</div><div class="ct">Head Studs</div><div class="ct">EGR</div><div class="ct">Fuel System</div><div class="ct">Engine</div></div>
-<div class="stg-row"><div class="stg">Stage 1</div><div class="stg on">Stage 2</div><div class="stg">Stage 3</div></div>
+<div class="cats" id="catTabs"><div class="ct on">All</div></div>
+<div class="stg-row"><div class="stg">Stage 1</div><div class="stg">Stage 2</div><div class="stg">Stage 3</div></div>
 <div class="dds">
 <select class="dd"><option>Price: All</option><option>Under $100</option><option>$100–$500</option><option>$500–$1K</option><option>$1K+</option></select>
-<select class="dd"><option>Brand: All</option><option>Alliant Power</option><option>ARP</option><option>Garrett</option></select>
+<select class="dd" id="brandDd"><option>Brand: All</option></select>
 <select class="dd"><option>Sort</option><option>Low → High</option><option>High → Low</option></select>
 </div>
 <div class="sbox"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Search parts…"></div>
 <div class="pgrid" id="pgrid">
-<div class="pc g" data-cat="injectors" data-stage="2" data-brand="alliant power" data-price="2495"><div class="pc-img">💉<div class="pc-fit">✓ Fits</div><div class="pc-stg s2">STG 2</div></div><div class="pc-bd"><div class="pc-br">Alliant Power</div><h4>Reman Injector Set (8)</h4><div class="pc-bt"><div class="pc-pr mono">$2,495</div><button class="ab" onclick="addToCart('inj','Reman Injector Set (8)','Alliant Power',2495,'💉')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
-<div class="pc g" data-cat="turbo" data-stage="2" data-brand="garrett" data-price="795"><div class="pc-img">🌀<div class="pc-fit">✓ Fits</div><div class="pc-stg s2">STG 2</div></div><div class="pc-bd"><div class="pc-br">Garrett</div><h4>GT3782VA Turbo Reman</h4><div class="pc-bt"><div class="pc-pr mono">$795</div><button class="ab" onclick="addToCart('turbo','GT3782VA Turbo Reman','Garrett',795,'🌀')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
-<div class="pc g" data-cat="head studs" data-stage="3" data-brand="arp" data-price="449"><div class="pc-img">🔩<div class="pc-fit">✓ Fits</div><div class="pc-stg s3">STG 3</div></div><div class="pc-bd"><div class="pc-br">ARP</div><h4>Head Stud Kit</h4><div class="pc-bt"><div class="pc-pr mono">$449</div><button class="ab" onclick="addToCart('studs','Head Stud Kit','ARP',449,'🔩')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
-<div class="pc g" data-cat="egr" data-stage="2" data-brand="sinister diesel" data-price="289"><div class="pc-img">🔧<div class="pc-fit">✓ Fits</div><div class="pc-stg s2">STG 2</div></div><div class="pc-bd"><div class="pc-br">Sinister Diesel</div><h4>EGR Delete Kit</h4><div class="pc-bt"><div class="pc-pr mono">$289</div><button class="ab" onclick="addToCart('egr','EGR Delete Kit','Sinister Diesel',289,'🔧')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
-<div class="pc g" data-cat="fuel system" data-stage="2" data-brand="motorcraft" data-price="845"><div class="pc-img">⛽<div class="pc-fit">✓ Fits</div><div class="pc-stg s2">STG 2</div></div><div class="pc-bd"><div class="pc-br">Motorcraft</div><h4>HPOP Pump</h4><div class="pc-bt"><div class="pc-pr mono">$845</div><button class="ab" onclick="addToCart('hpop','HPOP Pump','Motorcraft',845,'⛽')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
-<div class="pc g" data-cat="engine" data-stage="1" data-brand="dorman" data-price="219"><div class="pc-img">🔧<div class="pc-fit">✓ Fits</div><div class="pc-stg s1">STG 1</div></div><div class="pc-bd"><div class="pc-br">Dorman</div><h4>Oil Cooler</h4><div class="pc-bt"><div class="pc-pr mono">$219</div><button class="ab" onclick="addToCart('cooler','Oil Cooler','Dorman',219,'🔧')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
-<div class="pc g noresult" style="display:none;grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--t3);font-size:14px" id="noResults">No parts match your filters</div>
+<div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--t3);font-size:14px">Loading products…</div>
 </div>
 </div>
 
@@ -448,8 +442,60 @@ function doCheckout(){
   if(cart.length===0)return;
   alert('Checkout coming soon! Your total: $'+cart.reduce(function(s,c){return s+c.price*c.qty},0).toLocaleString());
 }
+// === Category emoji map ===
+var catEmoji={injectors:'💉',turbos:'🌀','head studs':'🔩',egr:'🔧','fuel system':'⛽',engine:'🔧',exhaust:'💨',tuning:'📟',intake:'🌬️',gauges:'📊',cooling:'❄️'};
+function getCatEmoji(cat){return catEmoji[(cat||'').toLowerCase()]||'🔧'}
+
+// === Load products from Supabase ===
+async function loadProducts(){
+  var grid=document.getElementById('pgrid');
+  var res=await sb.from('products').select('*').eq('status','active').order('created_at',{ascending:false});
+  if(res.error||!res.data||res.data.length===0){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--t3);font-size:14px">No products available yet</div>';
+    return;
+  }
+  var products=res.data;
+  // Build category tabs
+  var cats=new Set();var brands=new Set();
+  products.forEach(function(p){if(p.category)cats.add(p.category);if(p.brand)brands.add(p.brand)});
+  var tabHtml='<div class="ct on">All</div>';
+  Array.from(cats).sort().forEach(function(c){tabHtml+='<div class="ct">'+c+'</div>'});
+  document.getElementById('catTabs').innerHTML=tabHtml;
+  // Rebind category tab clicks
+  document.querySelectorAll('.ct').forEach(function(c){c.onclick=function(){document.querySelectorAll('.ct').forEach(function(x){x.classList.remove('on')});c.classList.add('on');filterProducts()}});
+  // Build brand dropdown
+  var brandHtml='<option>Brand: All</option>';
+  Array.from(brands).sort().forEach(function(b){brandHtml+='<option>'+b+'</option>'});
+  document.getElementById('brandDd').innerHTML=brandHtml;
+
+  // Build product cards
+  var html='';
+  products.forEach(function(p){
+    var cat=(p.category||'').toLowerCase();
+    var stg=p.stage||'';
+    var brand=(p.brand||'').toLowerCase();
+    var price=parseFloat(p.price)||0;
+    var emoji=getCatEmoji(p.category);
+    var stgClass=stg?'s'+stg:'';
+    var stgLabel=stg?'STG '+stg:'';
+    html+='<div class="pc g" data-cat="'+cat+'" data-stage="'+stg+'" data-brand="'+brand+'" data-price="'+Math.round(price)+'">';
+    html+='<div class="pc-img">'+emoji;
+    html+='<div class="pc-fit">✓ Fits</div>';
+    if(stg)html+='<div class="pc-stg '+stgClass+'">'+stgLabel+'</div>';
+    html+='</div>';
+    html+='<div class="pc-bd">';
+    if(p.brand)html+='<div class="pc-br">'+p.brand+'</div>';
+    html+='<h4>'+p.product_name+'</h4>';
+    html+='<div class="pc-bt"><div class="pc-pr mono">$'+price.toLocaleString()+'</div>';
+    html+='<button class="ab" onclick="addToCart(\''+p.id+'\',\''+p.product_name.replace(/'/g,"\\'")+'\',\''+(p.brand||'').replace(/'/g,"\\'")+'\','+price+',\''+emoji+'\')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>';
+    html+='</div></div></div>';
+  });
+  html+='<div class="pc g noresult" style="display:none;grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--t3);font-size:14px" id="noResults">No parts match your filters</div>';
+  grid.innerHTML=html;
+}
+
 renderCart();
-uProg(1);initYrs();checkSession();
+uProg(1);initYrs();checkSession();loadProducts();
 document.getElementById('authPass').addEventListener('keydown',function(e){if(e.key==='Enter')handleAuth()});
 document.querySelectorAll('.ct').forEach(function(c){c.onclick=function(){document.querySelectorAll('.ct').forEach(function(x){x.classList.remove('on')});c.classList.add('on');filterProducts()}});
 document.querySelectorAll('.stg').forEach(function(b){b.onclick=function(){b.classList.toggle('on');filterProducts()}});
