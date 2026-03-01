@@ -437,7 +437,7 @@ section{padding:100px 40px}
           <div style="padding:28px;text-align:center">
             <div style="font-size:36px;margin-bottom:12px">📄</div>
             <h3 style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">CSV Upload</h3>
-            <p style="font-size:13px;color:var(--t2);line-height:1.6">Upload a spreadsheet of your entire catalog. Map columns on the next screen.</p>
+            <p style="font-size:13px;color:var(--t2);line-height:1.6">Drop in any CSV — we auto-detect your columns. No mapping needed.</p>
             <div style="margin-top:16px;padding:8px 20px;border-radius:8px;background:var(--ember);color:#fff;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:2px;display:inline-block">Upload CSV</div>
           </div>
         </div>
@@ -464,19 +464,23 @@ section{padding:100px 40px}
         </div>
       </div>
 
-      <!-- CSV MAPPING (hidden until CSV uploaded) -->
+      <!-- CSV PREVIEW (hidden until CSV uploaded) -->
       <div class="card" id="csvMapper" style="display:none;margin-bottom:20px">
-        <div class="card-header"><h3>Map CSV Columns</h3><button class="btn-sm" onclick="cancelCSV()">✕ Cancel</button></div>
+        <div class="card-header"><h3>📄 CSV Preview</h3><button class="btn-sm" onclick="cancelCSV()">✕ Cancel</button></div>
         <div style="padding:24px">
-          <p style="font-size:13px;color:var(--t2);margin-bottom:16px">We detected <strong id="csvRowCount">0</strong> rows. Map your columns to our fields:</p>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <div style="padding:8px 16px;border-radius:8px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.15);font-size:13px;color:#34D399"><strong id="csvRowCount">0</strong> products detected</div>
+            <div style="padding:8px 16px;border-radius:8px;background:rgba(74,158,255,.08);border:1px solid rgba(74,158,255,.15);font-size:13px;color:#4A9EFF"><strong id="csvColCount">0</strong> columns matched</div>
+          </div>
           <div class="form-err" id="csvErr"></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" id="csvMapFields">
-            <!-- Populated dynamically -->
+          <div style="overflow-x:auto;margin-bottom:16px;border-radius:10px;border:1px solid var(--bd)">
+            <table style="width:100%;border-collapse:collapse;font-size:12px" id="csvPreviewTable">
+            </table>
           </div>
-          <div style="margin-top:16px;padding:14px;border-radius:10px;background:rgba(74,158,255,.06);border:1px solid rgba(74,158,255,.12)">
-            <p style="font-size:12px;color:var(--blue)"><strong>Required columns:</strong> product_name, price. <strong>Recommended:</strong> sku, brand, category, stock_qty, fitment, description, condition, shipping_cost, image_url, weight</p>
+          <div id="csvWarnings" style="display:none;margin-bottom:16px;padding:12px 16px;border-radius:10px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.12)">
+            <p style="font-size:12px;color:#FBBF24" id="csvWarningText"></p>
           </div>
-          <button class="form-btn" onclick="importCSV()" id="csvImportBtn">Import Products</button>
+          <button class="form-btn" onclick="importCSV()" id="csvImportBtn">Import <span id="csvImportCount">0</span> Products</button>
         </div>
       </div>
 
@@ -719,13 +723,49 @@ function dashTab(id,el){
   document.getElementById('dp-'+id).classList.add('active');
 }
 
-// ===== CSV UPLOAD =====
-var csvData=null,csvHeaders=[];
+// ===== CSV UPLOAD (Smart Auto-Detect) =====
+var csvData=null,csvHeaders=[],csvMapping={};
+
+// Smart column matching — maps common header variations to our fields
+var headerAliases={
+  product_name:['product_name','name','product name','product','title','item','item name','item_name','part','part name','part_name','description_short'],
+  sku:['sku','part_number','part number','partnumber','item_number','item number','upc','mpn','mfr_part','mfr part','product_id','id','item_id','catalog_number'],
+  brand:['brand','manufacturer','mfg','make','vendor','brand_name','mfr','supplier'],
+  price:['price','retail','retail_price','retail price','msrp','sell','sell_price','unit_price','amount','cost_price','sale_price','list_price'],
+  shipping_cost:['shipping_cost','shipping','ship_cost','freight','shipping_price','delivery_cost'],
+  stock_qty:['stock_qty','qty','quantity','stock','in_stock','inventory','available','on_hand','count','units'],
+  category:['category','type','product_type','product type','department','class','group','product_category'],
+  condition:['condition','status','product_condition','state'],
+  fitment:['fitment','engine_compatibility','engine','compatibility','fits','vehicle','application','fit','engines','makes_models'],
+  description:['description','desc','product_description','long_description','details','notes','info','about','summary'],
+  image_url:['image_url','image','img','photo','picture','thumbnail','image_link','img_url','photo_url','main_image'],
+  weight:['weight','weight_lbs','lbs','ship_weight','package_weight','wt']
+};
+
+function matchHeader(h){
+  var clean=h.toLowerCase().trim().replace(/[\s\-]+/g,'_').replace(/[^a-z0-9_]/g,'');
+  for(var field in headerAliases){
+    for(var i=0;i<headerAliases[field].length;i++){
+      if(clean===headerAliases[field][i].replace(/[\s\-]+/g,'_'))return field;
+    }
+  }
+  return null;
+}
+
 function handleCSV(input){
   var file=input.files[0];if(!file)return;
   var reader=new FileReader();
   reader.onload=function(e){
-    var lines=e.target.result.split('\n').filter(function(l){return l.trim()});
+    var text=e.target.result;
+    // Handle quoted fields with commas inside
+    var lines=[];var current='';var inQuote=false;
+    for(var c=0;c<text.length;c++){
+      var ch=text[c];
+      if(ch==='"')inQuote=!inQuote;
+      else if((ch==='\n'||ch==='\r')&&!inQuote){if(current.trim())lines.push(current);current=''}
+      else current+=ch;
+    }
+    if(current.trim())lines.push(current);
     if(lines.length<2){alert('CSV needs at least a header row and one data row.');return}
     var delim=lines[0].indexOf('\t')>-1?'\t':',';
     csvHeaders=lines[0].split(delim).map(function(h){return h.trim().replace(/^"|"$/g,'')});
@@ -734,53 +774,141 @@ function handleCSV(input){
       var vals=lines[i].split(delim).map(function(v){return v.trim().replace(/^"|"$/g,'')});
       if(vals.length>=2)csvData.push(vals);
     }
-    document.getElementById('csvRowCount').textContent=csvData.length;
-    var bsdFields=['product_name','sku','brand','price','shipping_cost','stock_qty','category','condition','fitment','description','image_url','weight_lbs'];
-    var mapHTML='';
-    bsdFields.forEach(function(f){
-      var opts='<option value="">— Skip —</option>';
-      csvHeaders.forEach(function(h,i){
-        var sel=(h.toLowerCase().replace(/[\s_-]+/g,'_')===f||h.toLowerCase().indexOf(f.replace('_',' '))>-1)?'selected':'';
-        opts+='<option value="'+i+'" '+sel+'>'+h+'</option>';
-      });
-      var req=f==='product_name'||f==='price'?' *':'';
-      mapHTML+='<div class="fg"><label>'+f.replace(/_/g,' ')+req+'</label><select class="fi" id="csvMap_'+f+'">'+opts+'</select></div>';
+    // Auto-match columns
+    csvMapping={};
+    var matched=0,warnings=[];
+    csvHeaders.forEach(function(h,idx){
+      var field=matchHeader(h);
+      if(field){csvMapping[field]=idx;matched++}
     });
-    document.getElementById('csvMapFields').innerHTML=mapHTML;
+    // Validate required fields
+    if(!csvMapping.hasOwnProperty('product_name')&&!csvMapping.hasOwnProperty('sku')){
+      warnings.push('Could not detect a product name or SKU column. Import may not work correctly.');
+    }
+    if(!csvMapping.hasOwnProperty('price')){
+      warnings.push('Could not detect a price column.');
+    }
+    // Count valid products
+    var validCount=0;
+    csvData.forEach(function(row){
+      var hasName=(csvMapping.product_name!==undefined&&row[csvMapping.product_name])||(csvMapping.sku!==undefined&&row[csvMapping.sku]);
+      var hasPrice=csvMapping.price!==undefined&&parseFloat(row[csvMapping.price])>0;
+      if(hasName&&hasPrice)validCount++;
+    });
+
+    document.getElementById('csvRowCount').textContent=validCount;
+    document.getElementById('csvColCount').textContent=matched;
+    document.getElementById('csvImportCount').textContent=validCount;
+
+    // Build preview table
+    var mappedFields=Object.keys(csvMapping);
+    var thtml='<thead><tr>';
+    mappedFields.forEach(function(f){thtml+='<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ember);background:var(--bg2);border-bottom:1px solid var(--bd);white-space:nowrap">'+f.replace(/_/g,' ')+'</th>'});
+    thtml+='</tr></thead><tbody>';
+    var previewRows=Math.min(csvData.length,5);
+    for(var r=0;r<previewRows;r++){
+      thtml+='<tr>';
+      mappedFields.forEach(function(f){
+        var val=csvData[r][csvMapping[f]]||'—';
+        if(val.length>40)val=val.substring(0,40)+'…';
+        if(f==='price'||f==='shipping_cost')val=parseFloat(val)?'$'+parseFloat(val).toFixed(2):(val||'—');
+        thtml+='<td style="padding:8px 14px;font-size:12px;color:var(--t2);border-bottom:1px solid var(--bd);white-space:nowrap">'+val+'</td>';
+      });
+      thtml+='</tr>';
+    }
+    if(csvData.length>5)thtml+='<tr><td colspan="'+mappedFields.length+'" style="padding:10px 14px;font-size:12px;color:var(--t3);text-align:center;font-style:italic">…and '+(csvData.length-5)+' more rows</td></tr>';
+    thtml+='</tbody>';
+    document.getElementById('csvPreviewTable').innerHTML=thtml;
+
+    // Show warnings if any
+    if(warnings.length>0){
+      document.getElementById('csvWarningText').innerHTML='⚠️ '+warnings.join('<br>⚠️ ');
+      document.getElementById('csvWarnings').style.display='block';
+    }else{
+      document.getElementById('csvWarnings').style.display='none';
+    }
+
     document.getElementById('csvMapper').style.display='block';
     document.getElementById('csvMapper').scrollIntoView({behavior:'smooth'});
   };
   reader.readAsText(file);
   input.value='';
 }
-function cancelCSV(){csvData=null;csvHeaders=[];document.getElementById('csvMapper').style.display='none'}
+
+function cancelCSV(){csvData=null;csvHeaders=[];csvMapping={};document.getElementById('csvMapper').style.display='none'}
+
 function importCSV(){
-  var nameIdx=document.getElementById('csvMap_product_name').value;
-  var priceIdx=document.getElementById('csvMap_price').value;
-  if(nameIdx===''||priceIdx===''){document.getElementById('csvErr').textContent='Product name and price are required.';document.getElementById('csvErr').style.display='block';return}
+  if(!csvMapping.hasOwnProperty('price')){
+    document.getElementById('csvErr').textContent='Cannot import without a price column detected.';
+    document.getElementById('csvErr').style.display='block';return;
+  }
   document.getElementById('csvErr').style.display='none';
-  var bsdFields=['product_name','sku','brand','price','shipping_cost','stock_qty','category','condition','fitment','description','image_url','weight_lbs'];
-  var mapping={};
-  bsdFields.forEach(function(f){var v=document.getElementById('csvMap_'+f).value;if(v!=='')mapping[f]=parseInt(v)});
   var products=[];
   csvData.forEach(function(row){
     var p={};
-    Object.keys(mapping).forEach(function(f){p[f]=row[mapping[f]]||null});
+    Object.keys(csvMapping).forEach(function(f){p[f]=row[csvMapping[f]]||null});
+    // If no product_name but has sku, use sku as name
+    if(!p.product_name&&p.sku)p.product_name=p.sku;
     if(p.price)p.price=parseFloat(p.price)||0;
     if(p.shipping_cost)p.shipping_cost=parseFloat(p.shipping_cost)||0;
     if(p.stock_qty)p.stock_qty=parseInt(p.stock_qty)||0;
-    if(p.weight_lbs)p.weight_lbs=parseFloat(p.weight_lbs)||0;
+    if(p.weight)p.weight=parseFloat(p.weight)||0;
     if(p.product_name&&p.price>0)products.push(p);
   });
-  if(products.length===0){document.getElementById('csvErr').textContent='No valid products found. Ensure name and price columns are mapped.';document.getElementById('csvErr').style.display='block';return}
-  // For now show success — Supabase insert comes after table creation
+  if(products.length===0){
+    document.getElementById('csvErr').textContent='No valid products found. Each row needs at least a name and price > $0.';
+    document.getElementById('csvErr').style.display='block';return;
+  }
   var btn=document.getElementById('csvImportBtn');btn.textContent='Importing...';btn.disabled=true;
-  setTimeout(function(){
-    alert(products.length+' products ready for import! (Database tables will be wired next.)');
-    console.log('CSV products:',products);
-    cancelCSV();
-    btn.textContent='Import Products';btn.disabled=false;
-  },800);
+
+  // Insert into Supabase if vendor is logged in
+  if(vendorData&&vendorData.id){
+    var rows=products.map(function(p){
+      p.vendor_id=vendorData.id;
+      p.status='active';
+      p.created_at=new Date().toISOString();
+      return p;
+    });
+    sb.from('products').insert(rows).then(function(res){
+      if(res.error){
+        console.error('Supabase insert error:',res.error);
+        // Show products locally even if DB fails
+        showImportedProducts(products);
+        alert(products.length+' products parsed! (Database insert had an issue: '+res.error.message+'. Products shown locally.)');
+      }else{
+        showImportedProducts(products);
+        document.getElementById('productCount').textContent=products.length;
+        alert(products.length+' products imported successfully!');
+      }
+      cancelCSV();btn.textContent='Import Products';btn.disabled=false;
+    });
+  }else{
+    // No vendor session — show locally
+    showImportedProducts(products);
+    alert(products.length+' products parsed! Log in as a vendor to save to database.');
+    cancelCSV();btn.textContent='Import Products';btn.disabled=false;
+  }
+}
+
+function showImportedProducts(products){
+  var html='<div class="product-grid">';
+  products.forEach(function(p){
+    html+='<div class="product-card">';
+    html+='<h4>'+p.product_name+'</h4>';
+    html+='<div class="price">$'+(p.price||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>';
+    html+='<div class="meta">';
+    if(p.brand)html+=p.brand+' · ';
+    if(p.sku)html+=p.sku+' · ';
+    if(p.category)html+=p.category+' · ';
+    if(p.stock_qty)html+=p.stock_qty+' in stock';
+    else html+='Stock N/A';
+    html+='</div>';
+    if(p.fitment)html+='<div class="meta" style="margin-top:4px;color:var(--blue)">Fits: '+p.fitment+'</div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  document.getElementById('productList').innerHTML=html;
+  document.getElementById('productCount').textContent=products.length;
 }
 
 // ===== API PANEL =====
