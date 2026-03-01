@@ -711,6 +711,12 @@ async function loadVendorDash(user){
     document.getElementById('setEmail').value=vendorData.email||'';
     document.getElementById('setPhone').value=vendorData.phone||'';
     document.getElementById('setWeb').value=vendorData.website||'';
+    // Load existing products
+    var pr=await sb.from('products').select('*').eq('vendor_id',vendorData.id).eq('status','active');
+    if(pr.data&&pr.data.length>0){
+      showImportedProducts(pr.data);
+      document.getElementById('productCount').textContent=pr.data.length;
+    }
   }
   window.scrollTo(0,0);
 }
@@ -736,10 +742,11 @@ var headerAliases={
   stock_qty:['stock_qty','qty','quantity','stock','in_stock','inventory','available','on_hand','count','units'],
   category:['category','type','product_type','product type','department','class','group','product_category'],
   condition:['condition','status','product_condition','state'],
-  fitment:['fitment','engine_compatibility','engine','compatibility','fits','vehicle','application','fit','engines','makes_models'],
+  fitment:['fitment','engine_compatibility','engine','compatibility','fits','vehicle','application','fit','engines','makes_models','fitment_text'],
   description:['description','desc','product_description','long_description','details','notes','info','about','summary'],
   image_url:['image_url','image','img','photo','picture','thumbnail','image_link','img_url','photo_url','main_image'],
-  weight:['weight','weight_lbs','lbs','ship_weight','package_weight','wt']
+  weight_lbs:['weight_lbs','weight','lbs','ship_weight','package_weight','wt'],
+  stage:['stage','performance_stage','build_stage','level']
 };
 
 function matchHeader(h){
@@ -852,7 +859,11 @@ function importCSV(){
     if(p.price)p.price=parseFloat(p.price)||0;
     if(p.shipping_cost)p.shipping_cost=parseFloat(p.shipping_cost)||0;
     if(p.stock_qty)p.stock_qty=parseInt(p.stock_qty)||0;
-    if(p.weight)p.weight=parseFloat(p.weight)||0;
+    if(p.weight_lbs)p.weight_lbs=parseFloat(p.weight_lbs)||0;
+    // Map stage text to smallint
+    if(p.stage){var sm=String(p.stage).replace(/[^0-9]/g,'');p.stage=([1,2,3].indexOf(parseInt(sm))>-1)?parseInt(sm):null}
+    // Map fitment to fitment_text
+    if(p.fitment&&!p.fitment_text){p.fitment_text=p.fitment;delete p.fitment}
     if(p.product_name&&p.price>0)products.push(p);
   });
   if(products.length===0){
@@ -861,31 +872,51 @@ function importCSV(){
   }
   var btn=document.getElementById('csvImportBtn');btn.textContent='Importing...';btn.disabled=true;
 
+  // Allowed columns in the products table
+  var allowedCols=['product_name','sku','brand','price','shipping_cost','stock_qty','category','condition','stage','fitment_text','fitment_makes','fitment_engines','description','image_url','image_urls','weight_lbs','source','source_ref','status','vendor_id'];
+
   // Insert into Supabase if vendor is logged in
   if(vendorData&&vendorData.id){
     var rows=products.map(function(p){
-      p.vendor_id=vendorData.id;
-      p.status='active';
-      p.created_at=new Date().toISOString();
-      return p;
+      // Clean and transform fields
+      var clean={};
+      clean.vendor_id=vendorData.id;
+      clean.product_name=p.product_name;
+      if(p.sku)clean.sku=String(p.sku);
+      if(p.brand)clean.brand=p.brand;
+      clean.price=parseFloat(p.price)||0;
+      if(p.shipping_cost)clean.shipping_cost=parseFloat(p.shipping_cost)||0;
+      if(p.stock_qty)clean.stock_qty=parseInt(p.stock_qty)||0;
+      if(p.category)clean.category=p.category;
+      if(p.condition&&['new','remanufactured','used'].indexOf(p.condition.toLowerCase())>-1)clean.condition=p.condition.toLowerCase();
+      if(p.stage){var sn=parseInt(String(p.stage).replace(/[^0-9]/g,''));if([1,2,3].indexOf(sn)>-1)clean.stage=sn}
+      if(p.fitment_text)clean.fitment_text=p.fitment_text;
+      else if(p.fitment)clean.fitment_text=p.fitment;
+      if(p.description)clean.description=p.description;
+      if(p.image_url)clean.image_url=p.image_url;
+      if(p.weight_lbs)clean.weight_lbs=parseFloat(p.weight_lbs)||null;
+      else if(p.weight)clean.weight_lbs=parseFloat(p.weight)||null;
+      clean.source='csv';
+      clean.status='active';
+      return clean;
     });
+    console.log('Inserting',rows.length,'products into Supabase:',JSON.stringify(rows[0]));
     sb.from('products').insert(rows).then(function(res){
       if(res.error){
         console.error('Supabase insert error:',res.error);
-        // Show products locally even if DB fails
         showImportedProducts(products);
-        alert(products.length+' products parsed! (Database insert had an issue: '+res.error.message+'. Products shown locally.)');
+        alert('Import issue: '+res.error.message+'\n\nProducts shown locally but NOT saved to database. Check console for details.');
       }else{
         showImportedProducts(products);
         document.getElementById('productCount').textContent=products.length;
-        alert(products.length+' products imported successfully!');
+        alert(products.length+' products imported and saved to database!');
       }
       cancelCSV();btn.textContent='Import Products';btn.disabled=false;
     });
   }else{
-    // No vendor session — show locally
+    // No vendor session
     showImportedProducts(products);
-    alert(products.length+' products parsed! Log in as a vendor to save to database.');
+    alert(products.length+' products parsed locally.\n\nNot saved — you must be logged in as an approved vendor to save to database.');
     cancelCSV();btn.textContent='Import Products';btn.disabled=false;
   }
 }
