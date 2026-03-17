@@ -10,7 +10,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="BlackStack">
 <link rel="manifest" href="/app/manifest.json">
-<link rel="apple-touch-icon" href="/app/icon-192.png">
 <title>BlackStack Diesel</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -71,8 +70,9 @@ body{font-family:'Manrope',sans-serif;color:var(--t1)}
 
 /* ========== LOGIN ========== */
 #s-login{display:flex;flex-direction:column;padding:40px 28px;justify-content:center;align-items:center}
-.l-logo{width:56px;height:56px;border-radius:18px;background:var(--goldg);display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:20px;box-shadow:0 8px 40px rgba(237,174,10,.15);position:relative}
-.l-logo::after{content:'';position:absolute;inset:-6px;border-radius:24px;border:1px solid rgba(237,174,10,.08);pointer-events:none}
+.l-logo{width:100px;height:100px;border-radius:20px;background:transparent;display:flex;align-items:center;justify-content:center;margin-bottom:20px;position:relative;overflow:hidden}
+.l-logo img{width:100%;height:100%;object-fit:contain}
+.l-logo::after{content:'';position:absolute;inset:-6px;border-radius:26px;border:none;pointer-events:none}
 .l-mark{font-size:30px;font-weight:800;letter-spacing:-.8px;margin-bottom:2px}
 .l-mark em{font-style:normal;color:var(--gold)}
 .l-sub{color:var(--t3);font-size:14px;margin-bottom:36px;letter-spacing:.4px;font-weight:500}
@@ -267,7 +267,7 @@ body{font-family:'Manrope',sans-serif;color:var(--t1)}
 
 <!-- LOGIN -->
 <div class="scr on" id="s-login">
-<div class="l-logo">⚡</div>
+<div class="l-logo"><img src="/app/icon-512.png" alt="Black Stack Diesel"></div>
 <div class="l-mark">Black<em>Stack</em></div>
 <div class="l-sub">Diesel parts & diagnostics</div>
 <div class="auth-err" id="authErr"></div>
