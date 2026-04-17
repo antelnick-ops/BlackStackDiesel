@@ -1,88 +1,266 @@
 const Stripe = require('stripe');
 const { createClient } = require('@supabase/supabase-js');
 
-// Vercel sends raw body for webhooks when configured correctly
 module.exports = async (req, res) => {
-  if (req.method !== 'POST') return res.status(405).end();
+  if (req.method !== 'POST') {
+    return res.status(405).end();
+  }
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   const supabase = createClient(
     process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_KEY // Use service role key for server-side writes
+    process.env.SUPABASE_SERVICE_KEY
   );
 
   const sig = req.headers['stripe-signature'];
   let event;
 
   try {
-    // Verify webhook signature
-    const buf = await getRawBody(req);
-    event = stripe.webhooks.constructEvent(buf, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    const rawBody = await getRawBody(req);
+    event = stripe.webhooks.constructEvent(
+      rawBody,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
   } catch (err) {
     console.error('Webhook signature verification failed:', err.message);
     return res.status(400).json({ error: 'Webhook signature failed' });
   }
 
-  // Handle checkout.session.completed
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object;
+  try {
+    switch (event.type) {
+      case 'checkout.session.completed':
+        await handleCheckoutCompleted(event.data.object, stripe, supabase);
+        break;
 
-    try {
-      // Retrieve full session with line items
-      const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
-        expand: ['line_items', 'line_items.data.price.product'],
-      });
+      case 'checkout.session.async_payment_failed':
+        await handleCheckoutFailed(event.data.object, supabase);
+        break;
 
-      const items = fullSession.line_items.data.map(item => ({
-        product_id: item.price.product.metadata?.product_id || null,
-        name: item.description,
-        brand: item.price.product.metadata?.brand || '',
-        qty: item.quantity,
-        unit_price: item.price.unit_amount / 100,
-        total: item.amount_total / 100,
-      }));
+      default:
+        console.log(`Unhandled event type: ${event.type}`);
+    }
 
-      // Create order in Supabase
-      const order = {
-        stripe_session_id: session.id,
-        stripe_payment_intent: session.payment_intent,
-        customer_email: session.customer_details?.email || session.customer_email,
-        customer_name: session.customer_details?.name || null,
-        shipping_address: session.shipping_details?.address || null,
-        shipping_name: session.shipping_details?.name || null,
-        items: items,
-        subtotal: session.amount_subtotal / 100,
-        shipping_cost: session.total_details?.amount_shipping ? session.total_details.amount_shipping / 100 : 0,
-        total: session.amount_total / 100,
-        currency: session.currency,
-        vehicle: session.metadata?.vehicle || null,
-        status: 'paid',
-        created_at: new Date().toISOString(),
-      };
+    return res.status(200).json({ received: true });
+  } catch (err) {
+    console.error('Webhook processing error:', err);
+    return res.status(500).json({ error: 'Webhook processing failed' });
+  }
+};
 
-      const { error } = await supabase.from('orders').insert(order);
-      if (error) console.error('Supabase order insert error:', error);
-      else console.log('Order created:', session.id);
+async function handleCheckoutCompleted(session, stripe, supabase) {
+  const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
+    expand: ['line_items', 'line_items.data.price.product']
+  });
 
-      // Update product stock quantities
-      for (const item of items) {
-        if (item.product_id) {
-          await supabase.rpc('decrement_stock', {
-            p_id: item.product_id,
-            qty: item.qty,
-          });
-        }
+  const existingOrderQuery = await supabase
+    .from('orders')
+    .select('id')
+    .eq('stripe_checkout_session_id', session.id)
+    .limit(1)
+    .maybeSingle();
+
+  if (existingOrderQuery.error) {
+    throw existingOrderQuery.error;
+  }
+
+  if (existingOrderQuery.data?.id) {
+    console.log(`Order already exists for session ${session.id}`);
+    return;
+  }
+
+  const shippingAddress = session.shipping_details?.address || {};
+  const customerEmail =
+    session.customer_details?.email ||
+    session.customer_email ||
+    session.metadata?.customer_email ||
+    '';
+
+  if (!customerEmail) {
+    throw new Error('Customer email missing from Stripe session');
+  }
+
+  const subtotal = toMoney(session.amount_subtotal);
+  const shippingTotal = toMoney(session.total_details?.amount_shipping || 0);
+  const tax = toMoney(session.total_details?.amount_tax || 0);
+  const total = toMoney(session.amount_total);
+
+  const orderPayload = {
+    customer_id: isUuid(session.metadata?.customer_id) ? session.metadata.customer_id : null,
+    customer_email: customerEmail,
+    customer_name: session.customer_details?.name || null,
+    ship_name: session.shipping_details?.name || null,
+    ship_address: joinAddressLines(shippingAddress.line1, shippingAddress.line2),
+    ship_city: shippingAddress.city || null,
+    ship_state: shippingAddress.state || null,
+    ship_zip: shippingAddress.postal_code || null,
+    ship_country: shippingAddress.country || 'US',
+    subtotal,
+    shipping_total: shippingTotal,
+    tax,
+    total,
+    stripe_checkout_session_id: session.id,
+    stripe_payment_intent_id: session.payment_intent || null,
+    currency: (session.currency || 'usd').toUpperCase(),
+    shipping_method:
+      session.metadata?.shipping_method ||
+      session.shipping_cost?.shipping_rate ||
+      null,
+    shipping_service: session.shipping_details?.name ? 'customer_selected' : null,
+    payment_status: 'paid',
+    status: 'confirmed',
+    supplier_status: 'queued'
+  };
+
+  const { data: insertedOrder, error: orderInsertError } = await supabase
+    .from('orders')
+    .insert(orderPayload)
+    .select('id, order_number')
+    .single();
+
+  if (orderInsertError) {
+    throw orderInsertError;
+  }
+
+  const lineItems = fullSession.line_items?.data || [];
+  const orderItemsPayload = [];
+  const stockUpdates = [];
+
+  for (const li of lineItems) {
+    const productMeta = li.price?.product?.metadata || {};
+    const productId = productMeta.product_id || null;
+    const vendorId = productMeta.vendor_id || null;
+    const vendorDistributorId = productMeta.vendor_distributor_id || null;
+    const qty = Math.max(1, parseInt(li.quantity || 1, 10));
+    const unitPrice = toMoney(li.price?.unit_amount || 0);
+    const lineTotal = toMoney(li.amount_total || 0);
+
+    let dbProduct = null;
+    if (productId) {
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          id,
+          vendor_id,
+          vendor_distributor_id,
+          product_name,
+          sku,
+          brand,
+          cost,
+          map_price,
+          image_url
+        `)
+        .eq('id', productId)
+        .single();
+
+      if (error) {
+        console.warn(`Could not load product ${productId}:`, error.message);
+      } else {
+        dbProduct = data;
       }
+    }
 
-    } catch (err) {
-      console.error('Order processing error:', err);
+    const resolvedVendorId = dbProduct?.vendor_id || vendorId;
+    if (!resolvedVendorId) {
+      throw new Error(`Missing vendor_id for line item ${li.description}`);
+    }
+
+    orderItemsPayload.push({
+      order_id: insertedOrder.id,
+      product_id: dbProduct?.id || productId || null,
+      vendor_id: resolvedVendorId,
+      vendor_distributor_id:
+        dbProduct?.vendor_distributor_id || vendorDistributorId || null,
+      product_name: dbProduct?.product_name || li.description || 'Product',
+      sku: dbProduct?.sku || productMeta.sku || null,
+      brand: dbProduct?.brand || productMeta.brand || '',
+      quantity: qty,
+      unit_price: unitPrice,
+      unit_cost: dbProduct?.cost != null ? Number(dbProduct.cost) : null,
+      map_price: dbProduct?.map_price != null ? Number(dbProduct.map_price) : null,
+      shipping_cost: 0,
+      line_total: lineTotal,
+      image_url: dbProduct?.image_url || null,
+      status: 'pending'
+    });
+
+    if (dbProduct?.id) {
+      stockUpdates.push({
+        productId: dbProduct.id,
+        qty
+      });
     }
   }
 
-  return res.status(200).json({ received: true });
-};
+  if (orderItemsPayload.length) {
+    const { error: itemInsertError } = await supabase
+      .from('order_items')
+      .insert(orderItemsPayload);
 
-// Helper to get raw body for signature verification
+    if (itemInsertError) {
+      throw itemInsertError;
+    }
+  }
+
+  for (const update of stockUpdates) {
+    const { data: currentProduct, error: currentError } = await supabase
+      .from('products')
+      .select('stock_qty')
+      .eq('id', update.productId)
+      .single();
+
+    if (currentError) {
+      console.warn(`Could not fetch stock for ${update.productId}:`, currentError.message);
+      continue;
+    }
+
+    const newQty = Math.max(0, Number(currentProduct.stock_qty || 0) - update.qty);
+
+    const { error: stockError } = await supabase
+      .from('products')
+      .update({
+        stock_qty: newQty,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', update.productId);
+
+    if (stockError) {
+      console.warn(`Could not update stock for ${update.productId}:`, stockError.message);
+    }
+  }
+
+  console.log(`Order ${insertedOrder.order_number} created from session ${session.id}`);
+}
+
+async function handleCheckoutFailed(session, supabase) {
+  if (!session?.id) return;
+
+  const { error } = await supabase
+    .from('orders')
+    .update({
+      payment_status: 'failed',
+      status: 'cancelled',
+      updated_at: new Date().toISOString()
+    })
+    .eq('stripe_checkout_session_id', session.id);
+
+  if (error) {
+    console.warn(`Failed to mark checkout failure for session ${session.id}:`, error.message);
+  }
+}
+
+function toMoney(amountInCents) {
+  return Number(((amountInCents || 0) / 100).toFixed(2));
+}
+
+function joinAddressLines(line1, line2) {
+  return [line1, line2].filter(Boolean).join(', ') || null;
+}
+
+function isUuid(value) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value || '');
+}
+
 function getRawBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];
