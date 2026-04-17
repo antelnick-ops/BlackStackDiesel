@@ -6,6 +6,16 @@ module.exports = async (req, res) => {
     return res.status(405).end();
   }
 
+  if (
+    !process.env.STRIPE_SECRET_KEY ||
+    !process.env.STRIPE_WEBHOOK_SECRET ||
+    !process.env.SUPABASE_URL ||
+    !process.env.SUPABASE_SERVICE_KEY
+  ) {
+    console.error('Missing required environment variables');
+    return res.status(500).json({ error: 'Server misconfiguration' });
+  }
+
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -53,23 +63,32 @@ async function handleCheckoutCompleted(session, stripe, supabase) {
     expand: ['line_items', 'line_items.data.price.product']
   });
 
-  const existingOrderQuery = await supabase
+  const { data: existingOrder, error: existingOrderError } = await supabase
     .from('orders')
     .select('id')
     .eq('stripe_checkout_session_id', session.id)
     .limit(1)
     .maybeSingle();
 
-  if (existingOrderQuery.error) {
-    throw existingOrderQuery.error;
+  if (existingOrderError) {
+    throw existingOrderError;
   }
 
-  if (existingOrderQuery.data?.id) {
+  if (existingOrder?.id) {
     console.log(`Order already exists for session ${session.id}`);
     return;
   }
 
-  const shippingAddress = session.shipping_details?.address || {};
+  const shippingAddress =
+    session.shipping_details?.address ||
+    session.customer_details?.address ||
+    {};
+
+  const shipName =
+    session.shipping_details?.name ||
+    session.customer_details?.name ||
+    null;
+
   const customerEmail =
     session.customer_details?.email ||
     session.customer_email ||
@@ -89,7 +108,7 @@ async function handleCheckoutCompleted(session, stripe, supabase) {
     customer_id: isUuid(session.metadata?.customer_id) ? session.metadata.customer_id : null,
     customer_email: customerEmail,
     customer_name: session.customer_details?.name || null,
-    ship_name: session.shipping_details?.name || null,
+    ship_name: shipName,
     ship_address: joinAddressLines(shippingAddress.line1, shippingAddress.line2),
     ship_city: shippingAddress.city || null,
     ship_state: shippingAddress.state || null,
@@ -106,7 +125,7 @@ async function handleCheckoutCompleted(session, stripe, supabase) {
       session.metadata?.shipping_method ||
       session.shipping_cost?.shipping_rate ||
       null,
-    shipping_service: session.shipping_details?.name ? 'customer_selected' : null,
+    shipping_service: session.shipping_cost?.shipping_rate || null,
     payment_status: 'paid',
     status: 'confirmed',
     supplier_status: 'queued'
@@ -136,6 +155,7 @@ async function handleCheckoutCompleted(session, stripe, supabase) {
     const lineTotal = toMoney(li.amount_total || 0);
 
     let dbProduct = null;
+
     if (productId) {
       const { data, error } = await supabase
         .from('products')
