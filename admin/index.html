@@ -2,420 +2,377 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BSD Admin — Dashboard</title>
-<link rel="icon" type="image/x-icon" href="../favicon.ico">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>BSD Admin — Owner Dashboard</title>
+<link rel="icon" href="../favicon.ico">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Archivo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#08090B;--bg2:#0E1014;--bg3:#151820;--bg4:#1C2029;--ember:#FF6B2C;--ember2:#E85A1E;--green:#34C759;--red:#E84545;--amber:#F5A623;--blue:#4A9EFF;--t1:#F2EDE6;--t2:#A0A4B0;--t3:#5E6270;--bd:rgba(255,255,255,.06);--smoke:#2A2D35}
-body{font-family:'Archivo',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh}
-.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
-.login-box{width:100%;max-width:380px;background:var(--bg3);border:1px solid var(--bd);border-radius:20px;padding:40px;text-align:center}
-.login-box img{width:60px;height:60px;border-radius:12px;margin-bottom:16px}
-.login-box h1{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px}
-.login-box p{font-size:13px;color:var(--t3);margin-bottom:24px}
-.fg{margin-bottom:14px;text-align:left}
-.fg label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:6px}
-.fi{width:100%;height:46px;background:var(--bg);border:2px solid var(--smoke);border-radius:10px;padding:0 14px;font-size:14px;color:var(--t1);font-family:'Archivo',sans-serif;outline:none;transition:.2s}
-.fi:focus{border-color:var(--ember);box-shadow:0 0 0 3px rgba(255,107,44,.1)}
-.btn{width:100%;height:48px;background:var(--ember);border:none;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#fff;cursor:pointer;transition:.2s;margin-top:8px}
-.btn:hover{background:var(--ember2)}.btn:disabled{opacity:.5;cursor:not-allowed}
-.err{color:var(--red);font-size:12px;text-align:center;margin-bottom:8px;display:none}
-.dash{display:none}
-.topbar{display:flex;justify-content:space-between;align-items:center;padding:16px 32px;border-bottom:1px solid var(--bd);background:var(--bg2)}
-.topbar-left{display:flex;align-items:center;gap:12px}
-.topbar-left img{width:32px;height:32px;border-radius:8px}
-.topbar-left span{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:2px}
-.topbar-left em{font-style:normal;color:var(--ember)}
-.topbar-right{display:flex;align-items:center;gap:16px}
-.topbar-user{font-size:12px;color:var(--t3)}
-.btn-sm{padding:8px 16px;background:var(--smoke);border:none;border-radius:8px;font-size:12px;font-weight:600;color:var(--t2);cursor:pointer;transition:.2s}
-.btn-sm:hover{background:var(--bg4);color:var(--t1)}
-.tabs{display:flex;gap:0;padding:0 32px;background:var(--bg2);border-bottom:1px solid var(--bd);overflow-x:auto}
-.tab{padding:14px 24px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--t3);cursor:pointer;border-bottom:3px solid transparent;transition:.2s;white-space:nowrap}
-.tab.active{color:var(--ember);border-bottom-color:var(--ember)}.tab:hover{color:var(--t1)}
-.content{padding:32px}
-.panel{display:none}.panel.active{display:block}
-.stats-row{display:flex;gap:16px;margin-bottom:32px;flex-wrap:wrap}
-.stat-card{flex:1;min-width:140px;background:var(--bg3);border:1px solid var(--bd);border-radius:14px;padding:20px 24px;position:relative;overflow:hidden}
-.stat-card .val{font-family:'Rajdhani',sans-serif;font-size:36px;font-weight:700}
-.stat-card .lbl{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--t3);margin-top:2px}
-.stat-card.ember .val{color:var(--ember)}.stat-card.green .val{color:var(--green)}.stat-card.amber .val{color:var(--amber)}.stat-card.blue .val{color:var(--blue)}.stat-card.red .val{color:var(--red)}
-.stat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px}
-.stat-card.ember::after{background:var(--ember)}.stat-card.green::after{background:var(--green)}.stat-card.amber::after{background:var(--amber)}.stat-card.blue::after{background:var(--blue)}.stat-card.red::after{background:var(--red)}
-.tbl-wrap{background:var(--bg3);border:1px solid var(--bd);border-radius:14px;overflow:hidden}
-.tbl-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--bd)}
-.tbl-header h3{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:2px}
-.refresh-btn{padding:6px 14px;background:var(--smoke);border:none;border-radius:6px;font-size:11px;font-weight:600;color:var(--t2);cursor:pointer;transition:.2s}
-.refresh-btn:hover{background:var(--bg4);color:var(--t1)}
-.tbl{width:100%;border-collapse:collapse;font-size:13px}
-.tbl th{text-align:left;padding:12px 16px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--t3);border-bottom:1px solid var(--bd);font-weight:600;background:var(--bg2)}
-.tbl td{padding:12px 16px;border-bottom:1px solid var(--bd);color:var(--t2)}
-.tbl tr:hover td{background:rgba(255,255,255,.02)}
-.badge{display:inline-block;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
-.badge-pending{background:rgba(245,166,35,.15);color:var(--amber)}.badge-approved{background:rgba(52,199,89,.15);color:var(--green)}.badge-denied{background:rgba(232,69,69,.15);color:var(--red)}
-.btn-approve{padding:6px 14px;background:var(--green);border:none;border-radius:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#fff;cursor:pointer;transition:.2s}
-.btn-approve:hover{opacity:.8}.btn-approve:disabled{opacity:.4;cursor:not-allowed}
-.btn-deny{padding:6px 14px;background:var(--red);border:none;border-radius:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#fff;cursor:pointer;transition:.2s}
-.btn-deny:hover{opacity:.8}
-.actions{display:flex;gap:8px}
-.expand-btn{cursor:pointer;font-size:12px;color:var(--t3);transition:.15s;display:inline-block;user-select:none}
-.expand-btn:hover{color:var(--ember)}
-.detail-panel{display:none}
-.detail-panel.show{display:table-row}
-.detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;padding:16px 20px;background:var(--bg2)}
-.detail-item .dl{color:var(--t3);text-transform:uppercase;letter-spacing:1px;font-size:10px;font-weight:600;margin-bottom:2px}
-.detail-item .dv{color:var(--t1);font-size:13px}
-.cat-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-.cat-tag{padding:3px 8px;background:var(--bg3);border:1px solid var(--bd);border-radius:4px;font-size:10px;color:var(--t2)}
-.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:24px}
-.analytics-card{background:var(--bg3);border:1px solid var(--bd);border-radius:14px;padding:24px;min-height:200px}
-.analytics-card h3{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px}
-.placeholder-msg{display:flex;flex-direction:column;align-items:center;justify-content:center;height:140px;color:var(--t3);font-size:13px;text-align:center;gap:8px}
-.placeholder-msg .icon{font-size:32px;opacity:.5}
-.waitlist-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd);font-size:13px}
-.waitlist-item:last-child{border:none}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
-.modal-overlay.show{display:flex}
-.modal{background:var(--bg3);border:1px solid var(--bd);border-radius:20px;padding:32px;max-width:560px;width:90%;max-height:90vh;overflow-y:auto}
-.modal h2{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px}
-.modal-info{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:16px}
-.modal-info strong{color:var(--t1)}
-.section-label{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:8px}
-.cred-box{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:16px;padding-right:80px;margin-bottom:20px;font-family:monospace;font-size:13px;color:var(--green);line-height:2;position:relative;white-space:pre-line}
-.email-box{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:16px;padding-right:80px;margin-bottom:20px;font-size:12px;color:var(--t2);line-height:1.8;position:relative;white-space:pre-line}
-.copy-btn{position:absolute;top:8px;right:8px;padding:6px 12px;background:var(--smoke);border:none;border-radius:6px;font-size:11px;font-weight:600;color:var(--t2);cursor:pointer;z-index:2}
-.copy-btn:hover{background:var(--bg4);color:var(--t1)}
-.btn-modal{padding:10px 24px;border:none;border-radius:8px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:2px;cursor:pointer;transition:.2s}
-.btn-close{background:var(--smoke);color:var(--t2)}.btn-close:hover{background:var(--bg4);color:var(--t1)}
-.empty{text-align:center;padding:48px;color:var(--t3);font-size:14px}
-@media(max-width:900px){.content{padding:16px}.topbar{padding:12px 16px}.tabs{padding:0 12px}.tab{padding:12px 14px;font-size:11px}.analytics-grid{grid-template-columns:1fr}.stats-row .stat-card{min-width:calc(50% - 8px)}}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#0b0d11;--bg2:#151820;--card:#1b1f27;--line:#2b313d;
+--txt:#f3f4f6;--muted:#9ca3af;--brand:#ff6b2c;--green:#22c55e;--red:#ef4444;--amber:#f59e0b;
+}
+body{font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--txt)}
+button,input{font:inherit}
+.hidden{display:none}
+.wrap{min-height:100vh}
+.login{
+display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px
+}
+.box{
+width:100%;max-width:420px;background:var(--card);border:1px solid var(--line);
+padding:24px;border-radius:18px
+}
+h1{font-size:24px;margin-bottom:10px}
+small{color:var(--muted)}
+label{display:block;margin:14px 0 6px}
+input{
+width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);
+background:var(--bg2);color:#fff
+}
+.btn{
+width:100%;padding:12px;border:none;border-radius:10px;
+background:var(--brand);color:#fff;font-weight:700;cursor:pointer;margin-top:16px
+}
+.msg{margin-top:12px;font-size:14px;color:#fca5a5}
+.ok{color:#86efac}
+.dash{
+display:grid;grid-template-columns:260px 1fr;min-height:100vh
+}
+.side{
+background:var(--card);border-right:1px solid var(--line);padding:18px
+}
+.brand{font-size:22px;font-weight:700;margin-bottom:18px}
+.brand span{color:var(--brand)}
+.user{
+padding:12px;background:var(--bg2);border-radius:12px;font-size:14px;
+word-break:break-word;margin-bottom:18px
+}
+.nav button{
+width:100%;text-align:left;padding:12px;border:none;background:transparent;
+color:#fff;border-radius:10px;cursor:pointer;margin-bottom:8px
+}
+.nav button.active,.nav button:hover{background:var(--bg2)}
+.out{
+margin-top:14px;background:#374151
+}
+.main{padding:22px}
+.top{
+display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px
+}
+.cards{
+display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px
+}
+.card{
+background:var(--card);padding:18px;border-radius:14px;border:1px solid var(--line)
+}
+.val{font-size:28px;font-weight:700}
+.lab{font-size:12px;color:var(--muted);margin-top:4px}
+.panel{display:none}
+.panel.active{display:block}
+.tableWrap{
+overflow:auto;background:var(--card);border-radius:14px;border:1px solid var(--line)
+}
+table{width:100%;border-collapse:collapse;min-width:820px}
+th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left}
+th{font-size:12px;color:var(--muted)}
+.badge{
+padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700
+}
+.pending{background:#3f2d08;color:#fbbf24}
+.approved{background:#052e16;color:#86efac}
+.denied{background:#450a0a;color:#fca5a5}
+.sm{
+padding:8px 10px;border:none;border-radius:8px;color:#fff;cursor:pointer
+}
+.green{background:var(--green)}
+.red{background:var(--red)}
+.empty{padding:20px;color:var(--muted)}
+@media(max-width:980px){
+.dash{grid-template-columns:1fr}
+.side{border-right:none;border-bottom:1px solid var(--line)}
+.cards{grid-template-columns:1fr 1fr}
+}
+@media(max-width:680px){
+.cards{grid-template-columns:1fr}
+table{min-width:700px}
+}
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<div class="login-wrap" id="loginScreen">
-  <div class="login-box">
-    <img src="../logo.png" alt="BSD">
-    <h1>Admin Panel</h1>
-    <p>BlackStack Diesel — Vendor Management</p>
-    <div class="err" id="loginErr"></div>
-    <div class="fg"><label>Email</label><input class="fi" type="email" id="loginEmail" placeholder="admin@black-stack-diesel.com"></div>
-    <div class="fg"><label>Password</label><input class="fi" type="password" id="loginPw" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()"></div>
-    <button class="btn" id="loginBtn" onclick="adminLogin()">Sign In</button>
-  </div>
+<!-- LOGIN -->
+<section id="loginScreen" class="login">
+<div class="box">
+<h1>BSD Admin Portal</h1>
+<small>Owner access only</small>
+
+<label>Email</label>
+<input id="email" type="email" placeholder="nick@black-stack-diesel.com">
+
+<label>Password</label>
+<input id="pw" type="password" placeholder="••••••••"
+onkeydown="if(event.key==='Enter')login()">
+
+<button class="btn" onclick="login()">Sign In</button>
+<div id="msg" class="msg"></div>
+</div>
+</section>
+
+<!-- DASHBOARD -->
+<section id="dash" class="dash hidden">
+
+<aside class="side">
+<div class="brand">Black<span>Stack</span> Diesel</div>
+
+<div class="user" id="userBox">Not signed in</div>
+
+<div class="nav">
+<button class="active" onclick="tab('apps',this)">Applications</button>
+<button onclick="tab('vendors',this)">Vendors</button>
+<button onclick="tab('sales',this)">Sales</button>
+<button onclick="tab('traffic',this)">Traffic</button>
 </div>
 
-<div class="dash" id="dashboard">
-  <div class="topbar">
-    <div class="topbar-left"><img src="../logo.png" alt="BSD"><span>Black<em>Stack</em> Admin</span></div>
-    <div class="topbar-right"><span class="topbar-user" id="adminEmail"></span><button class="btn-sm" onclick="adminLogout()">Sign Out</button></div>
-  </div>
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('applications',this)">Applications</div>
-    <div class="tab" onclick="switchTab('vendors',this)">Active Vendors</div>
-    <div class="tab" onclick="switchTab('sales',this)">Sales</div>
-    <div class="tab" onclick="switchTab('traffic',this)">Traffic</div>
-  </div>
-  <div class="content">
+<button class="btn out" onclick="logout()">Sign Out</button>
+</aside>
 
-    <div class="panel active" id="panel-applications">
-      <div class="stats-row">
-        <div class="stat-card amber"><div class="val" id="statPending">0</div><div class="lbl">Pending</div></div>
-        <div class="stat-card green"><div class="val" id="statApproved">0</div><div class="lbl">Approved</div></div>
-        <div class="stat-card red"><div class="val" id="statDenied">0</div><div class="lbl">Denied</div></div>
-        <div class="stat-card ember"><div class="val" id="statTotal">0</div><div class="lbl">Total</div></div>
-      </div>
-      <div class="tbl-wrap">
-        <div class="tbl-header"><h3>Vendor Applications</h3><button class="refresh-btn" onclick="loadApplications()">↻ Refresh</button></div>
-        <table class="tbl"><thead><tr><th style="width:30px"></th><th>Business</th><th>Contact</th><th>Email</th><th>Type</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="appRows"></tbody></table>
-        <div class="empty" id="appEmpty" style="display:none">No vendor applications yet.</div>
-      </div>
-    </div>
+<main class="main">
 
-    <div class="panel" id="panel-vendors">
-      <div class="stats-row">
-        <div class="stat-card blue"><div class="val" id="statActiveVendors">0</div><div class="lbl">Active Vendors</div></div>
-        <div class="stat-card ember"><div class="val">12%</div><div class="lbl">Commission</div></div>
-        <div class="stat-card green"><div class="val">Instant</div><div class="lbl">Payout Speed</div></div>
-      </div>
-      <div class="tbl-wrap">
-        <div class="tbl-header"><h3>Active Vendors</h3><button class="refresh-btn" onclick="loadVendors()">↻ Refresh</button></div>
-        <table class="tbl"><thead><tr><th>Business</th><th>Contact</th><th>Email</th><th>Type</th><th>Commission</th><th>Since</th></tr></thead><tbody id="vendorRows"></tbody></table>
-        <div class="empty" id="vendorEmpty" style="display:none">No active vendors yet. Approve applications to add vendors.</div>
-      </div>
-    </div>
-
-    <div class="panel" id="panel-sales">
-      <div class="stats-row">
-        <div class="stat-card green"><div class="val">$0</div><div class="lbl">Total Revenue</div></div>
-        <div class="stat-card ember"><div class="val">$0</div><div class="lbl">Commission Earned</div></div>
-        <div class="stat-card blue"><div class="val">0</div><div class="lbl">Total Orders</div></div>
-        <div class="stat-card amber"><div class="val">$0</div><div class="lbl">Avg Order Value</div></div>
-      </div>
-      <div class="analytics-grid">
-        <div class="analytics-card"><h3>Revenue (Last 30 Days)</h3><div class="placeholder-msg"><div class="icon">📊</div><div>Revenue chart will appear once<br>Stripe Connect is integrated.</div></div></div>
-        <div class="analytics-card"><h3>Commission Earned</h3><div class="placeholder-msg"><div class="icon">💰</div><div>Commission tracking goes live<br>when the marketplace launches.</div></div></div>
-        <div class="analytics-card"><h3>Top Selling Parts</h3><div class="placeholder-msg"><div class="icon">🔧</div><div>Top products ranked here<br>once sales data flows in.</div></div></div>
-        <div class="analytics-card"><h3>Top Vendors by Revenue</h3><div class="placeholder-msg"><div class="icon">🏆</div><div>Vendor leaderboard appears<br>once vendors make sales.</div></div></div>
-      </div>
-    </div>
-
-    <div class="panel" id="panel-traffic">
-      <div class="stats-row">
-        <div class="stat-card ember"><div class="val" id="statWaitlist">0</div><div class="lbl">Waitlist Signups</div></div>
-        <div class="stat-card blue"><div class="val" id="statVendorApps">0</div><div class="lbl">Vendor Apps</div></div>
-        <div class="stat-card amber"><div class="val">—</div><div class="lbl">Page Views (Add GA4)</div></div>
-      </div>
-      <div class="analytics-grid">
-        <div class="analytics-card"><h3>Waitlist Emails</h3><div id="waitlistList"></div><div class="empty" id="waitlistEmpty" style="display:none;padding:24px">No waitlist signups yet.</div></div>
-        <div class="analytics-card"><h3>Signups Over Time</h3><div id="signupChart"><div class="placeholder-msg"><div class="icon">📧</div><div>Chart appears when<br>waitlist emails are collected.</div></div></div></div>
-        <div class="analytics-card"><h3>Traffic Sources</h3><div class="placeholder-msg"><div class="icon">🌐</div><div>Connect Google Analytics 4<br>to see traffic sources.<br><br><span style="font-size:11px;color:var(--t3)">Add GA4 tag to your site.</span></div></div></div>
-        <div class="analytics-card"><h3>Conversion Funnel</h3><div class="placeholder-msg"><div class="icon">📈</div><div>Visitor → Waitlist → User<br>conversion tracking coming soon.</div></div></div>
-      </div>
-    </div>
-
-  </div>
+<div class="top">
+<div>
+<h2>Owner Dashboard</h2>
+<small>Manage BSD marketplace</small>
+</div>
+<button class="btn" style="width:auto;padding:10px 16px" onclick="refreshAll()">Refresh</button>
 </div>
 
-<div class="modal-overlay" id="approveModal">
-  <div class="modal">
-    <h2>✅ Vendor Approved</h2>
-    <div class="modal-info" id="modalInfo"></div>
-    <div class="section-label">Login Credentials</div>
-    <div class="cred-box" id="credBox"><button class="copy-btn" onclick="copyBox('credBox')">Copy</button></div>
-    <div class="section-label">Welcome Email (copy & send to vendor)</div>
-    <div class="email-box" id="emailBox"><button class="copy-btn" onclick="copyBox('emailBox')">Copy</button></div>
-    <div style="text-align:right"><button class="btn-modal btn-close" onclick="closeModal()">Done</button></div>
-  </div>
+<div class="cards">
+<div class="card"><div class="val" id="pendingCt">0</div><div class="lab">Pending Apps</div></div>
+<div class="card"><div class="val" id="approvedCt">0</div><div class="lab">Approved</div></div>
+<div class="card"><div class="val" id="vendorCt">0</div><div class="lab">Active Vendors</div></div>
+<div class="card"><div class="val" id="waitCt">0</div><div class="lab">Waitlist</div></div>
+</div>
+
+<!-- APPLICATIONS -->
+<div id="apps" class="panel active">
+<div class="tableWrap">
+<table>
+<thead>
+<tr>
+<th>Business</th>
+<th>Contact</th>
+<th>Email</th>
+<th>Status</th>
+<th>Date</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="appRows"></tbody>
+</table>
+<div id="appEmpty" class="empty hidden">No applications found.</div>
+</div>
+</div>
+
+<!-- VENDORS -->
+<div id="vendors" class="panel">
+<div class="tableWrap">
+<table>
+<thead>
+<tr>
+<th>Business</th>
+<th>Contact</th>
+<th>Email</th>
+<th>Commission</th>
+</tr>
+</thead>
+<tbody id="vendorRows"></tbody>
+</table>
+<div id="vendorEmpty" class="empty hidden">No vendors found.</div>
+</div>
+</div>
+
+<!-- SALES -->
+<div id="sales" class="panel">
+<div class="card">
+<div class="val">$0</div>
+<div class="lab">Stripe metrics can be connected later</div>
+</div>
+</div>
+
+<!-- TRAFFIC -->
+<div id="traffic" class="panel">
+<div class="card">
+<div class="val" id="waitCt2">0</div>
+<div class="lab">Waitlist signups</div>
+</div>
+</div>
+
+</main>
+</section>
 </div>
 
 <script>
-var SUPA_URL='https://jfjbilfsiebifzddveof.supabase.co';
-var SUPA_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamJpbGZzaWViaWZ6ZGR2ZW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2OTg4ODUsImV4cCI6MjA4NzI3NDg4NX0.bbTQ0l4HsHoKUzoKACBvbXJ0TbnUM5tltK4YLKyuMr8';
-var sb=supabase.createClient(SUPA_URL,SUPA_ANON);
-var ADMIN_EMAILS=['nicholas.antel@outlook.com','help@black-stack-diesel.com'];
-var currentUser=null;
-var appData=[];
+const SUPA_URL='https://jfjbilfsiebifzddveof.supabase.co';
+const SUPA_KEY='YOUR_SUPABASE_ANON_KEY_HERE';
+const OWNER='nick@black-stack-diesel.com';
 
-// ===== AUTH =====
-async function adminLogin(){
-  var email=document.getElementById('loginEmail').value.trim();
-  var pw=document.getElementById('loginPw').value;
-  var errEl=document.getElementById('loginErr');
-  if(!email||!pw){errEl.textContent='Enter email and password.';errEl.style.display='block';return}
-  document.getElementById('loginBtn').textContent='Signing in...';document.getElementById('loginBtn').disabled=true;
-  var r=await sb.auth.signInWithPassword({email:email,password:pw});
-  if(r.error){errEl.textContent=r.error.message;errEl.style.display='block';document.getElementById('loginBtn').textContent='Sign In';document.getElementById('loginBtn').disabled=false;return}
-  if(!ADMIN_EMAILS.includes(r.data.user.email)){errEl.textContent='Access denied. Admin accounts only.';errEl.style.display='block';await sb.auth.signOut();document.getElementById('loginBtn').textContent='Sign In';document.getElementById('loginBtn').disabled=false;return}
-  currentUser=r.data.user;showDash();
-}
-async function adminLogout(){await sb.auth.signOut();location.reload()}
-function showDash(){
-  document.getElementById('loginScreen').style.display='none';
-  document.getElementById('dashboard').style.display='block';
-  document.getElementById('adminEmail').textContent=currentUser.email;
-  loadApplications();loadVendors();loadWaitlist();
-}
-(async function(){var r=await sb.auth.getSession();if(r.data.session&&ADMIN_EMAILS.includes(r.data.session.user.email)){currentUser=r.data.session.user;showDash()}})();
+const sb = supabase.createClient(SUPA_URL,SUPA_KEY);
 
-function switchTab(id,el){
-  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
-  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});
-  el.classList.add('active');document.getElementById('panel-'+id).classList.add('active');
+async function isAdmin(user){
+if(!user) return false;
+if(user.email.toLowerCase()===OWNER.toLowerCase()) return true;
+
+try{
+const r=await sb.from('profiles').select('role').eq('id',user.id).maybeSingle();
+return r.data && String(r.data.role).toLowerCase()==='admin';
+}catch(e){
+return false;
+}
 }
 
-// ===== APPLICATIONS =====
-async function loadApplications(){
-  var r=await sb.from('vendor_applications').select('*').order('created_at',{ascending:false});
-  if(r.error||!r.data){document.getElementById('appEmpty').style.display='block';return}
-  appData=r.data;
-  var p=0,a=0,d=0;
-  r.data.forEach(function(x){if(x.status==='pending')p++;else if(x.status==='approved')a++;else d++});
-  document.getElementById('statPending').textContent=p;
-  document.getElementById('statApproved').textContent=a;
-  document.getElementById('statDenied').textContent=d;
-  document.getElementById('statTotal').textContent=r.data.length;
-  if(document.getElementById('statVendorApps'))document.getElementById('statVendorApps').textContent=r.data.length;
-  renderApps();
+function setMsg(t,good=false){
+const el=document.getElementById('msg');
+el.textContent=t||'';
+el.className=good?'msg ok':'msg';
 }
 
-function renderApps(){
-  var tbody=document.getElementById('appRows');tbody.innerHTML='';
-  if(!appData.length){document.getElementById('appEmpty').style.display='block';return}
-  document.getElementById('appEmpty').style.display='none';
-  for(var i=0;i<appData.length;i++){
-    var app=appData[i];
-    var bc=app.status==='pending'?'badge-pending':app.status==='approved'?'badge-approved':'badge-denied';
-    var dt=new Date(app.created_at).toLocaleDateString();
-    var act='';
-    if(app.status==='pending'){
-      act='<div class="actions"><button class="btn-approve" onclick="approveVendor('+i+')">Approve</button><button class="btn-deny" onclick="denyVendor('+i+')">Deny</button></div>';
-    }else if(app.status==='approved'){
-      act='<span style="color:var(--green);font-size:12px;font-weight:600">✓ Approved</span>';
-    }else{
-      act='<span style="color:var(--red);font-size:12px;font-weight:600">✗ Denied</span>';
-    }
-    var cats=(app.product_categories||[]).map(function(c){return '<span class="cat-tag">'+c+'</span>'}).join('');
+async function login(){
+const email=document.getElementById('email').value.trim();
+const pw=document.getElementById('pw').value;
 
-    var tr1=document.createElement('tr');
-    tr1.innerHTML='<td><span class="expand-btn" onclick="toggleDetail(this,'+i+')">▶</span></td>'
-      +'<td><strong style="color:var(--t1)">'+(app.business_name||'')+'</strong></td>'
-      +'<td>'+(app.contact_name||'')+'</td>'
-      +'<td style="font-size:12px">'+(app.email||'')+'</td>'
-      +'<td>'+(app.business_type||'—')+'</td>'
-      +'<td><span class="badge '+bc+'">'+app.status+'</span></td>'
-      +'<td>'+dt+'</td>'
-      +'<td>'+act+'</td>';
-    tbody.appendChild(tr1);
+if(!email||!pw){setMsg('Enter email and password');return;}
 
-    var tr2=document.createElement('tr');
-    tr2.className='detail-panel';tr2.id='detail-'+i;
-    tr2.innerHTML='<td colspan="8"><div class="detail-grid">'
-      +'<div class="detail-item"><div class="dl">Phone</div><div class="dv">'+(app.phone||'Not provided')+'</div></div>'
-      +'<div class="detail-item"><div class="dl">Website</div><div class="dv">'+(app.website?'<a href="'+app.website+'" target="_blank" style="color:var(--ember)">'+app.website+'</a>':'Not provided')+'</div></div>'
-      +'<div class="detail-item"><div class="dl">Est. SKUs</div><div class="dv">'+(app.estimated_skus||'Not specified')+'</div></div>'
-      +'<div class="detail-item"><div class="dl">Business Type</div><div class="dv">'+(app.business_type||'—')+'</div></div>'
-      +'<div class="detail-item" style="grid-column:span 2"><div class="dl">Categories</div><div class="cat-tags">'+(cats||'<span style="color:var(--t3)">None selected</span>')+'</div></div>'
-      +(app.message?'<div class="detail-item" style="grid-column:1/-1"><div class="dl">Message</div><div class="dv" style="line-height:1.6">'+app.message+'</div></div>':'')
-      +'</div></td>';
-    tbody.appendChild(tr2);
-  }
+setMsg('Signing in...');
+
+const r=await sb.auth.signInWithPassword({email,password:pw});
+
+if(r.error){setMsg(r.error.message);return;}
+
+const allowed=await isAdmin(r.data.user);
+if(!allowed){
+await sb.auth.signOut();
+setMsg('Access denied');
+return;
 }
 
-function toggleDetail(btn,i){
-  var p=document.getElementById('detail-'+i);
-  if(p.classList.contains('show')){p.classList.remove('show');btn.textContent='▶'}
-  else{p.classList.add('show');btn.textContent='▼'}
+showDash(r.data.user);
 }
 
-async function approveVendor(i){
-  var app=appData[i];
-  if(!confirm('Approve '+app.business_name+'?\n\nThis will create their vendor login account.'))return;
-
-  var chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%';
-  var pw='';for(var x=0;x<14;x++)pw+=chars.charAt(Math.floor(Math.random()*chars.length));
-
-  try{
-    // Create auth user
-    var ar=await sb.auth.signUp({email:app.email,password:pw,options:{data:{role:'vendor',business_name:app.business_name}}});
-    if(ar.error)throw ar.error;
-
-    // Add to vendors table
-    await sb.from('vendors').insert({
-      user_id:ar.data.user?ar.data.user.id:null,
-      business_name:app.business_name,
-      contact_name:app.contact_name,
-      email:app.email,
-      phone:app.phone||null,
-      website:app.website||null,
-      business_type:app.business_type||null,
-      commission_rate:0.12
-    });
-
-    // Update application
-    await sb.from('vendor_applications').update({status:'approved'}).eq('id',app.id);
-
-    // Show modal with credentials + email template
-    document.getElementById('modalInfo').innerHTML='<strong>'+app.business_name+'</strong> has been approved and their vendor account is now active.';
-
-    var credEl=document.getElementById('credBox');
-    credEl.innerHTML='<button class="copy-btn" onclick="copyBox(\'credBox\')">Copy</button>'
-      +'Email: '+app.email+'\nPassword: '+pw+'\nLogin: https://www.black-stack-diesel.com/vendors/';
-
-    var emailEl=document.getElementById('emailBox');
-    emailEl.innerHTML='<button class="copy-btn" onclick="copyBox(\'emailBox\')">Copy</button>'
-      +'Subject: Welcome to Black Stack Diesel — Your Vendor Account is Ready!\n\n'
-      +'Hi '+app.contact_name+',\n\n'
-      +'Great news! Your application to sell on Black Stack Diesel has been approved.\n\n'
-      +'Here are your login credentials:\n'
-      +'Email: '+app.email+'\n'
-      +'Temporary Password: '+pw+'\n'
-      +'Login: https://www.black-stack-diesel.com/vendors/\n\n'
-      +'Please change your password after your first login.\n\n'
-      +'Next steps:\n'
-      +'1. Log in to your vendor dashboard\n'
-      +'2. Upload your product catalog\n'
-      +'3. Set your shipping rates\n'
-      +'4. Start receiving orders!\n\n'
-      +'Commission: 12% on part price only (not shipping)\n'
-      +'Payouts: Instant via Stripe when you confirm shipment\n\n'
-      +'Welcome aboard,\n'
-      +'Black Stack Diesel Team\n'
-      +'help@black-stack-diesel.com';
-
-    document.getElementById('approveModal').classList.add('show');
-    loadApplications();loadVendors();
-  }catch(err){
-    alert('Error: '+err.message+'\n\nIf email rate limit, wait a few minutes and try again.');
-  }
+async function logout(){
+await sb.auth.signOut();
+location.reload();
 }
 
-async function denyVendor(i){
-  var app=appData[i];
-  if(!confirm('Deny '+app.business_name+'?'))return;
-  await sb.from('vendor_applications').update({status:'denied'}).eq('id',app.id);
-  loadApplications();
+function showDash(user){
+document.getElementById('loginScreen').classList.add('hidden');
+document.getElementById('dash').classList.remove('hidden');
+document.getElementById('userBox').textContent=user.email;
+refreshAll();
 }
 
-// ===== VENDORS =====
+function tab(id,btn){
+document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+
+document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+btn.classList.add('active');
+}
+
+async function refreshAll(){
+loadApps();
+loadVendors();
+loadWaitlist();
+}
+
+async function loadApps(){
+const r=await sb.from('vendor_applications').select('*').order('created_at',{ascending:false});
+const rows=document.getElementById('appRows');
+rows.innerHTML='';
+
+if(r.error || !r.data || !r.data.length){
+document.getElementById('appEmpty').classList.remove('hidden');
+return;
+}
+document.getElementById('appEmpty').classList.add('hidden');
+
+let p=0,a=0;
+
+r.data.forEach(x=>{
+if(x.status==='pending')p++;
+if(x.status==='approved')a++;
+
+rows.innerHTML+=`
+<tr>
+<td>${x.business_name||''}</td>
+<td>${x.contact_name||''}</td>
+<td>${x.email||''}</td>
+<td>
+<span class="badge ${x.status||'pending'}">${x.status||'pending'}</span>
+</td>
+<td>${x.created_at?new Date(x.created_at).toLocaleDateString():'-'}</td>
+<td>
+<button class="sm green" onclick="approve('${x.id}')">Approve</button>
+<button class="sm red" onclick="denyApp('${x.id}')">Deny</button>
+</td>
+</tr>`;
+});
+
+document.getElementById('pendingCt').textContent=p;
+document.getElementById('approvedCt').textContent=a;
+}
+
+async function approve(id){
+await sb.from('vendor_applications').update({status:'approved'}).eq('id',id);
+loadApps();
+loadVendors();
+}
+
+async function denyApp(id){
+await sb.from('vendor_applications').update({status:'denied'}).eq('id',id);
+loadApps();
+}
+
 async function loadVendors(){
-  var r=await sb.from('vendors').select('*').order('created_at',{ascending:false});
-  var tbody=document.getElementById('vendorRows');tbody.innerHTML='';
-  if(!r.data||!r.data.length){document.getElementById('vendorEmpty').style.display='block';document.getElementById('statActiveVendors').textContent='0';return}
-  document.getElementById('vendorEmpty').style.display='none';
-  document.getElementById('statActiveVendors').textContent=r.data.length;
-  r.data.forEach(function(v){
-    var dt=new Date(v.created_at).toLocaleDateString();
-    tbody.innerHTML+='<tr><td><strong style="color:var(--t1)">'+v.business_name+'</strong></td><td>'+v.contact_name+'</td><td>'+v.email+'</td><td>'+(v.business_type||'—')+'</td><td>'+Math.round(v.commission_rate*100)+'%</td><td>'+dt+'</td></tr>';
-  });
+const r=await sb.from('vendors').select('*').order('created_at',{ascending:false});
+const rows=document.getElementById('vendorRows');
+rows.innerHTML='';
+
+if(r.error || !r.data || !r.data.length){
+document.getElementById('vendorEmpty').classList.remove('hidden');
+document.getElementById('vendorCt').textContent='0';
+return;
+}
+document.getElementById('vendorEmpty').classList.add('hidden');
+
+document.getElementById('vendorCt').textContent=r.data.length;
+
+r.data.forEach(v=>{
+rows.innerHTML+=`
+<tr>
+<td>${v.business_name||''}</td>
+<td>${v.contact_name||''}</td>
+<td>${v.email||''}</td>
+<td>${Math.round((v.commission_rate||0.12)*100)}%</td>
+</tr>`;
+});
 }
 
-// ===== WAITLIST =====
 async function loadWaitlist(){
-  var r=await sb.from('waitlist').select('*').order('created_at',{ascending:false});
-  if(!r.data||!r.data.length){
-    document.getElementById('waitlistEmpty').style.display='block';
-    document.getElementById('statWaitlist').textContent='0';
-    return;
-  }
-  document.getElementById('waitlistEmpty').style.display='none';
-  document.getElementById('statWaitlist').textContent=r.data.length;
-
-  var list=document.getElementById('waitlistList');list.innerHTML='';
-  r.data.slice(0,20).forEach(function(w){
-    var dt=new Date(w.created_at).toLocaleDateString();
-    list.innerHTML+='<div class="waitlist-item"><span style="color:var(--t2)">'+w.email+'</span><span style="color:var(--t3);font-size:11px">'+dt+'</span></div>';
-  });
-  if(r.data.length>20)list.innerHTML+='<div style="text-align:center;padding:8px;font-size:12px;color:var(--t3)">+ '+(r.data.length-20)+' more</div>';
-
-  // Build signup chart
-  var days={};
-  r.data.forEach(function(w){var d=new Date(w.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});days[d]=(days[d]||0)+1});
-  var keys=Object.keys(days).reverse().slice(-14);
-  if(keys.length>0){
-    var max=Math.max.apply(null,keys.map(function(k){return days[k]}));
-    var html='<div style="display:flex;align-items:flex-end;gap:6px;height:120px;padding:10px 0 24px">';
-    keys.forEach(function(k){
-      var h=Math.max(8,Math.round((days[k]/max)*100));
-      html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="font-size:10px;color:var(--ember);font-weight:700">'+days[k]+'</div><div style="width:100%;height:'+h+'px;background:linear-gradient(to top,var(--ember),rgba(255,107,44,.4));border-radius:4px 4px 0 0"></div><div style="font-size:8px;color:var(--t3);white-space:nowrap">'+k+'</div></div>';
-    });
-    html+='</div>';
-    document.getElementById('signupChart').innerHTML=html;
-  }
+const r=await sb.from('waitlist').select('*');
+const ct=(r.data&&r.data.length)?r.data.length:0;
+document.getElementById('waitCt').textContent=ct;
+document.getElementById('waitCt2').textContent=ct;
 }
 
-// ===== UTILS =====
-function copyBox(id){
-  var el=document.getElementById(id);
-  var text=el.innerText.replace(/^Copy\s*/,'').trim();
-  navigator.clipboard.writeText(text);
-  var btn=el.querySelector('.copy-btn');
-  btn.textContent='Copied!';setTimeout(function(){btn.textContent='Copy'},2000);
+(async ()=>{
+const s=await sb.auth.getSession();
+if(s.data.session){
+const ok=await isAdmin(s.data.session.user);
+if(ok) showDash(s.data.session.user);
 }
-function closeModal(){document.getElementById('approveModal').classList.remove('show')}
+})();
 </script>
 </body>
 </html>

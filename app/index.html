@@ -1,419 +1,587 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-TDGHS7EY89"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-TDGHS7EY89');</script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#07070A">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="BlackStack">
-<link rel="manifest" href="/app/manifest.json">
-<title>BlackStack Diesel</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{
-  --bg:#07070A;--c1:#0D0D12;--c2:#131318;--c3:#1A1A22;--c4:#25252F;
-  --gl:rgba(255,255,255,.035);--glb:rgba(255,255,255,.055);--glh:rgba(255,255,255,.07);
-  --gold:#EDAE0A;--gold2:#D4990B;--goldg:linear-gradient(140deg,#FBBF24,#F59E0B,#D97706);
-  --goldgl:rgba(237,174,10,.12);--goldb:rgba(237,174,10,.1);
-  --red:#F87171;--grn:#34D399;--blu:#60A5FA;--pur:#A78BFA;
-  --t1:#F1F5F9;--t2:rgba(241,245,249,.5);--t3:rgba(241,245,249,.22);--t4:rgba(241,245,249,.1);
-  --r:14px;--r2:18px;--r3:24px;
-  --ease:cubic-bezier(.22,1,.36,1);
-}
-html,body{height:100%;overflow:hidden;background:var(--bg)}
-body{font-family:'Manrope',sans-serif;color:var(--t1)}
-
-.phone{width:100%;height:100dvh;background:var(--bg);position:relative;overflow:hidden}
-
-/* Ambient blobs */
-.blob{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
-.blob-1{width:260px;height:260px;background:rgba(237,174,10,.045);top:-60px;right:-40px;animation:float1 22s ease infinite alternate}
-.blob-2{width:200px;height:200px;background:rgba(96,165,250,.03);bottom:60px;left:-50px;animation:float2 18s ease infinite alternate}
-.blob-3{width:160px;height:160px;background:rgba(167,139,250,.025);top:40%;left:50%;animation:float3 25s ease infinite alternate}
-@keyframes float1{to{transform:translate(-30px,50px) scale(1.15)}}
-@keyframes float2{to{transform:translate(40px,-40px) scale(.9)}}
-@keyframes float3{to{transform:translate(-50px,30px) scale(1.2)}}
-
-/* Noise texture overlay */
-.phone::after{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");opacity:.5;pointer-events:none;z-index:0}
-
-.sbar{height:env(safe-area-inset-top,12px);min-height:12px;z-index:200;position:relative}
-
-.sw{height:calc(100dvh - env(safe-area-inset-top,12px));position:relative;overflow:hidden;z-index:1}
-.scr{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;opacity:0;pointer-events:none;transition:opacity .45s var(--ease),transform .45s var(--ease);transform:translateY(8px) scale(.985)}
-.scr::-webkit-scrollbar{display:none}
-.scr.on{opacity:1;pointer-events:auto;transform:translateY(0) scale(1)}
-
-/* Nav */
-.bnav{position:absolute;bottom:0;left:0;right:0;z-index:100;padding:0 24px calc(env(safe-area-inset-bottom,6px) + 6px)}
-.bnav-in{display:flex;align-items:center;justify-content:space-around;height:60px;background:rgba(13,13,18,.92);backdrop-filter:blur(40px) saturate(1.8);-webkit-backdrop-filter:blur(40px) saturate(1.8);border:1px solid rgba(255,255,255,.1);border-radius:100px;padding:0 8px;box-shadow:0 -4px 30px rgba(0,0,0,.5)}
-.ni{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 24px;border-radius:100px;position:relative;transition:.3s var(--ease)}
-.ni svg{width:22px;height:22px;stroke:rgba(241,245,249,.4);fill:none;stroke-width:1.8;transition:.35s var(--ease)}
-.ni span{font-size:10px;font-weight:700;color:rgba(241,245,249,.4);text-transform:uppercase;letter-spacing:1.8px;transition:.35s var(--ease)}
-.ni.on svg{stroke:var(--gold)}
-.ni.on span{color:var(--gold)}
-.ni.on::before{content:'';position:absolute;inset:0;border-radius:100px;background:rgba(237,174,10,.05);border:1px solid rgba(237,174,10,.08)}
-.hid{display:none!important}
-
-/* Shared */
-.g{background:var(--gl);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glb);border-radius:var(--r2)}
-.gs{background:var(--gl);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glb);border-radius:var(--r)}
-.btn-g{width:100%;height:54px;background:var(--goldg);border:none;border-radius:var(--r);font-family:'Manrope',sans-serif;font-size:15px;font-weight:700;letter-spacing:.3px;color:#0a0a0a;cursor:pointer;transition:.2s;position:relative;overflow:hidden;box-shadow:0 0 30px rgba(237,174,10,.12),inset 0 1px 0 rgba(255,255,255,.25)}
-.btn-g:active{transform:scale(.97);box-shadow:none}
-.mono{font-family:'DM Mono',monospace}
-
-/* ========== LOGIN ========== */
-#s-login{display:flex;flex-direction:column;padding:40px 28px;justify-content:center;align-items:center}
-.l-logo{width:100px;height:100px;border-radius:20px;background:transparent;display:flex;align-items:center;justify-content:center;margin-bottom:20px;position:relative;overflow:hidden}
-.l-logo img{width:100%;height:100%;object-fit:contain}
-.l-logo::after{content:'';position:absolute;inset:-6px;border-radius:26px;border:none;pointer-events:none}
-.l-mark{font-size:30px;font-weight:800;letter-spacing:-.8px;margin-bottom:2px}
-.l-mark em{font-style:normal;color:var(--gold)}
-.l-sub{color:var(--t3);font-size:14px;margin-bottom:36px;letter-spacing:.4px;font-weight:500}
-.fg{width:100%;margin-bottom:12px}
-.fl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.8px;color:var(--t3);margin-bottom:6px}
-.fi{width:100%;height:52px;background:var(--gl);border:1px solid var(--glb);border-radius:12px;padding:0 16px;font-size:16px;color:var(--t1);font-family:'Manrope',sans-serif;outline:none;transition:.3s var(--ease)}
-.fi:focus{border-color:rgba(237,174,10,.25);box-shadow:0 0 0 4px rgba(237,174,10,.04)}
-.fi::placeholder{color:var(--t3)}
-.sep{display:flex;align-items:center;gap:16px;width:100%;margin:22px 0}.sep::before,.sep::after{content:'';flex:1;height:1px;background:var(--glb)}.sep span{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:2.5px;font-weight:600}
-.soc{display:flex;gap:10px;width:100%}
-.soc-b{flex:1;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;font-size:14px;font-weight:600;color:var(--t2);transition:.2s}
-.soc-b:active{transform:scale(.95)}
-.soc-b svg{width:17px;height:17px}
-.l-ft{margin-top:24px;font-size:14px;color:var(--t3)}.l-ft a{color:var(--gold);text-decoration:none;font-weight:700}
-
-/* ========== VEHICLE ========== */
-#s-veh{padding:0}
-.v-top{display:flex;align-items:center;padding:10px 24px 0}
-.v-back{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}
-.v-back:active{transform:scale(.86)}
-.v-back svg{width:20px;height:20px;stroke:var(--t2);fill:none;stroke-width:2}
-.v-body{padding:4px 24px 40px}
-.v-heading{text-align:center;margin-bottom:24px}
-.v-heading h2{font-size:22px;font-weight:800;letter-spacing:-.4px}
-.v-heading p{color:var(--t3);font-size:14px;margin-top:4px;font-weight:500}
-.prog-bar{display:flex;gap:5px;margin-bottom:28px}
-.pb{flex:1;height:3px;border-radius:2px;background:var(--t4);transition:.6s var(--ease);position:relative;overflow:hidden}
-.pb.done{background:var(--gold)}
-.pb.done::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);animation:shim 2.5s ease infinite}
-@keyframes shim{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
-.pb.cur{background:rgba(237,174,10,.25)}
-.lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--t3);margin-bottom:10px}
-.pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
-.pill{padding:11px 22px;border-radius:12px;font-size:15px;font-weight:600;color:var(--t2);cursor:pointer;transition:all .3s var(--ease);white-space:nowrap;position:relative;background:var(--gl);border:1px solid var(--glb)}
-.pill:active{transform:scale(.93)}
-.pill.sel{color:var(--gold);background:var(--goldgl);border-color:rgba(237,174,10,.2);box-shadow:0 0 20px rgba(237,174,10,.04)}
-.vprev{border-radius:var(--r2);padding:20px;margin-top:20px;position:relative;overflow:hidden}
-.vprev::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--goldg)}
-.vprev .vl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:var(--t3);margin-bottom:8px}
-.vprev .vn{font-size:20px;font-weight:800;background:var(--goldg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-.3px}
-.vprev .ve{font-size:12px;color:var(--t2);margin-top:4px;font-weight:500}
-.vprev .vt{display:flex;gap:6px;margin-top:12px}
-.vprev .tag{padding:4px 12px;border-radius:8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t2)}
-
-/* ========== AI ========== */
-#s-ai{padding:20px 24px calc(80px + env(safe-area-inset-bottom,6px))}
-.sec-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-.sec-h h2{font-size:20px;font-weight:800;letter-spacing:-.3px}
-.badge{padding:5px 14px;border-radius:100px;font-size:9px;font-weight:700;letter-spacing:.6px;color:var(--gold);background:var(--goldgl);border:1px solid var(--goldb)}
-.ai-lock{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;height:calc(100% - 100px)}
-.orb{width:96px;height:96px;border-radius:30px;display:flex;align-items:center;justify-content:center;font-size:44px;margin-bottom:28px;position:relative;background:var(--c1)}
-.orb::before{content:'';position:absolute;inset:-2px;border-radius:32px;background:conic-gradient(from 180deg,var(--gold),transparent 25%,transparent 75%,var(--gold));opacity:.35;animation:spin 10s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.orb span{position:relative;z-index:1}
-.ai-t{font-size:20px;font-weight:800;background:var(--goldg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px}
-.ai-d{font-size:15px;color:var(--t2);line-height:1.8;max-width:270px;margin-bottom:22px;font-weight:400}
-.ai-j{font-size:14px;color:var(--t3);line-height:1.75;max-width:250px;font-style:italic;margin-bottom:30px;padding:16px 20px;border-radius:14px;background:var(--gl);border-left:2px solid rgba(237,174,10,.15);font-weight:400}
-.ai-soon{padding:10px 26px;border-radius:100px;display:flex;align-items:center;gap:10px;border:1px solid var(--goldb);background:var(--goldgl)}
-.ai-soon .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pul 2s ease infinite}
-@keyframes pul{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.15;transform:scale(.6)}}
-.ai-soon span{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:var(--t2)}
-
-/* ========== MARKETPLACE ========== */
-#s-mkt{padding:14px 18px calc(80px + env(safe-area-inset-bottom,6px))}
-.mk-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding:0 2px}
-.mk-top h2{font-size:20px;font-weight:800;letter-spacing:-.3px}
-.cbtn{position:relative;width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.cbtn:active{transform:scale(.88)}
-.cbtn svg{width:19px;height:19px;stroke:var(--t2);fill:none;stroke-width:1.7}
-.cbdg{position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;background:var(--goldg);border-radius:100px;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);padding:0 4px;color:#0a0a0a}
-.vstrip{padding:10px 14px;border-radius:12px;display:flex;align-items:center;gap:9px;margin-bottom:14px;font-size:13px;font-weight:600;color:var(--gold)}
-.vstrip svg{width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:2;flex-shrink:0}
-.cats{display:flex;gap:5px;overflow-x:auto;margin-bottom:12px;scrollbar-width:none;padding-bottom:2px}.cats::-webkit-scrollbar{display:none}
-.ct{padding:9px 18px;border-radius:100px;font-size:12px;font-weight:700;color:var(--t3);cursor:pointer;white-space:nowrap;transition:.25s var(--ease);background:var(--gl);border:1px solid var(--glb)}
-.ct.on{color:var(--gold);background:var(--goldgl);border-color:rgba(237,174,10,.15)}
-.stg-row{display:flex;gap:6px;margin-bottom:10px}
-.stg{padding:6px 14px;border-radius:10px;font-size:9px;font-weight:800;letter-spacing:1px;color:var(--t3);cursor:pointer;transition:.25s var(--ease);text-transform:uppercase;background:var(--gl);border:1px solid var(--glb)}
-.stg.on{color:var(--gold);background:var(--goldgl);border-color:rgba(237,174,10,.15)}
-.dds{display:flex;gap:6px;margin-bottom:12px}
-.dd{flex:1;height:36px;background:var(--gl);border:1px solid var(--glb);border-radius:10px;padding:0 8px;font-size:10px;font-weight:600;color:var(--t2);font-family:'Manrope',sans-serif;outline:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M6 9l6 6 6-6' stroke='rgba(255,255,255,0.15)' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center;background-size:12px;padding-right:22px}
-.dd:focus{border-color:rgba(237,174,10,.2)}
-.dd option{background:#151519;color:#e2e2e2}
-.sbox{position:relative;margin-bottom:16px}
-.sbox input{width:100%;height:44px;background:var(--gl);border:1px solid var(--glb);border-radius:13px;padding:0 14px 0 42px;font-size:15px;color:var(--t1);outline:none;font-family:'Manrope',sans-serif;transition:.25s var(--ease)}
-.sbox input::placeholder{color:var(--t3);font-weight:500}
-.sbox input:focus{border-color:rgba(237,174,10,.15)}
-.sbox svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:17px;height:17px;stroke:var(--t3);fill:none;stroke-width:1.8}
-.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.pc{border-radius:var(--r2);overflow:hidden;cursor:pointer;transition:.25s var(--ease)}
-.pc:active{transform:scale(.965)}
-.pc-img{height:100px;background:rgba(255,255,255,.015);display:flex;align-items:center;justify-content:center;position:relative;font-size:34px;border-bottom:1px solid var(--glb)}
-.pc-fit{position:absolute;top:7px;left:7px;padding:3px 8px;border-radius:7px;font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;background:rgba(52,211,153,.06);color:var(--grn);border:1px solid rgba(52,211,153,.1)}
-.pc-stg{position:absolute;top:7px;right:7px;padding:3px 8px;border-radius:7px;font-size:7px;font-weight:800;letter-spacing:.8px;text-transform:uppercase}
-.s1{background:rgba(96,165,250,.06);color:var(--blu);border:1px solid rgba(96,165,250,.1)}
-.s2{background:var(--goldgl);color:var(--gold);border:1px solid var(--goldb)}
-.s3{background:rgba(248,113,113,.06);color:var(--red);border:1px solid rgba(248,113,113,.1)}
-.pc-bd{padding:10px 12px 12px}
-.pc-br{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:3px}
-.pc-bd h4{font-size:13px;font-weight:600;line-height:1.4;margin-bottom:8px;color:var(--t1)}
-.pc-bt{display:flex;justify-content:space-between;align-items:center}
-.pc-pr{font-size:18px;font-weight:800;color:var(--gold);font-family:'DM Mono',monospace;letter-spacing:-.5px}
-.ab{width:32px;height:32px;background:var(--goldg);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;transition:.15s;box-shadow:0 2px 10px rgba(237,174,10,.1)}
-.ab:active{transform:scale(.8)}
-.ab svg{width:14px;height:14px;stroke:#0a0a0a;stroke-width:2.5;fill:none}
-
-/* Cart */
-.cd{position:absolute;inset:0;z-index:300;pointer-events:none;display:none}.cd.op{pointer-events:auto;display:block}
-.cd-bg{position:absolute;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);opacity:0;transition:.4s}.cd.op .cd-bg{opacity:1}
-.cd-sh{position:absolute;bottom:0;left:0;right:0;background:rgba(13,13,18,.96);backdrop-filter:blur(40px);border-radius:24px 24px 0 0;padding:20px 24px 36px;transform:translateY(100%);transition:.5s var(--ease);max-height:70%;overflow-y:auto;border:1px solid var(--glb);border-bottom:none}.cd.op .cd-sh{transform:translateY(0)}
-.cd-h{width:32px;height:3px;background:var(--t4);border-radius:2px;margin:0 auto 18px}
-.cd-t{font-size:17px;font-weight:800;margin-bottom:14px;letter-spacing:-.2px}
-.cd-e{text-align:center;padding:32px 0;color:var(--t3);font-size:12px;font-weight:500}
-.cd-items{display:flex;flex-direction:column;gap:10px;max-height:40vh;overflow-y:auto;scrollbar-width:none}
-.cd-items::-webkit-scrollbar{display:none}
-.ci{display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--r);background:var(--gl);border:1px solid var(--glb)}
-.ci-img{width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,.02);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.ci-info{flex:1;min-width:0}
-.ci-info h4{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ci-info p{font-size:11px;color:var(--t3);margin-top:2px}
-.ci-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
-.ci-price{font-size:15px;font-weight:800;font-family:'DM Mono',monospace;color:var(--gold)}
-.ci-rm{width:26px;height:26px;border-radius:8px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}
-.ci-rm:active{transform:scale(.8)}
-.ci-rm svg{width:12px;height:12px;stroke:var(--red);fill:none;stroke-width:2.5}
-.cd-tot{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-top:1px solid var(--glb);margin:14px 0}
-.cd-tot span{font-size:12px;color:var(--t2);font-weight:500}
-.cd-tot strong{font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:var(--gold)}
-
-/* ========== PROFILE ========== */
-#s-pro{padding:20px 24px calc(80px + env(safe-area-inset-bottom,6px))}
-.p-head{text-align:center;padding:20px 0 8px}
-.p-av{width:76px;height:76px;border-radius:24px;background:var(--goldg);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#0a0a0a;box-shadow:0 8px 36px rgba(237,174,10,.12);position:relative}
-.p-av::after{content:'';position:absolute;inset:-4px;border-radius:28px;border:1px solid rgba(237,174,10,.08)}
-.p-name{font-size:20px;font-weight:800;letter-spacing:-.3px}
-.p-email{font-size:11px;color:var(--t3);margin-top:3px;font-weight:500}
-.p-truck{border-radius:var(--r2);padding:16px;margin:22px 0 18px;display:flex;align-items:center;gap:12px}
-.p-trk-i{width:46px;height:46px;background:var(--goldgl);border:1px solid var(--goldb);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.p-trk-t h4{font-size:15px;font-weight:700;background:var(--goldg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.p-trk-t p{font-size:10px;color:var(--t3);margin-top:2px;font-weight:500}
-.p-edit{margin-left:auto;padding:7px 16px;border-radius:10px;font-size:9px;font-weight:700;color:var(--t2);cursor:pointer;font-family:'Manrope',sans-serif;letter-spacing:.5px;text-transform:uppercase}
-.p-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:22px}
-.p-st{border-radius:var(--r);padding:14px 6px;text-align:center}
-.p-stv{font-size:18px;font-weight:800;font-family:'DM Mono',monospace;color:var(--gold)}
-.p-stl{font-size:8px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1.4px;margin-top:4px}
-.p-list{display:flex;flex-direction:column;gap:1px;border-radius:var(--r2);overflow:hidden}
-.p-row{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--gl);cursor:pointer;transition:.15s}
-.p-row:active{background:var(--glh)}
-.p-ri{width:36px;height:36px;border-radius:11px;background:rgba(255,255,255,.025);border:1px solid var(--glb);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.p-ri svg{width:16px;height:16px;stroke:var(--t2);fill:none;stroke-width:1.7}
-.p-row span{flex:1;font-size:15px;font-weight:500}.p-row .ch{color:var(--t4);font-size:15px}
-.so-btn{width:100%;height:48px;background:transparent;border:1px solid rgba(248,113,113,.1);border-radius:var(--r);margin-top:20px;font-family:'Manrope',sans-serif;font-size:14px;font-weight:700;color:var(--red);cursor:pointer;transition:.2s;letter-spacing:.3px}
-.so-btn:active{background:rgba(248,113,113,.04)}
-
-/* Desktop cap */
-@media(min-width:500px){.phone{max-width:430px;margin:0 auto}}
-
-@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.pc{animation:fadeIn .5s var(--ease) both}
-.pc:nth-child(2){animation-delay:.05s}.pc:nth-child(3){animation-delay:.1s}
-.pc:nth-child(4){animation-delay:.15s}.pc:nth-child(5){animation-delay:.2s}.pc:nth-child(6){animation-delay:.25s}
-
-/* Sub-screens */
-.sub{position:absolute;inset:0;z-index:200;background:var(--bg);overflow-y:auto;scrollbar-width:none;transform:translateX(100%);transition:transform .35s var(--ease);pointer-events:none;padding:0 24px 40px}
-.sub::-webkit-scrollbar{display:none}
-.sub.open{transform:translateX(0);pointer-events:auto}
-.sub-top{display:flex;align-items:center;gap:12px;padding:16px 0}
-.sub-top h3{font-size:18px;font-weight:800}
-.sub-back{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.sub-back:active{transform:scale(.85)}
-.sub-back svg{width:18px;height:18px;stroke:var(--t2);fill:none;stroke-width:2}
-.sub-empty{text-align:center;padding:60px 20px;color:var(--t3);font-size:15px;line-height:1.7}
-.sub-empty .si{font-size:44px;margin-bottom:16px;display:block}
-.sub-item{display:flex;align-items:center;gap:12px;padding:14px;border-radius:var(--r);margin-bottom:8px}
-.sub-item h4{font-size:15px;font-weight:600}
-.sub-item p{font-size:12px;color:var(--t3);margin-top:2px}
-.tog-row{display:flex;align-items:center;justify-content:space-between;padding:14px;border-radius:var(--r);margin-bottom:8px}
-.tog-row span{font-size:15px;font-weight:500}
-.tog{width:44px;height:26px;border-radius:13px;background:var(--t4);position:relative;cursor:pointer;transition:.3s}
-.tog.on{background:var(--gold)}
-.tog::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.3s}
-.tog.on::after{left:21px}
-/* Auth error */
-.auth-err{display:none;width:100%;padding:10px 14px;border-radius:10px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.15);color:var(--red);font-size:13px;font-weight:500;margin-bottom:12px;text-align:center}
-
-</style>
-</head>
-<body>
-<div class="phone">
-<div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
-<div class="sbar"></div>
-<div class="sw">
-
-<!-- LOGIN -->
-<div class="scr on" id="s-login">
-<div class="l-logo"><img src="/app/icon-512.png" alt="Black Stack Diesel"></div>
-<div class="l-mark">Black<em>Stack</em></div>
-<div class="l-sub">Diesel parts & diagnostics</div>
-<div class="auth-err" id="authErr"></div>
-<div class="fg"><div class="fl">Email</div><input class="fi" id="authEmail" type="email" placeholder="you@email.com" autocomplete="email"></div>
-<div class="fg"><div class="fl">Password</div><input class="fi" id="authPass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
-<div id="confirmWrap" class="fg" style="display:none"><div class="fl">Confirm Password</div><input class="fi" id="authConfirm" type="password" placeholder="••••••••"></div>
-<button class="btn-g" id="authBtn" onclick="handleAuth()">Sign In</button>
-<div class="sep"><span>or</span></div>
-<div class="soc">
-<div class="soc-b gs" onclick="oAuth('google')"><svg viewBox="0 0 24 24" fill="#4285F4"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Google</div>
-</div>
-<div class="l-ft" id="authToggle">No account? <a href="#" onclick="toggleAuthMode(event)">Sign Up</a></div>
-</div>
-
-<!-- VEHICLE -->
-<div class="scr" id="s-veh">
-<div class="v-top"><div class="v-back gs" onclick="vehBack()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div></div>
-<div class="v-body">
-<div class="v-heading"><h2>Set Up Your Truck</h2><p>Only parts that fit your rig</p></div>
-<div class="prog-bar"><div class="pb" id="p1"></div><div class="pb" id="p2"></div><div class="pb" id="p3"></div><div class="pb" id="p4"></div></div>
-<div id="vg-year"><div class="lbl">Year</div><div class="pills" id="yearP"></div></div>
-<div id="vg-make" class="hid"><div class="lbl">Make</div><div class="pills" id="makeP"></div></div>
-<div id="vg-model" class="hid"><div class="lbl">Model</div><div class="pills" id="modelP"></div></div>
-<div id="vg-engine" class="hid"><div class="lbl">Engine</div><div class="pills" id="engineP"></div></div>
-<div class="vprev g hid" id="vprev"><div class="vl">Your Vehicle</div><div class="vn" id="vpN"></div><div class="ve" id="vpE"></div><div class="vt" id="vpT"></div></div>
-<button class="btn-g hid" id="vBtn" style="margin-top:16px" onclick="confirmV()">Continue</button>
-</div>
-</div>
-
-<!-- AI -->
-<div class="scr" id="s-ai">
-<div class="sec-h"><h2>AI Diagnostics</h2><div class="badge" id="aiBadge">—</div></div>
-<div class="ai-lock">
-<div class="orb"><span>🔧</span></div>
-<div class="ai-t">Under The Hood</div>
-<div class="ai-d">Our AI is getting a full rebuild — new turbo, bigger injectors, and a custom tune. She’ll be rollin’ coal in no time.</div>
-<div class="ai-j">“Why did the diesel mechanic break up with the gas engine? Because she just couldn’t handle the pressure.”</div>
-<div class="ai-soon"><div class="dot"></div><span>Coming Soon</span></div>
-</div>
-</div>
-
-<!-- MARKETPLACE -->
-<div class="scr" id="s-mkt">
-<div class="mk-top"><h2>Marketplace</h2><div class="cbtn gs" onclick="toggleCart()"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg><div class="cbdg">0</div></div></div>
-<div class="vstrip g"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span id="vsText">Select your vehicle first</span></div>
-<div class="cats" id="catTabs"><div class="ct on">All</div></div>
-<div class="stg-row"><div class="stg">Stage 1</div><div class="stg">Stage 2</div><div class="stg">Stage 3</div></div>
-<div class="dds">
-<select class="dd"><option>Price: All</option><option>Under $100</option><option>$100–$500</option><option>$500–$1K</option><option>$1K+</option></select>
-<select class="dd" id="brandDd"><option>Brand: All</option></select>
-<select class="dd"><option>Sort</option><option>Low → High</option><option>High → Low</option></select>
-</div>
-<div class="sbox"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Search parts…"></div>
-<div class="pgrid" id="pgrid">
-<div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--t3);font-size:14px">Loading products…</div>
-</div>
-</div>
-
-<!-- PROFILE -->
-<div class="scr" id="s-pro">
-<div class="p-head"><div class="p-av" id="pAv">BS</div><div class="p-name" id="pName">BlackStack User</div><div class="p-email"><span id="pEmail"></span></div></div>
-<div class="p-truck g"><div class="p-trk-i">🚛</div><div class="p-trk-t"><h4 id="pTrk">No vehicle set</h4><p id="pEng">Select your truck</p></div><button class="p-edit gs" onclick="resetVeh()">Edit</button></div>
-<div class="p-grid">
-<div class="p-st g"><div class="p-stv mono">0</div><div class="p-stl">Orders</div></div>
-<div class="p-st g"><div class="p-stv mono">$0</div><div class="p-stl">Spent</div></div>
-<div class="p-st g"><div class="p-stv mono">0</div><div class="p-stl">Chats</div></div>
-</div>
-<div class="p-list">
-<div class="p-row" onclick="openSub('orders')"><div class="p-ri"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span>Order History</span><span class="ch">›</span></div>
-<div class="p-row" onclick="openSub('payment')"><div class="p-ri"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><span>Payment Methods</span><span class="ch">›</span></div>
-<div class="p-row" onclick="openSub('address')"><div class="p-ri"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><span>Saved Addresses</span><span class="ch">›</span></div>
-<div class="p-row" onclick="openSub('notif')"><div class="p-ri"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div><span>Notifications</span><span class="ch">›</span></div>
-<div class="p-row" onclick="openSub('help')"><div class="p-ri"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><span>Help & Support</span><span class="ch">›</span></div>
-</div>
-<button class="so-btn" onclick="handleSignOut()">Sign Out</button>
-</div>
-
-<!-- PROFILE SUB-SCREENS (outside #s-pro so they don't block scrolling) -->
-<div class="sub" id="sub-orders"><div class="sub-top"><div class="sub-back gs" onclick="closeSub('orders')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><h3>Order History</h3></div><div class="sub-empty"><span class="si">📦</span>No orders yet<br>Your purchases will appear here</div></div>
-<div class="sub" id="sub-payment"><div class="sub-top"><div class="sub-back gs" onclick="closeSub('payment')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><h3>Payment Methods</h3></div><div class="sub-empty"><span class="si">💳</span>No payment methods<br>Add one at checkout</div></div>
-<div class="sub" id="sub-address"><div class="sub-top"><div class="sub-back gs" onclick="closeSub('address')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><h3>Saved Addresses</h3></div><div class="sub-empty"><span class="si">📍</span>No saved addresses<br>Add one at checkout</div></div>
-<div class="sub" id="sub-notif"><div class="sub-top"><div class="sub-back gs" onclick="closeSub('notif')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><h3>Notifications</h3></div><div class="tog-row g"><span>Order Updates</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div><div class="tog-row g"><span>Price Drops</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div><div class="tog-row g"><span>New Products</span><div class="tog" onclick="this.classList.toggle('on')"></div></div><div class="tog-row g"><span>Promotions</span><div class="tog" onclick="this.classList.toggle('on')"></div></div></div>
-<div class="sub" id="sub-help"><div class="sub-top"><div class="sub-back gs" onclick="closeSub('help')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><h3>Help & Support</h3></div><div class="sub-item g"><div style="font-size:22px;width:40px;text-align:center">📧</div><div><h4>Email Us</h4><p style="color:var(--t3)">Coming soon</p></div></div><div class="sub-item g"><div style="font-size:22px;width:40px;text-align:center">💬</div><div><h4>Live Chat</h4><p>Coming soon</p></div></div><div class="sub-item g"><div style="font-size:22px;width:40px;text-align:center">📖</div><div><h4>FAQ</h4><p>Common questions answered</p></div></div><div class="sub-item g" style="margin-top:20px"><div style="font-size:22px;width:40px;text-align:center">📱</div><div><h4>App Version</h4><p>v1.0.0</p></div></div></div>
-
-<!-- CART -->
-<div class="cd" id="cD"><div class="cd-bg" onclick="toggleCart()"></div><div class="cd-sh"><div class="cd-h"></div><div class="cd-t">Your Cart <span id="cartCount" style="color:var(--t3);font-size:13px;font-weight:500"></span></div><div id="cartItems"></div><div class="cd-tot"><span>Total</span><strong class="mono" id="cartTotal">$0</strong></div><button class="btn-g" id="checkoutBtn" onclick="doCheckout()">Checkout</button></div></div>
-
-<!-- NAV -->
-<div class="bnav hid" id="bnav"><div class="bnav-in">
-<div class="ni" data-s="ai" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 01-1 1H9a1 1 0 01-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/><line x1="9" y1="21" x2="15" y2="21"/></svg><span>AI</span></div>
-<div class="ni on" data-s="mkt" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><span>Shop</span></div>
-<div class="ni" data-s="pro" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profile</span></div>
-</div></div>
-
-</div>
-</div>
-
 <script>
-var sb=supabase.createClient('https://jfjbilfsiebifzddveof.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamJpbGZzaWViaWZ6ZGR2ZW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2OTg4ODUsImV4cCI6MjA4NzI3NDg4NX0.bbTQ0l4HsHoKUzoKACBvbXJ0TbnUM5tltK4YLKyuMr8');
-var DB={Dodge:{"Ram 2500":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009],e:{"1994-1998":["5.9L 12V Cummins"],"1998-2002":["5.9L 24V Cummins ISB"],"2003-2007":["5.9L Cummins ISB 325"],"2007-2009":["6.7L Cummins ISB"]}},"Ram 3500":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009],e:{"1994-1998":["5.9L 12V Cummins"],"1998-2002":["5.9L 24V Cummins ISB"],"2003-2007":["5.9L Cummins ISB 325"],"2007-2009":["6.7L Cummins ISB"]}}},Ram:{"2500":{y:[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2010-2012":["6.7L Cummins ISB"],"2013-2018":["6.7L Cummins ISB 385"],"2019-2026":["6.7L Cummins HO 420"]}},"3500":{y:[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2010-2012":["6.7L Cummins ISB"],"2013-2018":["6.7L Cummins ISB 385"],"2019-2026":["6.7L Cummins HO 420"]}}},Ford:{"F-250":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1994-1997":["7.3L Power Stroke"],"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-350":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1994-1997":["7.3L Power Stroke"],"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-450":{y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-550":{y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"Excursion":{y:[2000,2001,2002,2003,2004,2005],e:{"2000-2003":["7.3L Power Stroke"],"2003-2005":["6.0L Power Stroke"]}}},Chevrolet:{"Silverado 2500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}},"Silverado 3500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}}},GMC:{"Sierra 2500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}},"Sierra 3500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}}}};
-var V={year:null,make:null,model:null,engine:null};
-var ym='r',isSignUp=false;
-function showErr(m){var e=document.getElementById('authErr');e.textContent=m;e.style.display='block'}
-function hideErr(){document.getElementById('authErr').style.display='none'}
-function toggleAuthMode(e){e.preventDefault();isSignUp=!isSignUp;hideErr();document.getElementById('authBtn').textContent=isSignUp?'Create Account':'Sign In';document.getElementById('confirmWrap').style.display=isSignUp?'block':'none';document.getElementById('authToggle').innerHTML=isSignUp?'Already have an account? <a href="#" onclick="toggleAuthMode(event)">Sign In</a>':'No account? <a href="#" onclick="toggleAuthMode(event)">Sign Up</a>'}
-async function handleAuth(){hideErr();var email=document.getElementById('authEmail').value.trim(),pass=document.getElementById('authPass').value;if(!email||!pass)return showErr('Please enter email and password');if(isSignUp){if(pass!==document.getElementById('authConfirm').value)return showErr('Passwords do not match');if(pass.length<6)return showErr('Password must be at least 6 characters')}var btn=document.getElementById('authBtn');btn.textContent=isSignUp?'Creating account...':'Signing in...';btn.style.opacity='.6';btn.style.pointerEvents='none';try{var res;if(isSignUp){res=await sb.auth.signUp({email:email,password:pass});if(res.error)throw res.error;if(res.data.session){onAuth(res.data.session.user,true);return}if(res.data.user&&!res.data.session){btn.textContent='Create Account';btn.style.opacity='1';btn.style.pointerEvents='auto';showErr('Check your email to confirm your account, then sign in.');isSignUp=false;document.getElementById('authBtn').textContent='Sign In';document.getElementById('confirmWrap').style.display='none';document.getElementById('authToggle').innerHTML='No account? <a href="#" onclick="toggleAuthMode(event)">Sign Up</a>';return}}else{res=await sb.auth.signInWithPassword({email:email,password:pass});if(res.error)throw res.error;onAuth(res.data.session.user,false)}}catch(err){showErr(err.message||'Authentication failed');btn.textContent=isSignUp?'Create Account':'Sign In';btn.style.opacity='1';btn.style.pointerEvents='auto'}}
-async function oAuth(p){hideErr();var r=await sb.auth.signInWithOAuth({provider:p,options:{redirectTo:location.origin+'/app/'}});if(r.error)showErr(r.error.message)}
-function onAuth(user,isNew){var email=user.email||'',name=email.split('@')[0].split('.').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1)}).join(' '),initials=name.split(' ').map(function(w){return w[0]}).join('').slice(0,2).toUpperCase();document.getElementById('pAv').textContent=initials;document.getElementById('pName').textContent=name;document.getElementById('pEmail').textContent=email;var saved=localStorage.getItem('bsd_vehicle');if(saved){try{var sv=JSON.parse(saved);if(sv.year&&sv.make&&sv.model&&sv.engine){V.year=sv.year;V.make=sv.make;V.model=sv.model;V.engine=sv.engine;applyVehicle();go('mkt');showNav();return}}catch(e){}}go('veh');hideNav()}
-function applyVehicle(){document.getElementById('vsText').textContent='Parts for: '+V.year+' '+V.make+' '+V.model;document.getElementById('aiBadge').textContent=String(V.year).slice(-2)+"' "+V.make.charAt(0)+'. '+V.model;document.getElementById('pTrk').textContent=V.year+' '+V.make+' '+V.model;document.getElementById('pEng').textContent=V.engine}
-async function handleSignOut(){await sb.auth.signOut();localStorage.removeItem('bsd_vehicle');localStorage.removeItem('bsd_cart');cart=[];renderCart();V.year=V.make=V.model=V.engine=null;document.getElementById('authEmail').value='';document.getElementById('authPass').value='';hideErr();hideNav();go('login')}
-async function checkSession(){try{var r=await sb.auth.getSession();if(r.data.session&&r.data.session.user)onAuth(r.data.session.user,false)}catch(e){}}
-function go(id){document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on')});document.getElementById('s-'+id).classList.add('on')}
-function nav(el){document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on')});el.classList.add('on');go(el.dataset.s)}
-function showNav(){document.getElementById('bnav').classList.remove('hid')}
-function hideNav(){document.getElementById('bnav').classList.add('hid')}
-function toggleCart(){document.getElementById('cD').classList.toggle('op')}
-function uProg(s){for(var i=1;i<=4;i++){var e=document.getElementById('p'+i);e.className='pb';if(i<s)e.classList.add('done');else if(i===s)e.classList.add('cur')}}
-function sG(id){document.getElementById('vg-'+id).classList.remove('hid')}
-function hG(id){document.getElementById('vg-'+id).classList.add('hid')}
-function hPrev(){document.getElementById('vprev').classList.add('hid');document.getElementById('vBtn').classList.add('hid')}
-function sPrev(){document.getElementById('vpN').textContent=V.year+' '+V.make+' '+V.model;document.getElementById('vpE').textContent=V.engine;document.getElementById('vpT').innerHTML='<div class="tag gs">Diesel</div><div class="tag gs">'+V.engine.split(' ')[0]+'</div>';document.getElementById('vprev').classList.remove('hid');document.getElementById('vBtn').classList.remove('hid')}
-function mkPill(txt,fn){var d=document.createElement('div');d.className='pill';d.textContent=txt;d.onclick=function(){d.parentElement.querySelectorAll('.pill').forEach(function(x){x.classList.remove('sel')});d.classList.add('sel');fn(txt)};return d}
-function initYrs(){ym='r';var e=document.getElementById('yearP');e.innerHTML='';['2025-2026','2020-2024','2015-2019','2010-2014','2005-2009','2000-2004','1994-1999'].forEach(function(r){e.appendChild(mkPill(r,function(){expYrs(r)}))})}
-function expYrs(rng){ym='i';var p=rng.split('-').map(Number),s=p[0],e=p[1];var yrs=new Set();Object.values(DB).forEach(function(mk){Object.values(mk).forEach(function(m){m.y.filter(function(y){return y>=s&&y<=e}).forEach(function(y){yrs.add(y)})})});var el=document.getElementById('yearP');el.innerHTML='';var bk=document.createElement('div');bk.className='pill';bk.textContent='\u2190 All Years';bk.style.color='var(--gold)';bk.onclick=function(){V.year=V.make=V.model=V.engine=null;hG('make');hG('model');hG('engine');hPrev();uProg(1);initYrs()};el.appendChild(bk);Array.from(yrs).sort(function(a,b){return b-a}).forEach(function(y){el.appendChild(mkPill(String(y),function(t){V.year=parseInt(t);V.make=V.model=V.engine=null;hG('model');hG('engine');hPrev();uProg(2);ldMakes();sG('make')}))})}
-function ldMakes(){var el=document.getElementById('makeP');el.innerHTML='';var ms=new Set();Object.entries(DB).forEach(function(e){var mk=e[0],mds=e[1];Object.values(mds).forEach(function(m){if(m.y.includes(V.year))ms.add(mk)})});Array.from(ms).sort().forEach(function(mk){el.appendChild(mkPill(mk,function(t){V.make=t;V.model=V.engine=null;hG('engine');hPrev();uProg(3);ldModels();sG('model')}))})}
-function ldModels(){var el=document.getElementById('modelP');el.innerHTML='';Object.keys(DB[V.make]).filter(function(m){return DB[V.make][m].y.includes(V.year)}).forEach(function(m){el.appendChild(mkPill(m,function(t){V.model=t;V.engine=null;hPrev();uProg(4);ldEngs();sG('engine')}))})}
-function ldEngs(){var el=document.getElementById('engineP');el.innerHTML='';var md=DB[V.make][V.model];var engs=[];Object.entries(md.e).forEach(function(e){var p=e[0].split('-').map(Number);if(V.year>=p[0]&&V.year<=p[1])engs=engs.concat(e[1])});Array.from(new Set(engs)).forEach(function(eng){el.appendChild(mkPill(eng,function(t){V.engine=t;sPrev()}))})}
-function vehBack(){if(V.engine){V.engine=null;document.querySelectorAll('#engineP .pill').forEach(function(o){o.classList.remove('sel')});hPrev();uProg(4);return}if(V.model){V.model=V.engine=null;hG('engine');hPrev();document.querySelectorAll('#modelP .pill').forEach(function(o){o.classList.remove('sel')});uProg(3);return}if(V.make){V.make=V.model=V.engine=null;hG('model');hG('engine');hPrev();document.querySelectorAll('#makeP .pill').forEach(function(o){o.classList.remove('sel')});uProg(2);return}if(V.year){V.year=V.make=V.model=V.engine=null;hG('make');hG('model');hG('engine');hPrev();uProg(1);if(ym==='i')initYrs();else document.querySelectorAll('#yearP .pill').forEach(function(o){o.classList.remove('sel')});return}go('mkt');showNav()}
-function confirmV(){localStorage.setItem('bsd_vehicle',JSON.stringify({year:V.year,make:V.make,model:V.model,engine:V.engine}));applyVehicle();go('mkt');showNav()}
-function resetVeh(){V.year=V.make=V.model=V.engine=null;localStorage.removeItem('bsd_vehicle');uProg(1);initYrs();hG('make');hG('model');hG('engine');hPrev();go('veh');hideNav()}
-function openSub(id){document.getElementById('sub-'+id).classList.add('open')}
-function closeSub(id){document.getElementById('sub-'+id).classList.remove('open')}
+var sb=supabase.createClient(
+  'https://jfjbilfsiebifzddveof.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamJpbGZzaWViaWZ6ZGR2ZW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2OTg4ODUsImV4cCI6MjA4NzI3NDg4NX0.bbTQ0l4HsHoKUzoKACBvbXJ0TbnUM5tltK4YLKyuMr8'
+);
 
-// === Cart ===
+var DB={
+  Dodge:{
+    "Ram 2500":{
+      y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009],
+      e:{
+        "1994-1998":["5.9L 12V Cummins"],
+        "1998-2002":["5.9L 24V Cummins ISB"],
+        "2003-2007":["5.9L Cummins ISB 325"],
+        "2007-2009":["6.7L Cummins ISB"]
+      }
+    },
+    "Ram 3500":{
+      y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009],
+      e:{
+        "1994-1998":["5.9L 12V Cummins"],
+        "1998-2002":["5.9L 24V Cummins ISB"],
+        "2003-2007":["5.9L Cummins ISB 325"],
+        "2007-2009":["6.7L Cummins ISB"]
+      }
+    }
+  },
+  Ram:{
+    "2500":{
+      y:[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],
+      e:{
+        "2010-2012":["6.7L Cummins ISB"],
+        "2013-2018":["6.7L Cummins ISB 385"],
+        "2019-2026":["6.7L Cummins HO 420"]
+      }
+    },
+    "3500":{
+      y:[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],
+      e:{
+        "2010-2012":["6.7L Cummins ISB"],
+        "2013-2018":["6.7L Cummins ISB 385"],
+        "2019-2026":["6.7L Cummins HO 420"]
+      }
+    }
+  },
+  Ford:{
+    "F-250":{
+      y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],
+      e:{
+        "1994-1997":["7.3L Power Stroke"],
+        "1999-2003":["7.3L Power Stroke"],
+        "2003-2007":["6.0L Power Stroke"],
+        "2008-2010":["6.4L Power Stroke"],
+        "2011-2016":["6.7L Power Stroke"],
+        "2017-2019":["6.7L Power Stroke Gen2"],
+        "2020-2026":["6.7L Power Stroke Gen3"]
+      }
+    },
+    "F-350":{
+      y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],
+      e:{
+        "1994-1997":["7.3L Power Stroke"],
+        "1999-2003":["7.3L Power Stroke"],
+        "2003-2007":["6.0L Power Stroke"],
+        "2008-2010":["6.4L Power Stroke"],
+        "2011-2016":["6.7L Power Stroke"],
+        "2017-2019":["6.7L Power Stroke Gen2"],
+        "2020-2026":["6.7L Power Stroke Gen3"]
+      }
+    },
+    "F-450":{
+      y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],
+      e:{
+        "1999-2003":["7.3L Power Stroke"],
+        "2003-2007":["6.0L Power Stroke"],
+        "2008-2010":["6.4L Power Stroke"],
+        "2011-2016":["6.7L Power Stroke"],
+        "2017-2019":["6.7L Power Stroke Gen2"],
+        "2020-2026":["6.7L Power Stroke Gen3"]
+      }
+    },
+    "F-550":{
+      y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],
+      e:{
+        "1999-2003":["7.3L Power Stroke"],
+        "2003-2007":["6.0L Power Stroke"],
+        "2008-2010":["6.4L Power Stroke"],
+        "2011-2016":["6.7L Power Stroke"],
+        "2017-2019":["6.7L Power Stroke Gen2"],
+        "2020-2026":["6.7L Power Stroke Gen3"]
+      }
+    },
+    "Excursion":{
+      y:[2000,2001,2002,2003,2004,2005],
+      e:{
+        "2000-2003":["7.3L Power Stroke"],
+        "2003-2005":["6.0L Power Stroke"]
+      }
+    }
+  },
+  Chevrolet:{
+    "Silverado 2500HD":{
+      y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],
+      e:{
+        "2001-2004":["6.6L Duramax LB7"],
+        "2004-2006":["6.6L Duramax LLY"],
+        "2006-2007":["6.6L Duramax LBZ"],
+        "2007-2010":["6.6L Duramax LMM"],
+        "2011-2016":["6.6L Duramax LML"],
+        "2017-2019":["6.6L Duramax L5P"],
+        "2020-2026":["6.6L Duramax L5P Gen2"]
+      }
+    },
+    "Silverado 3500HD":{
+      y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],
+      e:{
+        "2001-2004":["6.6L Duramax LB7"],
+        "2004-2006":["6.6L Duramax LLY"],
+        "2006-2007":["6.6L Duramax LBZ"],
+        "2007-2010":["6.6L Duramax LMM"],
+        "2011-2016":["6.6L Duramax LML"],
+        "2017-2019":["6.6L Duramax L5P"],
+        "2020-2026":["6.6L Duramax L5P Gen2"]
+      }
+    }
+  },
+  GMC:{
+    "Sierra 2500HD":{
+      y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],
+      e:{
+        "2001-2004":["6.6L Duramax LB7"],
+        "2004-2006":["6.6L Duramax LLY"],
+        "2006-2007":["6.6L Duramax LBZ"],
+        "2007-2010":["6.6L Duramax LMM"],
+        "2011-2016":["6.6L Duramax LML"],
+        "2017-2019":["6.6L Duramax L5P"],
+        "2020-2026":["6.6L Duramax L5P Gen2"]
+      }
+    },
+    "Sierra 3500HD":{
+      y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],
+      e:{
+        "2001-2004":["6.6L Duramax LB7"],
+        "2004-2006":["6.6L Duramax LLY"],
+        "2006-2007":["6.6L Duramax LBZ"],
+        "2007-2010":["6.6L Duramax LMM"],
+        "2011-2016":["6.6L Duramax LML"],
+        "2017-2019":["6.6L Duramax L5P"],
+        "2020-2026":["6.6L Duramax L5P Gen2"]
+      }
+    }
+  }
+};
+
+var V={year:null,make:null,model:null,engine:null};
+var ym='r';
+var isSignUp=false;
+var ACTIVE_USER=null;
+var ALL_PRODUCTS=[];
+var MATCHED_PRODUCTS=[];
+var PRODUCT_MAP={};
 var cart=JSON.parse(localStorage.getItem('bsd_cart')||'[]');
-function saveCart(){localStorage.setItem('bsd_cart',JSON.stringify(cart))}
+
+function showErr(m){
+  var e=document.getElementById('authErr');
+  e.textContent=m;
+  e.style.display='block';
+}
+function hideErr(){
+  document.getElementById('authErr').style.display='none';
+}
+function toggleAuthMode(e){
+  e.preventDefault();
+  isSignUp=!isSignUp;
+  hideErr();
+  document.getElementById('authBtn').textContent=isSignUp?'Create Account':'Sign In';
+  document.getElementById('confirmWrap').style.display=isSignUp?'block':'none';
+  document.getElementById('authToggle').innerHTML=isSignUp
+    ? 'Already have an account? <a href="#" onclick="toggleAuthMode(event)">Sign In</a>'
+    : 'No account? <a href="#" onclick="toggleAuthMode(event)">Sign Up</a>';
+}
+async function handleAuth(){
+  hideErr();
+  var email=document.getElementById('authEmail').value.trim();
+  var pass=document.getElementById('authPass').value;
+
+  if(!email||!pass) return showErr('Please enter email and password');
+
+  if(isSignUp){
+    if(pass!==document.getElementById('authConfirm').value) return showErr('Passwords do not match');
+    if(pass.length<6) return showErr('Password must be at least 6 characters');
+  }
+
+  var btn=document.getElementById('authBtn');
+  btn.textContent=isSignUp?'Creating account...':'Signing in...';
+  btn.style.opacity='.6';
+  btn.style.pointerEvents='none';
+
+  try{
+    var res;
+    if(isSignUp){
+      res=await sb.auth.signUp({email:email,password:pass});
+      if(res.error) throw res.error;
+
+      if(res.data.session){
+        onAuth(res.data.session.user,true);
+        return;
+      }
+
+      if(res.data.user&&!res.data.session){
+        btn.textContent='Create Account';
+        btn.style.opacity='1';
+        btn.style.pointerEvents='auto';
+        showErr('Check your email to confirm your account, then sign in.');
+        isSignUp=false;
+        document.getElementById('authBtn').textContent='Sign In';
+        document.getElementById('confirmWrap').style.display='none';
+        document.getElementById('authToggle').innerHTML='No account? <a href="#" onclick="toggleAuthMode(event)">Sign Up</a>';
+        return;
+      }
+    }else{
+      res=await sb.auth.signInWithPassword({email:email,password:pass});
+      if(res.error) throw res.error;
+      onAuth(res.data.session.user,false);
+    }
+  }catch(err){
+    showErr(err.message||'Authentication failed');
+    btn.textContent=isSignUp?'Create Account':'Sign In';
+    btn.style.opacity='1';
+    btn.style.pointerEvents='auto';
+  }
+}
+async function oAuth(p){
+  hideErr();
+  var r=await sb.auth.signInWithOAuth({provider:p,options:{redirectTo:location.origin+'/app/'}});
+  if(r.error) showErr(r.error.message);
+}
+
+function vehicleObjIsComplete(v){
+  return !!(v&&v.year&&v.make&&v.model&&v.engine);
+}
+function getStoredVehicle(){
+  try{
+    var raw=localStorage.getItem('bsd_vehicle');
+    if(!raw) return null;
+    var v=JSON.parse(raw);
+    return vehicleObjIsComplete(v)?v:null;
+  }catch(e){
+    return null;
+  }
+}
+async function saveVehicleToAccount(){
+  localStorage.setItem('bsd_vehicle',JSON.stringify({year:V.year,make:V.make,model:V.model,engine:V.engine}));
+  if(!ACTIVE_USER) return;
+  try{
+    var md=ACTIVE_USER.user_metadata||{};
+    var updated=await sb.auth.updateUser({data:Object.assign({},md,{vehicle:{year:V.year,make:V.make,model:V.model,engine:V.engine}})});
+    if(updated&&updated.data&&updated.data.user) ACTIVE_USER=updated.data.user;
+  }catch(e){}
+}
+async function clearVehicleFromAccount(){
+  localStorage.removeItem('bsd_vehicle');
+  if(!ACTIVE_USER) return;
+  try{
+    var md=Object.assign({},ACTIVE_USER.user_metadata||{});
+    delete md.vehicle;
+    var updated=await sb.auth.updateUser({data:md});
+    if(updated&&updated.data&&updated.data.user) ACTIVE_USER=updated.data.user;
+  }catch(e){}
+}
+async function onAuth(user){
+  ACTIVE_USER=user||null;
+  var email=user.email||'';
+  var name=email.split('@')[0].split('.').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');
+  var initials=name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
+
+  document.getElementById('pAv').textContent=initials||'BS';
+  document.getElementById('pName').textContent=name||'BlackStack User';
+  document.getElementById('pEmail').textContent=email;
+
+  var acctVehicle=(user.user_metadata&&user.user_metadata.vehicle)?user.user_metadata.vehicle:null;
+  var saved=vehicleObjIsComplete(acctVehicle)?acctVehicle:getStoredVehicle();
+
+  if(vehicleObjIsComplete(saved)){
+    V.year=saved.year;
+    V.make=saved.make;
+    V.model=saved.model;
+    V.engine=saved.engine;
+    applyVehicle();
+    go('mkt');
+    showNav();
+    if(!vehicleObjIsComplete(acctVehicle)) await saveVehicleToAccount();
+    loadProducts();
+    return;
+  }
+
+  go('veh');
+  hideNav();
+}
+function applyVehicle(){
+  document.getElementById('vsText').textContent=V.year?'Parts for: '+V.year+' '+V.make+' '+V.model+' • '+V.engine:'Select your vehicle first';
+  document.getElementById('aiBadge').textContent=V.year?String(V.year).slice(-2)+"' "+V.make.charAt(0)+'. '+V.model:'—';
+  document.getElementById('pTrk').textContent=V.year?(V.year+' '+V.make+' '+V.model):'No vehicle set';
+  document.getElementById('pEng').textContent=V.engine||'Select your truck';
+}
+async function handleSignOut(){
+  await sb.auth.signOut();
+  ACTIVE_USER=null;
+  localStorage.removeItem('bsd_cart');
+  cart=[];
+  renderCart();
+  V.year=V.make=V.model=V.engine=null;
+  document.getElementById('authEmail').value='';
+  document.getElementById('authPass').value='';
+  hideErr();
+  hideNav();
+  go('login');
+}
+async function checkSession(){
+  try{
+    var r=await sb.auth.getSession();
+    if(r.data.session&&r.data.session.user) onAuth(r.data.session.user,false);
+  }catch(e){}
+}
+
+function go(id){
+  document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on');});
+  document.getElementById('s-'+id).classList.add('on');
+}
+function nav(el){
+  document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on');});
+  el.classList.add('on');
+  go(el.dataset.s);
+}
+function showNav(){document.getElementById('bnav').classList.remove('hid');}
+function hideNav(){document.getElementById('bnav').classList.add('hid');}
+function toggleCart(){document.getElementById('cD').classList.toggle('op');}
+function uProg(s){
+  for(var i=1;i<=4;i++){
+    var e=document.getElementById('p'+i);
+    e.className='pb';
+    if(i<s) e.classList.add('done');
+    else if(i===s) e.classList.add('cur');
+  }
+}
+function sG(id){document.getElementById('vg-'+id).classList.remove('hid');}
+function hG(id){document.getElementById('vg-'+id).classList.add('hid');}
+function hPrev(){
+  document.getElementById('vprev').classList.add('hid');
+  document.getElementById('vBtn').classList.add('hid');
+}
+function sPrev(){
+  document.getElementById('vpN').textContent=V.year+' '+V.make+' '+V.model;
+  document.getElementById('vpE').textContent=V.engine;
+  document.getElementById('vpT').innerHTML='<div class="tag gs">Diesel</div><div class="tag gs">'+V.engine.split(' ')[0]+'</div>';
+  document.getElementById('vprev').classList.remove('hid');
+  document.getElementById('vBtn').classList.remove('hid');
+}
+function mkPill(txt,fn){
+  var d=document.createElement('div');
+  d.className='pill';
+  d.textContent=txt;
+  d.onclick=function(){
+    d.parentElement.querySelectorAll('.pill').forEach(function(x){x.classList.remove('sel');});
+    d.classList.add('sel');
+    fn(txt);
+  };
+  return d;
+}
+function initYrs(){
+  ym='r';
+  var e=document.getElementById('yearP');
+  e.innerHTML='';
+  ['2025-2026','2020-2024','2015-2019','2010-2014','2005-2009','2000-2004','1994-1999'].forEach(function(r){
+    e.appendChild(mkPill(r,function(){expYrs(r);}));
+  });
+}
+function expYrs(rng){
+  ym='i';
+  var p=rng.split('-').map(Number),s=p[0],e=p[1];
+  var yrs=new Set();
+  Object.values(DB).forEach(function(mk){
+    Object.values(mk).forEach(function(m){
+      m.y.filter(function(y){return y>=s&&y<=e;}).forEach(function(y){yrs.add(y);});
+    });
+  });
+  var el=document.getElementById('yearP');
+  el.innerHTML='';
+  var bk=document.createElement('div');
+  bk.className='pill';
+  bk.textContent='← All Years';
+  bk.style.color='var(--gold)';
+  bk.onclick=function(){
+    V.year=V.make=V.model=V.engine=null;
+    hG('make');hG('model');hG('engine');hPrev();uProg(1);initYrs();
+  };
+  el.appendChild(bk);
+  Array.from(yrs).sort(function(a,b){return b-a;}).forEach(function(y){
+    el.appendChild(mkPill(String(y),function(t){
+      V.year=parseInt(t,10);
+      V.make=V.model=V.engine=null;
+      hG('model');hG('engine');hPrev();uProg(2);ldMakes();sG('make');
+    }));
+  });
+}
+function ldMakes(){
+  var el=document.getElementById('makeP');
+  el.innerHTML='';
+  var ms=new Set();
+  Object.entries(DB).forEach(function(e){
+    var mk=e[0],mds=e[1];
+    Object.values(mds).forEach(function(m){
+      if(m.y.includes(V.year)) ms.add(mk);
+    });
+  });
+  Array.from(ms).sort().forEach(function(mk){
+    el.appendChild(mkPill(mk,function(t){
+      V.make=t;V.model=V.engine=null;
+      hG('engine');hPrev();uProg(3);ldModels();sG('model');
+    }));
+  });
+}
+function ldModels(){
+  var el=document.getElementById('modelP');
+  el.innerHTML='';
+  Object.keys(DB[V.make]).filter(function(m){return DB[V.make][m].y.includes(V.year);}).forEach(function(m){
+    el.appendChild(mkPill(m,function(t){
+      V.model=t;V.engine=null;hPrev();uProg(4);ldEngs();sG('engine');
+    }));
+  });
+}
+function ldEngs(){
+  var el=document.getElementById('engineP');
+  el.innerHTML='';
+  var md=DB[V.make][V.model];
+  var engs=[];
+  Object.entries(md.e).forEach(function(e){
+    var p=e[0].split('-').map(Number);
+    if(V.year>=p[0]&&V.year<=p[1]) engs=engs.concat(e[1]);
+  });
+  Array.from(new Set(engs)).forEach(function(eng){
+    el.appendChild(mkPill(eng,function(t){V.engine=t;sPrev();}));
+  });
+}
+function vehBack(){
+  if(V.engine){
+    V.engine=null;
+    document.querySelectorAll('#engineP .pill').forEach(function(o){o.classList.remove('sel');});
+    hPrev();uProg(4);return;
+  }
+  if(V.model){
+    V.model=V.engine=null;
+    hG('engine');hPrev();
+    document.querySelectorAll('#modelP .pill').forEach(function(o){o.classList.remove('sel');});
+    uProg(3);return;
+  }
+  if(V.make){
+    V.make=V.model=V.engine=null;
+    hG('model');hG('engine');hPrev();
+    document.querySelectorAll('#makeP .pill').forEach(function(o){o.classList.remove('sel');});
+    uProg(2);return;
+  }
+  if(V.year){
+    V.year=V.make=V.model=V.engine=null;
+    hG('make');hG('model');hG('engine');hPrev();uProg(1);
+    if(ym==='i') initYrs();
+    else document.querySelectorAll('#yearP .pill').forEach(function(o){o.classList.remove('sel');});
+    return;
+  }
+  go('mkt');showNav();
+}
+async function confirmV(){
+  await saveVehicleToAccount();
+  applyVehicle();
+  go('mkt');
+  showNav();
+  loadProducts();
+}
+async function resetVeh(){
+  V.year=V.make=V.model=V.engine=null;
+  await clearVehicleFromAccount();
+  uProg(1);
+  initYrs();
+  hG('make');hG('model');hG('engine');hPrev();
+  applyVehicle();
+  loadProducts();
+  go('veh');
+  hideNav();
+}
+function openSub(id){document.getElementById('sub-'+id).classList.add('open');}
+function closeSub(id){document.getElementById('sub-'+id).classList.remove('open');}
+
+function escapeHtml(v){
+  return String(v||'').replace(/[&<>"']/g,function(m){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
+  });
+}
+function cleanImageUrl(v){
+  var s=(v||'').replace(/^"+|"+$/g,'').trim();
+  if(!s||s==='NA'||s==='null') return '';
+  return s;
+}
+function getVehicleAliases(){
+  if(!V.year||!V.make||!V.model||!V.engine) return [];
+  var aliases=[String(V.year),V.make,V.model,V.engine];
+  var eng=V.engine.toLowerCase();
+  if(eng.indexOf('7.3')>-1) aliases=aliases.concat(['7.3','power stroke','powerstroke','7.3l']);
+  if(eng.indexOf('6.0')>-1) aliases=aliases.concat(['6.0','power stroke','powerstroke','6.0l']);
+  if(eng.indexOf('6.4')>-1) aliases=aliases.concat(['6.4','power stroke','powerstroke','6.4l']);
+  if(eng.indexOf('6.7')>-1&&V.make==='Ford') aliases=aliases.concat(['6.7','power stroke','powerstroke','6.7l']);
+  if(V.make==='Ford'&&V.model==='F-250') aliases=aliases.concat(['f250','f-250','super duty','f series']);
+  if(V.make==='Ford'&&V.model==='F-350') aliases=aliases.concat(['f350','f-350','super duty','f series']);
+  return aliases.map(function(x){return String(x).toLowerCase();});
+}
+function scoreProductForVehicle(p){
+  if(!V.year||!V.make||!V.model||!V.engine) return 0;
+  var text=[p.product_name,p.description,p.fitment_text,p.category,p.brand,p.sku].filter(Boolean).join(' ').toLowerCase();
+  var score=0;
+  var aliases=getVehicleAliases();
+  aliases.forEach(function(a){if(a&&text.indexOf(a)>-1) score+=2;});
+  if(text.indexOf(String(V.year))>-1) score+=3;
+  if(text.indexOf(V.make.toLowerCase())>-1) score+=4;
+  if(text.indexOf(V.model.toLowerCase())>-1||text.indexOf(V.model.toLowerCase().replace('-',''))>-1) score+=5;
+  var eng=V.engine.toLowerCase();
+  if(text.indexOf(eng)>-1) score+=7;
+  if((eng.indexOf('power stroke')>-1||eng.indexOf('powerstroke')>-1) && (text.indexOf('power stroke')>-1||text.indexOf('powerstroke')>-1)) score+=5;
+  if(eng.indexOf('7.3')>-1&&text.indexOf('7.3')>-1) score+=8;
+  return score;
+}
+function vehicleMatchLabel(score){
+  if(score>=18) return 'Strong match';
+  if(score>=10) return 'Likely fit';
+  if(score>=5) return 'Possible fit';
+  return '';
+}
+function openProduct(id){
+  var p=PRODUCT_MAP[id];
+  if(!p) return;
+  var img=cleanImageUrl(p.image_url);
+  var emoji=getCatEmoji(p.category);
+  var score=scoreProductForVehicle(p);
+  var label=vehicleMatchLabel(score);
+  var pd=document.getElementById('pDetail');
+
+  document.getElementById('pdImg').innerHTML=img?'<img src="'+escapeHtml(img)+'" alt="'+escapeHtml(p.product_name)+'">':emoji;
+  document.getElementById('pdBrand').textContent=p.brand||'';
+  document.getElementById('pdTitle').textContent=p.product_name||'Product';
+  document.getElementById('pdPrice').textContent='$'+((parseFloat(p.price)||0).toLocaleString());
+
+  var meta=[];
+  if(p.sku) meta.push('<div class="pdet-tag">SKU: '+escapeHtml(p.sku)+'</div>');
+  if(p.category) meta.push('<div class="pdet-tag">'+escapeHtml(p.category)+'</div>');
+  if(label) meta.push('<div class="pdet-tag">'+escapeHtml(label)+'</div>');
+  if(p.brand) meta.push('<div class="pdet-tag">'+escapeHtml(p.brand)+'</div>');
+  document.getElementById('pdMeta').innerHTML=meta.join('');
+  document.getElementById('pdDesc').textContent=(p.description&&p.description.trim())?p.description:'No description available for this product yet.';
+  document.getElementById('pdAddBtn').onclick=function(){
+    addToCart(p.id,p.product_name,p.brand||'',parseFloat(p.price)||0,emoji);
+  };
+  pd.classList.add('op');
+}
+function closeProduct(){
+  document.getElementById('pDetail').classList.remove('op');
+}
+
+function saveCart(){
+  localStorage.setItem('bsd_cart',JSON.stringify(cart));
+}
 function addToCart(id,name,brand,price,emoji){
-  var existing=cart.find(function(c){return c.id===id});
-  if(existing){existing.qty++;} else {cart.push({id:id,name:name,brand:brand,price:price,emoji:emoji,qty:1})}
-  saveCart();renderCart();
+  var existing=cart.find(function(c){return c.id===id;});
+  if(existing) existing.qty++;
+  else cart.push({id:id,name:name,brand:brand,price:price,emoji:emoji,qty:1});
+  saveCart();
+  renderCart();
   document.getElementById('cD').classList.add('op');
 }
 function removeFromCart(id){
-  var idx=cart.findIndex(function(c){return c.id===id});
-  if(idx>-1){if(cart[idx].qty>1){cart[idx].qty--}else{cart.splice(idx,1)}}
-  saveCart();renderCart();
+  var idx=cart.findIndex(function(c){return c.id===id;});
+  if(idx>-1){
+    if(cart[idx].qty>1) cart[idx].qty--;
+    else cart.splice(idx,1);
+  }
+  saveCart();
+  renderCart();
 }
 function renderCart(){
   var el=document.getElementById('cartItems');
@@ -421,77 +589,128 @@ function renderCart(){
   var totalEl=document.getElementById('cartTotal');
   var countEl=document.getElementById('cartCount');
   var total=0,count=0;
-  cart.forEach(function(c){total+=c.price*c.qty;count+=c.qty});
+
+  cart.forEach(function(c){
+    total+=c.price*c.qty;
+    count+=c.qty;
+  });
+
   badge.textContent=count;
   countEl.textContent=count>0?'('+count+' items)':'';
+
   if(cart.length===0){
     el.innerHTML='<div class="cd-e">Your cart is empty</div>';
     totalEl.textContent='$0';
     return;
   }
+
   var html='<div class="cd-items">';
   cart.forEach(function(c){
-    html+='<div class="ci"><div class="ci-img">'+c.emoji+'</div><div class="ci-info"><h4>'+c.name+'</h4><p>'+c.brand+(c.qty>1?' × '+c.qty:'')+'</p></div><div class="ci-right"><div class="ci-price">$'+((c.price*c.qty).toLocaleString())+'</div><div class="ci-rm" onclick="removeFromCart(\''+c.id+'\')"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div></div>';
+    html+='<div class="ci"><div class="ci-img">'+c.emoji+'</div><div class="ci-info"><h4>'+escapeHtml(c.name)+'</h4><p>'+escapeHtml(c.brand)+(c.qty>1?' × '+c.qty:'')+'</p></div><div class="ci-right"><div class="ci-price">$'+((c.price*c.qty).toLocaleString())+'</div><div class="ci-rm" onclick="removeFromCart(\''+c.id+'\')"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div></div>';
   });
   html+='</div>';
   el.innerHTML=html;
   totalEl.textContent='$'+(total.toLocaleString());
 }
 async function doCheckout(){
-  if(cart.length===0)return;
+  if(cart.length===0) return;
+
   var btn=document.getElementById('checkoutBtn');
-  btn.textContent='Redirecting to Stripe...';btn.style.opacity='.6';btn.style.pointerEvents='none';
+  btn.textContent='Redirecting to Stripe...';
+  btn.style.opacity='.6';
+  btn.style.pointerEvents='none';
+
   try{
-    var user=null;try{var s=await sb.auth.getSession();user=s.data.session?.user}catch(e){}
+    var user=null;
+    try{
+      var s=await sb.auth.getSession();
+      user=s.data.session?.user;
+    }catch(e){}
+
     var vehicle=V.year?V.year+' '+V.make+' '+V.model+' — '+V.engine:'';
     var res=await fetch('/api/create-checkout',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        items:cart.map(function(c){return{id:c.id,name:c.name,brand:c.brand,price:c.price,qty:c.qty}}),
+        items:cart.map(function(c){return{id:c.id,name:c.name,brand:c.brand,price:c.price,qty:c.qty};}),
         customer_email:user?user.email:null,
         vehicle:vehicle
       })
     });
     var data=await res.json();
-    if(data.url){
-      window.location.href=data.url;
-    }else{
-      throw new Error(data.error||'Could not create checkout session');
-    }
+    if(data.url) window.location.href=data.url;
+    else throw new Error(data.error||'Could not create checkout session');
   }catch(err){
     alert('Checkout error: '+err.message+'\n\nPlease try again.');
-    btn.textContent='Checkout';btn.style.opacity='1';btn.style.pointerEvents='auto';
+    btn.textContent='Checkout';
+    btn.style.opacity='1';
+    btn.style.pointerEvents='auto';
   }
 }
-// === Category emoji map ===
-var catEmoji={injectors:'💉',turbos:'🌀','head studs':'🔩',egr:'🔧','fuel system':'⛽',engine:'🔧',exhaust:'💨',tuning:'📟',intake:'🌬️',gauges:'📊',cooling:'❄️'};
-function getCatEmoji(cat){return catEmoji[(cat||'').toLowerCase()]||'🔧'}
 
-// === Load products from Supabase ===
+var catEmoji={injectors:'💉',turbos:'🌀','head studs':'🔩',egr:'🔧','fuel system':'⛽',engine:'🔧',exhaust:'💨',tuning:'📟',intake:'🌬️',gauges:'📊',cooling:'❄️'};
+function getCatEmoji(cat){
+  return catEmoji[(cat||'').toLowerCase()]||'🔧';
+}
+
 async function loadProducts(){
   var grid=document.getElementById('pgrid');
   var res=await sb.from('products').select('*').eq('status','active').order('created_at',{ascending:false});
+
   if(res.error||!res.data||res.data.length===0){
     grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--t3);font-size:14px">No products available yet</div>';
     return;
   }
-  var products=res.data;
-  // Build category tabs
-  var cats=new Set();var brands=new Set();
-  products.forEach(function(p){if(p.category)cats.add(p.category);if(p.brand)brands.add(p.brand)});
+
+  ALL_PRODUCTS=res.data.map(function(p){
+    p.__img=cleanImageUrl(p.image_url);
+    p.__score=scoreProductForVehicle(p);
+    p.__fit=p.__score>=8;
+    PRODUCT_MAP[p.id]=p;
+    return p;
+  });
+
+  var vehicleMatched=ALL_PRODUCTS.filter(function(p){return p.__fit;});
+  MATCHED_PRODUCTS=vehicleMatched;
+
+  var products=(V.engine&&vehicleMatched.length>0)?vehicleMatched.slice():ALL_PRODUCTS.slice();
+
+  products.sort(function(a,b){
+    if((b.__fit?1:0)!==(a.__fit?1:0)) return (b.__fit?1:0)-(a.__fit?1:0);
+    if((b.__img?1:0)!==(a.__img?1:0)) return (b.__img?1:0)-(a.__img?1:0);
+    if((b.__score||0)!==(a.__score||0)) return (b.__score||0)-(a.__score||0);
+    return 0;
+  });
+
+  var cats=new Set(),brands=new Set();
+  products.forEach(function(p){
+    if(p.category) cats.add(p.category);
+    if(p.brand) brands.add(p.brand);
+  });
+
   var tabHtml='<div class="ct on">All</div>';
-  Array.from(cats).sort().forEach(function(c){tabHtml+='<div class="ct">'+c+'</div>'});
+  Array.from(cats).sort().forEach(function(c){tabHtml+='<div class="ct">'+c+'</div>';});
   document.getElementById('catTabs').innerHTML=tabHtml;
-  // Rebind category tab clicks
-  document.querySelectorAll('.ct').forEach(function(c){c.onclick=function(){document.querySelectorAll('.ct').forEach(function(x){x.classList.remove('on')});c.classList.add('on');filterProducts()}});
-  // Build brand dropdown
+  document.querySelectorAll('.ct').forEach(function(c){
+    c.onclick=function(){
+      document.querySelectorAll('.ct').forEach(function(x){x.classList.remove('on');});
+      c.classList.add('on');
+      filterProducts();
+    };
+  });
+
   var brandHtml='<option>Brand: All</option>';
-  Array.from(brands).sort().forEach(function(b){brandHtml+='<option>'+b+'</option>'});
+  Array.from(brands).sort().forEach(function(b){brandHtml+='<option>'+b+'</option>';});
   document.getElementById('brandDd').innerHTML=brandHtml;
 
-  // Build product cards
-  var html='';
+  var countHtml='';
+  if(V.engine&&vehicleMatched.length>0){
+    countHtml='<div class="pc-fit-count">Showing '+vehicleMatched.length.toLocaleString()+' likely matches for your '+escapeHtml(V.year+' '+V.make+' '+V.model)+' • '+escapeHtml(V.engine)+'</div>';
+  }else if(V.engine){
+    countHtml='<div class="pc-fit-count">Showing all active products. No strong vehicle matches were found yet for your '+escapeHtml(V.year+' '+V.make+' '+V.model)+' • '+escapeHtml(V.engine)+'.</div>';
+  }
+
+  var html=countHtml;
   products.forEach(function(p){
     var cat=(p.category||'').toLowerCase();
     var stg=p.stage||'';
@@ -500,88 +719,121 @@ async function loadProducts(){
     var emoji=getCatEmoji(p.category);
     var stgClass=stg?'s'+stg:'';
     var stgLabel=stg?'STG '+stg:'';
-    // Check fitment against user vehicle
-    var fits=false;
-    if(V.engine&&p.fitment_text){
-      var ft=p.fitment_text.toLowerCase();
-      var ue=V.engine.toLowerCase();
-      fits=(ft.indexOf(ue)>-1);
-    }
-    html+='<div class="pc g" data-cat="'+cat+'" data-stage="'+stg+'" data-brand="'+brand+'" data-price="'+Math.round(price)+'" data-fit="'+(fits?'1':'0')+'">';
-    html+='<div class="pc-img">'+emoji;
-    if(V.engine){
-      if(fits)html+='<div class="pc-fit">✓ Fits Your Rig</div>';
-    }
-    if(stg)html+='<div class="pc-stg '+stgClass+'">'+stgLabel+'</div>';
+    var img=p.__img;
+    var fits=!!p.__fit;
+
+    html+='<div class="pc g" data-id="'+p.id+'" data-cat="'+cat+'" data-stage="'+stg+'" data-brand="'+brand+'" data-price="'+Math.round(price)+'" data-fit="'+(fits?'1':'0')+'" onclick="openProduct(\''+p.id+'\')">';
+    html+='<div class="pc-img">';
+    if(img) html+='<img src="'+escapeHtml(img)+'" alt="'+escapeHtml(p.product_name||'Product')+'" loading="lazy">';
+    else html+=emoji;
+    if(V.engine&&fits) html+='<div class="pc-fit">✓ Fits Your Rig</div>';
+    if(stg) html+='<div class="pc-stg '+stgClass+'">'+stgLabel+'</div>';
     html+='</div>';
     html+='<div class="pc-bd">';
-    if(p.brand)html+='<div class="pc-br">'+(p.brand||'').replace(/&/g,'&amp;')+'</div>';
-    html+='<h4>'+p.product_name+'</h4>';
+    if(p.brand) html+='<div class="pc-br">'+escapeHtml(p.brand)+'</div>';
+    html+='<h4>'+escapeHtml(p.product_name)+'</h4>';
     html+='<div class="pc-bt"><div class="pc-pr mono">$'+price.toLocaleString()+'</div>';
-    html+='<button class="ab" onclick="addToCart(\''+p.id+'\',\''+p.product_name.replace(/'/g,"\\'")+'\',\''+(p.brand||'').replace(/'/g,"\\'")+'\','+price+',\''+emoji+'\')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>';
+    html+='<button class="ab" onclick="event.stopPropagation();addToCart(\''+p.id+'\',\''+String(p.product_name||'').replace(/'/g,"\\'")+'\',\''+String(p.brand||'').replace(/'/g,"\\'")+'\','+price+',\''+emoji+'\')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>';
     html+='</div></div></div>';
   });
+
   html+='<div class="pc g noresult" style="display:none;grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--t3);font-size:14px" id="noResults">No parts match your filters</div>';
   grid.innerHTML=html;
-  // Rebind filter events after products load
-  document.querySelectorAll('.stg').forEach(function(b){b.onclick=function(){b.classList.toggle('on');filterProducts()}});
-  document.querySelectorAll('.dd').forEach(function(d){d.onchange=function(){filterProducts()}});
-  document.querySelector('.sbox input').addEventListener('input',function(){filterProducts()});
+
+  document.querySelectorAll('.stg').forEach(function(b){
+    b.onclick=function(){
+      b.classList.toggle('on');
+      filterProducts();
+    };
+  });
+  document.querySelectorAll('.dd').forEach(function(d){
+    d.onchange=function(){filterProducts();};
+  });
+  document.querySelector('.sbox input').addEventListener('input',function(){filterProducts();});
+}
+
+function filterProducts(){
+  var activeCat=document.querySelector('.ct.on');
+  var catFilter=activeCat?activeCat.textContent.trim().toLowerCase():'all';
+  var activeStages=[];
+  document.querySelectorAll('.stg.on').forEach(function(s){
+    activeStages.push(s.textContent.trim().replace('Stage ',''));
+  });
+
+  var dds=document.querySelectorAll('.dd');
+  var priceFilter=dds[0].value;
+  var brandFilter=dds[1].value.toLowerCase();
+  var sortFilter=dds[2].value;
+  var searchQ=document.querySelector('.sbox input').value.trim().toLowerCase();
+  var cards=document.querySelectorAll('#pgrid .pc:not(.noresult)');
+  var visible=0;
+
+  cards.forEach(function(card){
+    var show=true;
+    var cardCat=card.dataset.cat;
+    var cardStage=card.dataset.stage;
+    var cardBrand=card.dataset.brand;
+    var cardPrice=parseInt(card.dataset.price||'0',10);
+    var cardName=card.querySelector('h4').textContent.toLowerCase();
+
+    if(catFilter!=='all'&&cardCat!==catFilter) show=false;
+    if(activeStages.length>0&&activeStages.indexOf(cardStage)===-1) show=false;
+    if(brandFilter&&brandFilter!=='brand: all'&&cardBrand!==brandFilter.replace('brand: ','')) show=false;
+    if(priceFilter==='Under $100'&&cardPrice>=100) show=false;
+    if(priceFilter==='$100–$500'&&(cardPrice<100||cardPrice>500)) show=false;
+    if(priceFilter==='$500–$1K'&&(cardPrice<500||cardPrice>1000)) show=false;
+    if(priceFilter==='$1K+'&&cardPrice<1000) show=false;
+    if(searchQ&&cardName.indexOf(searchQ)===-1&&cardBrand.indexOf(searchQ)===-1&&cardCat.indexOf(searchQ)===-1) show=false;
+
+    card.style.display=show?'':'none';
+    if(show) visible++;
+  });
+
+  var noRes=document.getElementById('noResults');
+  if(noRes) noRes.style.display=visible===0?'block':'none';
+
+  if(sortFilter==='Low → High'||sortFilter==='High → Low'){
+    var grid=document.getElementById('pgrid');
+    var arr=Array.from(cards).filter(function(c){return c.style.display!=='none';});
+    arr.sort(function(a,b){
+      var pa=parseInt(a.dataset.price||'0',10),pb=parseInt(b.dataset.price||'0',10);
+      return sortFilter==='Low → High'?pa-pb:pb-pa;
+    });
+    arr.forEach(function(c){grid.appendChild(c);});
+    if(noRes) grid.appendChild(noRes);
+  }
 }
 
 renderCart();
-uProg(1);initYrs();checkSession();loadProducts();
-// Handle return from Stripe checkout
+uProg(1);
+initYrs();
+checkSession();
+loadProducts();
+
 if(window.location.search.indexOf('checkout=success')>-1){
-  cart=[];saveCart();renderCart();
-  setTimeout(function(){alert('Payment successful! Your order is confirmed. You\'ll receive a confirmation email shortly.')},500);
+  cart=[];
+  saveCart();
+  renderCart();
+  setTimeout(function(){
+    alert('Payment successful! Your order is confirmed. You\'ll receive a confirmation email shortly.');
+  },500);
   history.replaceState(null,'','/app/');
 }else if(window.location.search.indexOf('checkout=cancelled')>-1){
-  setTimeout(function(){alert('Checkout was cancelled. Your cart is still saved.')},500);
+  setTimeout(function(){
+    alert('Checkout was cancelled. Your cart is still saved.');
+  },500);
   history.replaceState(null,'','/app/');
 }
-document.getElementById('authPass').addEventListener('keydown',function(e){if(e.key==='Enter')handleAuth()});
 
-function filterProducts(){
-var activeCat=document.querySelector('.ct.on');
-var catFilter=activeCat?activeCat.textContent.trim().toLowerCase():'all';
-var activeStages=[];
-document.querySelectorAll('.stg.on').forEach(function(s){activeStages.push(s.textContent.trim().replace('Stage ',''))});
-var dds=document.querySelectorAll('.dd');
-var priceFilter=dds[0].value;
-var brandFilter=dds[1].value.toLowerCase();
-var sortFilter=dds[2].value;
-var searchQ=document.querySelector('.sbox input').value.trim().toLowerCase();
-var cards=document.querySelectorAll('#pgrid .pc:not(.noresult)');
-var visible=0;
-cards.forEach(function(card){
-var show=true;
-var cardCat=card.dataset.cat;
-var cardStage=card.dataset.stage;
-var cardBrand=card.dataset.brand;
-var cardPrice=parseInt(card.dataset.price);
-var cardName=card.querySelector('h4').textContent.toLowerCase();
-if(catFilter!=='all'&&cardCat!==catFilter)show=false;
-if(activeStages.length>0&&activeStages.indexOf(cardStage)===-1)show=false;
-if(brandFilter&&brandFilter!=='brand: all'&&cardBrand!==brandFilter.replace('brand: ',''))show=false;
-if(priceFilter==='Under $100'&&cardPrice>=100)show=false;
-if(priceFilter==='$100–$500'&&(cardPrice<100||cardPrice>500))show=false;
-if(priceFilter==='$500–$1K'&&(cardPrice<500||cardPrice>1000))show=false;
-if(priceFilter==='$1K+'&&cardPrice<1000)show=false;
-if(searchQ&&cardName.indexOf(searchQ)===-1&&cardBrand.indexOf(searchQ)===-1&&cardCat.indexOf(searchQ)===-1)show=false;
-card.style.display=show?'':'none';
-if(show)visible++;
+document.getElementById('authPass').addEventListener('keydown',function(e){
+  if(e.key==='Enter') handleAuth();
 });
-document.getElementById('noResults').style.display=visible===0?'block':'none';
-if(sortFilter==='Low → High'||sortFilter==='High → Low'){
-var grid=document.getElementById('pgrid');
-var arr=Array.from(cards);
-arr.sort(function(a,b){var pa=parseInt(a.dataset.price),pb=parseInt(b.dataset.price);return sortFilter==='Low → High'?pa-pb:pb-pa});
-arr.forEach(function(c){grid.appendChild(c)});
-grid.appendChild(document.getElementById('noResults'));
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape') closeProduct();
+});
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/app/sw.js').catch(function(){});
 }
-}
-if('serviceWorker' in navigator){navigator.serviceWorker.register('/app/sw.js').catch(function(){})}
 </script>
-</body>
-</html>
