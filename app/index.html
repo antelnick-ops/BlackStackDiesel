@@ -6,7 +6,7 @@
 <title>Black Stack Diesel</title>
 <meta name="description" content="AI-powered diagnostics and parts for diesel trucks.">
 <link rel="icon" href="../favicon.ico">
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="/app/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="BlackStack">
@@ -358,6 +358,7 @@ function toggleCart(){document.getElementById('cD').classList.toggle('op');}
 function uProg(s){
   for(var i=1;i<=4;i++){
     var e=document.getElementById('p'+i);
+    if(!e) continue;
     e.className='pb';
     if(i<s) e.classList.add('done');
     else if(i===s) e.classList.add('cur');
