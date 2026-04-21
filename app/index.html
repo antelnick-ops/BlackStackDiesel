@@ -1079,9 +1079,9 @@ async function loadProducts() {
     return;
   }
 
-  ALL_PRODUCTS = Array.isArray(data) ? data : [];
+ALL_PRODUCTS = Array.isArray(data) ? data : [];
 
-  MATCHED_PRODUCTS = [];
+MATCHED_PRODUCTS = [];
 
   ALL_PRODUCTS.forEach(function (p) {
     // Clean image URL for each product
