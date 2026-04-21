@@ -5,11 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#07070A">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="BlackStack">
 <link rel="manifest" href="/app/manifest.json">
 <link rel="apple-touch-icon" href="/app/icon-192.png">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <title>BlackStack Diesel</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -28,8 +29,6 @@ html,body{height:100%;overflow:hidden}
 body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:flex;justify-content:center;align-items:center}
 
 .phone{width:393px;height:852px;background:var(--bg);position:relative;overflow:hidden;border-radius:52px;border:1px solid rgba(255,255,255,.06)}
-
-/* Ambient blobs */
 .blob{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
 .blob-1{width:260px;height:260px;background:rgba(237,174,10,.045);top:-60px;right:-40px;animation:float1 22s ease infinite alternate}
 .blob-2{width:200px;height:200px;background:rgba(96,165,250,.03);bottom:60px;left:-50px;animation:float2 18s ease infinite alternate}
@@ -37,8 +36,6 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 @keyframes float1{to{transform:translate(-30px,50px) scale(1.15)}}
 @keyframes float2{to{transform:translate(40px,-40px) scale(.9)}}
 @keyframes float3{to{transform:translate(-50px,30px) scale(1.2)}}
-
-/* Noise texture overlay */
 .phone::after{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");opacity:.5;pointer-events:none;z-index:0}
 
 .sbar{height:56px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 32px 8px;font-size:16px;font-weight:600;z-index:200;position:relative;letter-spacing:-.3px}
@@ -51,7 +48,6 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 .scr::-webkit-scrollbar{display:none}
 .scr.on{opacity:1;pointer-events:auto;transform:translateY(0) scale(1)}
 
-/* Nav */
 .bnav{position:absolute;bottom:0;left:0;right:0;z-index:100;padding:0 32px 10px}
 .bnav-in{display:flex;align-items:center;justify-content:space-around;height:56px;background:rgba(7,7,10,.75);backdrop-filter:blur(40px) saturate(1.8);-webkit-backdrop-filter:blur(40px) saturate(1.8);border:1px solid rgba(255,255,255,.04);border-radius:100px;padding:0 8px}
 .ni{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 24px;border-radius:100px;position:relative;transition:.3s var(--ease)}
@@ -62,14 +58,12 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 .ni.on::before{content:'';position:absolute;inset:0;border-radius:100px;background:rgba(237,174,10,.05);border:1px solid rgba(237,174,10,.08)}
 .hid{display:none!important}
 
-/* Shared */
 .g{background:var(--gl);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glb);border-radius:var(--r2)}
 .gs{background:var(--gl);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glb);border-radius:var(--r)}
 .btn-g{width:100%;height:54px;background:var(--goldg);border:none;border-radius:var(--r);font-family:'Manrope',sans-serif;font-size:14px;font-weight:700;letter-spacing:.3px;color:#0a0a0a;cursor:pointer;transition:.2s;position:relative;overflow:hidden;box-shadow:0 0 30px rgba(237,174,10,.12),inset 0 1px 0 rgba(255,255,255,.25)}
 .btn-g:active{transform:scale(.97);box-shadow:none}
 .mono{font-family:'DM Mono',monospace}
 
-/* ========== LOGIN ========== */
 #s-login{display:flex;flex-direction:column;padding:40px 28px;justify-content:center;align-items:center}
 .l-logo{width:56px;height:56px;border-radius:18px;background:var(--goldg);display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:20px;box-shadow:0 8px 40px rgba(237,174,10,.15);position:relative}
 .l-logo::after{content:'';position:absolute;inset:-6px;border-radius:24px;border:1px solid rgba(237,174,10,.08);pointer-events:none}
@@ -88,7 +82,6 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 .soc-b svg{width:17px;height:17px}
 .l-ft{margin-top:24px;font-size:12px;color:var(--t3)}.l-ft a{color:var(--gold);text-decoration:none;font-weight:700}
 
-/* ========== VEHICLE ========== */
 #s-veh{padding:0}
 .v-top{display:flex;align-items:center;padding:10px 24px 0}
 .v-back{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}
@@ -117,7 +110,6 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 .vprev .vt{display:flex;gap:6px;margin-top:12px}
 .vprev .tag{padding:4px 12px;border-radius:8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t2)}
 
-/* ========== AI ========== */
 #s-ai{padding:20px 24px 100px}
 .sec-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
 .sec-h h2{font-size:18px;font-weight:800;letter-spacing:-.3px}
@@ -135,7 +127,6 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 @keyframes pul{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.15;transform:scale(.6)}}
 .ai-soon span{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:var(--t2)}
 
-/* ========== MARKETPLACE ========== */
 #s-mkt{padding:14px 18px 120px}
 .mk-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding:0 2px}
 .mk-top h2{font-size:18px;font-weight:800;letter-spacing:-.3px}
@@ -163,7 +154,8 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .pc{border-radius:var(--r2);overflow:hidden;cursor:pointer;transition:.25s var(--ease)}
 .pc:active{transform:scale(.965)}
-.pc-img{height:100px;background:rgba(255,255,255,.015);display:flex;align-items:center;justify-content:center;position:relative;font-size:34px;border-bottom:1px solid var(--glb)}
+.pc-img{height:100px;background:rgba(255,255,255,.015);display:flex;align-items:center;justify-content:center;position:relative;font-size:34px;border-bottom:1px solid var(--glb);overflow:hidden}
+.pc-img img{width:100%;height:100%;object-fit:contain}
 .pc-fit{position:absolute;top:7px;left:7px;padding:3px 8px;border-radius:7px;font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;background:rgba(52,211,153,.06);color:var(--grn);border:1px solid rgba(52,211,153,.1)}
 .pc-stg{position:absolute;top:7px;right:7px;padding:3px 8px;border-radius:7px;font-size:7px;font-weight:800;letter-spacing:.8px;text-transform:uppercase}
 .s1{background:rgba(96,165,250,.06);color:var(--blu);border:1px solid rgba(96,165,250,.1)}
@@ -177,19 +169,28 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 .ab{width:32px;height:32px;background:var(--goldg);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;transition:.15s;box-shadow:0 2px 10px rgba(237,174,10,.1)}
 .ab:active{transform:scale(.8)}
 .ab svg{width:14px;height:14px;stroke:#0a0a0a;stroke-width:2.5;fill:none}
+.feed-msg{grid-column:1/-1;padding:14px;border-radius:12px;background:var(--goldgl);border:1px solid var(--goldb);font-size:11px;font-weight:600;color:var(--gold)}
+.feed-empty{grid-column:1/-1;padding:24px 12px;text-align:center;color:var(--t3);font-size:12px}
 
-/* Cart */
 .cd{position:absolute;inset:0;z-index:300;pointer-events:none}.cd.op{pointer-events:auto}
 .cd-bg{position:absolute;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);opacity:0;transition:.4s}.cd.op .cd-bg{opacity:1}
 .cd-sh{position:absolute;bottom:0;left:0;right:0;background:rgba(13,13,18,.96);backdrop-filter:blur(40px);border-radius:24px 24px 0 0;padding:20px 24px 36px;transform:translateY(100%);transition:.5s var(--ease);max-height:70%;overflow-y:auto;border:1px solid var(--glb);border-bottom:none}.cd.op .cd-sh{transform:translateY(0)}
 .cd-h{width:32px;height:3px;background:var(--t4);border-radius:2px;margin:0 auto 18px}
 .cd-t{font-size:15px;font-weight:800;margin-bottom:14px;letter-spacing:-.2px}
 .cd-e{text-align:center;padding:32px 0;color:var(--t3);font-size:12px;font-weight:500}
+.cart-list{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.cart-item{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--gl);border:1px solid var(--glb)}
+.cart-emoji{font-size:22px;flex-shrink:0}
+.cart-copy{flex:1}
+.cart-copy h4{font-size:12px;font-weight:700;margin-bottom:3px}
+.cart-copy p{font-size:10px;color:var(--t3)}
+.cart-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.cart-price{font-size:12px;font-weight:800;color:var(--gold);font-family:'DM Mono',monospace}
+.cart-remove{background:transparent;border:none;color:var(--red);font-size:10px;font-weight:700;cursor:pointer}
 .cd-tot{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-top:1px solid var(--glb);margin:14px 0}
 .cd-tot span{font-size:12px;color:var(--t2);font-weight:500}
 .cd-tot strong{font-size:20px;font-weight:800;font-family:'DM Mono',monospace;color:var(--gold)}
 
-/* ========== PROFILE ========== */
 #s-pro{padding:20px 24px 120px}
 .p-head{text-align:center;padding:20px 0 8px}
 .p-av{width:76px;height:76px;border-radius:24px;background:var(--goldg);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#0a0a0a;box-shadow:0 8px 36px rgba(237,174,10,.12);position:relative}
@@ -214,11 +215,9 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 .so-btn{width:100%;height:48px;background:transparent;border:1px solid rgba(248,113,113,.1);border-radius:var(--r);margin-top:20px;font-family:'Manrope',sans-serif;font-size:12px;font-weight:700;color:var(--red);cursor:pointer;transition:.2s;letter-spacing:.3px}
 .so-btn:active{background:rgba(248,113,113,.04)}
 
-/* Responsive */
 @media(max-height:900px){.phone{transform:scale(.85);transform-origin:center}}
 @media(max-height:750px){.phone{transform:scale(.72);transform-origin:center}}
 @media(max-width:420px){.phone{width:100%;height:100dvh;border-radius:0;border:none}}
-
 @keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .pc{animation:fadeIn .5s var(--ease) both}
 .pc:nth-child(2){animation-delay:.05s}.pc:nth-child(3){animation-delay:.1s}
@@ -227,248 +226,1012 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 </head>
 <body>
 <div class="phone">
-<div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
-<div class="notch"></div>
-<div class="sbar"><span>9:41</span><div class="sbar-r"><svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.24 4.24 0 0 0-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg><svg viewBox="0 0 24 24"><path d="M2 22h20V2z"/></svg><svg viewBox="0 0 24 24"><rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="13" x2="23" y2="11" stroke="currentColor" stroke-width="2" fill="none"/></svg></div></div>
-<div class="sw">
+  <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
+  <div class="notch"></div>
+  <div class="sbar">
+    <span>9:41</span>
+    <div class="sbar-r">
+      <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.24 4.24 0 0 0-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M2 22h20V2z"/></svg>
+      <svg viewBox="0 0 24 24"><rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="13" x2="23" y2="11" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+    </div>
+  </div>
 
-<!-- LOGIN -->
-<div class="scr on" id="s-login">
-<div class="l-logo">⚡</div>
-<div class="l-mark">Black<em>Stack</em></div>
-<div class="l-sub">Diesel parts & diagnostics</div>
-<div id="authErr" style="display:none;width:100%;padding:10px 14px;border-radius:10px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.15);color:var(--red);font-size:12px;font-weight:500;margin-bottom:12px;text-align:center"></div>
-<div class="fg"><div class="fl">Email</div><input class="fi" id="authEmail" type="email" placeholder="you@email.com" autocomplete="email"></div>
-<div class="fg"><div class="fl">Password</div><input class="fi" id="authPass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
-<div id="confirmWrap" class="fg" style="display:none"><div class="fl">Confirm Password</div><input class="fi" id="authConfirm" type="password" placeholder="••••••••"></div>
-<button class="btn-g" id="authBtn" onclick="handleAuth()">Sign In</button>
-<div class="sep"><span>or</span></div>
-<div class="soc">
-<div class="soc-b gs" onclick="oAuth('google')"><svg viewBox="0 0 24 24" fill="#4285F4"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Google</div>
-<div class="soc-b gs" onclick="oAuth('apple')"><svg viewBox="0 0 24 24" fill="#fff"><path d="M16.37 1.43c0 1.14-.5 2.27-1.18 3.08-.74.9-1.99 1.57-2.99 1.57-.18 0-.36-.02-.53-.06.02-.15.03-.32.03-.48 0-1.08.47-2.24 1.18-3.05C13.61 1.73 14.97 1 16.37 1l.03.43zm3.13 17.81c-.68 1.34-1.47 2.58-2.67 2.58-.93 0-1.24-.6-2.37-.6-1.15 0-1.5.58-2.38.6-1.14.03-2-1.32-2.69-2.66-1.44-2.72-1.6-5.93-.7-7.63.63-1.2 1.77-1.95 2.98-1.95 1.11 0 1.81.6 2.73.6.89 0 1.43-.6 2.72-.6 1.06 0 2.06.58 2.68 1.58-2.36 1.3-1.97 4.68.38 5.58-.46 1.17-.68 1.69-1.37 2.72l-.31.38z"/></svg>Apple</div>
-</div>
-<div class="l-ft" id="authToggle">No account? <a href="#" onclick="toggleAuthMode(event)">Sign Up</a></div>
-</div>
+  <div class="sw">
 
-<!-- VEHICLE -->
-<div class="scr" id="s-veh">
-<div class="v-top"><div class="v-back gs" onclick="vehBack()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div></div>
-<div class="v-body">
-<div class="v-heading"><h2>Set Up Your Truck</h2><p>Only parts that fit your rig</p></div>
-<div class="prog-bar"><div class="pb" id="p1"></div><div class="pb" id="p2"></div><div class="pb" id="p3"></div><div class="pb" id="p4"></div></div>
-<div id="vg-year"><div class="lbl">Year</div><div class="pills" id="yearP"></div></div>
-<div id="vg-make" class="hid"><div class="lbl">Make</div><div class="pills" id="makeP"></div></div>
-<div id="vg-model" class="hid"><div class="lbl">Model</div><div class="pills" id="modelP"></div></div>
-<div id="vg-engine" class="hid"><div class="lbl">Engine</div><div class="pills" id="engineP"></div></div>
-<div class="vprev g hid" id="vprev"><div class="vl">Your Vehicle</div><div class="vn" id="vpN"></div><div class="ve" id="vpE"></div><div class="vt" id="vpT"></div></div>
-<button class="btn-g hid" id="vBtn" style="margin-top:16px" onclick="confirmV()">Continue</button>
-</div>
-</div>
+    <div class="scr on" id="s-login">
+      <div class="l-logo">⚡</div>
+      <div class="l-mark">Black<em>Stack</em></div>
+      <div class="l-sub">Diesel parts & diagnostics</div>
 
-<!-- AI -->
-<div class="scr" id="s-ai">
-<div class="sec-h"><h2>AI Diagnostics</h2><div class="badge" id="aiBadge">—</div></div>
-<div class="ai-lock">
-<div class="orb"><span>🔧</span></div>
-<div class="ai-t">Under The Hood</div>
-<div class="ai-d">Our AI is getting a full rebuild — new turbo, bigger injectors, and a custom tune. She'll be rollin' coal in no time.</div>
-<div class="ai-j">"Why did the diesel mechanic break up with the gas engine? Because she just couldn't handle the pressure."</div>
-<div class="ai-soon"><div class="dot"></div><span>Coming Soon</span></div>
-</div>
-</div>
+      <div id="authErr" style="display:none;width:100%;padding:10px 14px;border-radius:10px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.15);color:var(--red);font-size:12px;font-weight:500;margin-bottom:12px;text-align:center"></div>
 
-<!-- MARKETPLACE -->
-<div class="scr" id="s-mkt">
-<div class="mk-top"><h2>Marketplace</h2><div class="cbtn gs" onclick="toggleCart()"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg><div class="cbdg">2</div></div></div>
-<div class="vstrip g"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span id="vsText">Parts for: 2006 Ford F-250</span></div>
-<div class="cats"><div class="ct on">All</div><div class="ct">Injectors</div><div class="ct">Turbo</div><div class="ct">Head Studs</div><div class="ct">EGR</div><div class="ct">Fuel System</div><div class="ct">Engine</div></div>
-<div class="stg-row"><div class="stg">Stage 1</div><div class="stg on">Stage 2</div><div class="stg">Stage 3</div></div>
-<div class="dds">
-<select class="dd"><option>Price: All</option><option>Under $100</option><option>$100–$500</option><option>$500–$1K</option><option>$1K+</option></select>
-<select class="dd"><option>Brand: All</option><option>Alliant Power</option><option>ARP</option><option>Garrett</option></select>
-<select class="dd"><option>Sort</option><option>Low → High</option><option>High → Low</option></select>
-</div>
-<div class="sbox"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Search parts…"></div>
-<div class="pgrid">
-<div class="pc g"><div class="pc-img">💉<div class="pc-fit">✓ Fits</div><div class="pc-stg s2">STG 2</div></div><div class="pc-bd"><div class="pc-br">Alliant Power</div><h4>Reman Injector Set (8)</h4><div class="pc-bt"><div class="pc-pr mono">$2,495</div><button class="ab"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
-<div class="pc g"><div class="pc-img">🌀<div class="pc-fit">✓ Fits</div><div class="pc-stg s2">STG 2</div></div><div class="pc-bd"><div class="pc-br">Garrett</div><h4>GT3782VA Turbo Reman</h4><div class="pc-bt"><div class="pc-pr mono">$795</div><button class="ab"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
-<div class="pc g"><div class="pc-img">🔩<div class="pc-fit">✓ Fits</div><div class="pc-stg s3">STG 3</div></div><div class="pc-bd"><div class="pc-br">ARP</div><h4>Head Stud Kit</h4><div class="pc-bt"><div class="pc-pr mono">$449</div><button class="ab"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
-<div class="pc g"><div class="pc-img">🔧<div class="pc-fit">✓ Fits</div><div class="pc-stg s2">STG 2</div></div><div class="pc-bd"><div class="pc-br">Sinister Diesel</div><h4>EGR Delete Kit</h4><div class="pc-bt"><div class="pc-pr mono">$289</div><button class="ab"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
-<div class="pc g"><div class="pc-img">⛽<div class="pc-fit">✓ Fits</div><div class="pc-stg s2">STG 2</div></div><div class="pc-bd"><div class="pc-br">Motorcraft</div><h4>HPOP Pump</h4><div class="pc-bt"><div class="pc-pr mono">$845</div><button class="ab"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
-<div class="pc g"><div class="pc-img">🔧<div class="pc-fit">✓ Fits</div><div class="pc-stg s1">STG 1</div></div><div class="pc-bd"><div class="pc-br">Dorman</div><h4>Oil Cooler</h4><div class="pc-bt"><div class="pc-pr mono">$219</div><button class="ab"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div></div></div>
-</div>
-</div>
+      <div class="fg">
+        <div class="fl">Email</div>
+        <input class="fi" id="authEmail" type="email" placeholder="you@email.com" autocomplete="email">
+      </div>
 
-<!-- PROFILE -->
-<div class="scr" id="s-pro">
-<div class="p-head"><div class="p-av">NA</div><div class="p-name">Nicholas Antel</div><div class="p-email"><span id="pEmail">nicholas.antel@outlook.com</span></div></div>
-<div class="p-truck g"><div class="p-trk-i">🚛</div><div class="p-trk-t"><h4 id="pTrk">2006 Ford F-250</h4><p id="pEng">6.0L Power Stroke</p></div><button class="p-edit gs" onclick="resetVeh()">Edit</button></div>
-<div class="p-grid">
-<div class="p-st g"><div class="p-stv mono">7</div><div class="p-stl">Orders</div></div>
-<div class="p-st g"><div class="p-stv mono">$2.4K</div><div class="p-stl">Spent</div></div>
-<div class="p-st g"><div class="p-stv mono">12</div><div class="p-stl">Chats</div></div>
-</div>
-<div class="p-list">
-<div class="p-row"><div class="p-ri"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span>Order History</span><span class="ch">›</span></div>
-<div class="p-row"><div class="p-ri"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><span>Payment Methods</span><span class="ch">›</span></div>
-<div class="p-row"><div class="p-ri"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><span>Saved Addresses</span><span class="ch">›</span></div>
-<div class="p-row"><div class="p-ri"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div><span>Notifications</span><span class="ch">›</span></div>
-<div class="p-row"><div class="p-ri"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><span>Help & Support</span><span class="ch">›</span></div>
-</div>
-<button class="so-btn" onclick="handleSignOut()">Sign Out</button>
-</div>
+      <div class="fg">
+        <div class="fl">Password</div>
+        <input class="fi" id="authPass" type="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
 
-<!-- CART -->
-<div class="cd" id="cD"><div class="cd-bg" onclick="toggleCart()"></div><div class="cd-sh"><div class="cd-h"></div><div class="cd-t">Your Cart</div><div class="cd-e">Your cart is empty</div><div class="cd-tot"><span>Total</span><strong class="mono">$0</strong></div><button class="btn-g" onclick="alert('Checkout coming soon!')">Checkout</button></div></div>
+      <div id="confirmWrap" class="fg" style="display:none">
+        <div class="fl">Confirm Password</div>
+        <input class="fi" id="authConfirm" type="password" placeholder="••••••••">
+      </div>
 
-<!-- NAV -->
-<div class="bnav" id="bnav"><div class="bnav-in">
-<div class="ni" data-s="ai" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 01-1 1H9a1 1 0 01-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/><line x1="9" y1="21" x2="15" y2="21"/></svg><span>AI</span></div>
-<div class="ni on" data-s="mkt" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><span>Shop</span></div>
-<div class="ni" data-s="pro" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profile</span></div>
-</div></div>
+      <button class="btn-g" id="authBtn" onclick="handleAuth()">Sign In</button>
 
-</div>
+      <div class="sep"><span>or</span></div>
+
+      <div class="soc">
+        <div class="soc-b gs" onclick="oAuth('google')">
+          <svg viewBox="0 0 24 24" fill="#4285F4"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Google
+        </div>
+
+        <div class="soc-b gs" onclick="oAuth('apple')">
+          <svg viewBox="0 0 24 24" fill="#fff"><path d="M16.37 1.43c0 1.14-.5 2.27-1.18 3.08-.74.9-1.99 1.57-2.99 1.57-.18 0-.36-.02-.53-.06.02-.15.03-.32.03-.48 0-1.08.47-2.24 1.18-3.05C13.61 1.73 14.97 1 16.37 1l.03.43zm3.13 17.81c-.68 1.34-1.47 2.58-2.67 2.58-.93 0-1.24-.6-2.37-.6-1.15 0-1.5.58-2.38.6-1.14.03-2-1.32-2.69-2.66-1.44-2.72-1.6-5.93-.7-7.63.63-1.2 1.77-1.95 2.98-1.95 1.11 0 1.81.6 2.73.6.89 0 1.43-.6 2.72-.6 1.06 0 2.06.58 2.68 1.58-2.36 1.3-1.97 4.68.38 5.58-.46 1.17-.68 1.69-1.37 2.72l-.31.38z"/></svg>
+          Apple
+        </div>
+      </div>
+
+      <div class="l-ft" id="authToggle">No account? <a href="#" onclick="toggleAuthMode(event)">Sign Up</a></div>
+    </div>
+
+    <div class="scr" id="s-veh">
+      <div class="v-top"><div class="v-back gs" onclick="vehBack()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div></div>
+      <div class="v-body">
+        <div class="v-heading"><h2>Set Up Your Truck</h2><p>Only parts that fit your rig</p></div>
+        <div class="prog-bar"><div class="pb" id="p1"></div><div class="pb" id="p2"></div><div class="pb" id="p3"></div><div class="pb" id="p4"></div></div>
+
+        <div id="vg-year">
+          <div class="lbl">Year</div>
+          <div class="pills" id="yearP"></div>
+        </div>
+
+        <div id="vg-make" class="hid">
+          <div class="lbl">Make</div>
+          <div class="pills" id="makeP"></div>
+        </div>
+
+        <div id="vg-model" class="hid">
+          <div class="lbl">Model</div>
+          <div class="pills" id="modelP"></div>
+        </div>
+
+        <div id="vg-engine" class="hid">
+          <div class="lbl">Engine</div>
+          <div class="pills" id="engineP"></div>
+        </div>
+
+        <div class="vprev g hid" id="vprev">
+          <div class="vl">Your Vehicle</div>
+          <div class="vn" id="vpN"></div>
+          <div class="ve" id="vpE"></div>
+          <div class="vt" id="vpT"></div>
+        </div>
+
+        <button class="btn-g hid" id="vBtn" style="margin-top:16px" onclick="confirmV()">Continue</button>
+      </div>
+    </div>
+
+    <div class="scr" id="s-ai">
+      <div class="sec-h"><h2>AI Diagnostics</h2><div class="badge" id="aiBadge">—</div></div>
+      <div class="ai-lock">
+        <div class="orb"><span>🔧</span></div>
+        <div class="ai-t">Under The Hood</div>
+        <div class="ai-d">Our AI is getting a full rebuild — new turbo, bigger injectors, and a custom tune. She'll be rollin' coal in no time.</div>
+        <div class="ai-j">"Why did the diesel mechanic break up with the gas engine? Because she just couldn't handle the pressure."</div>
+        <div class="ai-soon"><div class="dot"></div><span>Coming Soon</span></div>
+      </div>
+    </div>
+
+    <div class="scr" id="s-mkt">
+      <div class="mk-top">
+        <h2>Marketplace</h2>
+        <div class="cbtn gs" onclick="toggleCart()">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+          <div class="cbdg" id="cartBadge">0</div>
+        </div>
+      </div>
+
+      <div class="vstrip g">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span id="vsText">Select your vehicle first</span>
+      </div>
+
+      <div class="cats" id="catTabs">
+        <div class="ct on">All</div>
+      </div>
+
+      <div class="stg-row">
+        <div class="stg">Stage 1</div>
+        <div class="stg">Stage 2</div>
+        <div class="stg">Stage 3</div>
+      </div>
+
+      <div class="dds">
+        <select class="dd" id="priceDd">
+          <option>Price: All</option>
+          <option>Under $100</option>
+          <option>$100–$500</option>
+          <option>$500–$1K</option>
+          <option>$1K+</option>
+        </select>
+
+        <select class="dd" id="brandDd">
+          <option>Brand: All</option>
+        </select>
+
+        <select class="dd" id="sortDd">
+          <option>Sort</option>
+          <option>Low → High</option>
+          <option>High → Low</option>
+        </select>
+      </div>
+
+      <div class="sbox">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="searchInput" placeholder="Search parts…">
+      </div>
+
+      <div class="pgrid" id="pgrid"></div>
+    </div>
+
+    <div class="scr" id="s-pro">
+      <div class="p-head">
+        <div class="p-av">BS</div>
+        <div class="p-name">BlackStack User</div>
+        <div class="p-email"><span id="pEmail">user@email.com</span></div>
+      </div>
+
+      <div class="p-truck g">
+        <div class="p-trk-i">🚛</div>
+        <div class="p-trk-t">
+          <h4 id="pTrk">No vehicle set</h4>
+          <p id="pEng">Select your truck</p>
+        </div>
+        <button class="p-edit gs" onclick="resetVeh()">Edit</button>
+      </div>
+
+      <div class="p-grid">
+        <div class="p-st g"><div class="p-stv mono" id="statOrders">0</div><div class="p-stl">Orders</div></div>
+        <div class="p-st g"><div class="p-stv mono" id="statSpent">$0</div><div class="p-stl">Spent</div></div>
+        <div class="p-st g"><div class="p-stv mono" id="statItems">0</div><div class="p-stl">Items</div></div>
+      </div>
+
+      <div class="p-list">
+        <div class="p-row"><div class="p-ri"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span>Order History</span><span class="ch">›</span></div>
+        <div class="p-row"><div class="p-ri"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><span>Payment Methods</span><span class="ch">›</span></div>
+        <div class="p-row"><div class="p-ri"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><span>Saved Addresses</span><span class="ch">›</span></div>
+        <div class="p-row"><div class="p-ri"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div><span>Notifications</span><span class="ch">›</span></div>
+        <div class="p-row"><div class="p-ri"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><span>Help & Support</span><span class="ch">›</span></div>
+      </div>
+
+      <button class="so-btn" onclick="handleSignOut()">Sign Out</button>
+    </div>
+
+    <div class="cd" id="cD">
+      <div class="cd-bg" onclick="toggleCart()"></div>
+      <div class="cd-sh">
+        <div class="cd-h"></div>
+        <div class="cd-t">Your Cart</div>
+        <div id="cartItems" class="cart-list"></div>
+        <div class="cd-tot"><span>Total</span><strong class="mono" id="cartTotal">$0</strong></div>
+        <button class="btn-g" id="checkoutBtn" onclick="doCheckout()">Checkout</button>
+      </div>
+    </div>
+
+    <div class="bnav hid" id="bnav">
+      <div class="bnav-in">
+        <div class="ni" data-s="ai" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 01-1 1H9a1 1 0 01-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/><line x1="9" y1="21" x2="15" y2="21"/></svg><span>AI</span></div>
+        <div class="ni on" data-s="mkt" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><span>Shop</span></div>
+        <div class="ni" data-s="pro" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profile</span></div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 <script>
-// === Supabase Init ===
-const sb=supabase.createClient('https://jfjbilfsiebifzddveof.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamJpbGZzaWViaWZ6ZGR2ZW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2OTg4ODUsImV4cCI6MjA4NzI3NDg4NX0.bbTQ0l4HsHoKUzoKACBvbXJ0TbnUM5tltK4YLKyuMr8');
+const sb = supabase.createClient(
+  'https://jfjbilfsiebifzddveof.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamJpbGZzaWViaWZ6ZGR2ZW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2OTg4ODUsImV4cCI6MjA4NzI3NDg4NX0.bbTQ0l4HsHoKUzoKACBvbXJ0TbnUM5tltK4YLKyuMr8'
+);
 
-// === Vehicle DB ===
-const DB={Dodge:{"Ram 2500":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009],e:{"1994-1998":["5.9L 12V Cummins"],"1998-2002":["5.9L 24V Cummins ISB"],"2003-2007":["5.9L Cummins ISB 325"],"2007-2009":["6.7L Cummins ISB"]}},"Ram 3500":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009],e:{"1994-1998":["5.9L 12V Cummins"],"1998-2002":["5.9L 24V Cummins ISB"],"2003-2007":["5.9L Cummins ISB 325"],"2007-2009":["6.7L Cummins ISB"]}}},Ram:{"2500":{y:[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2010-2012":["6.7L Cummins ISB"],"2013-2018":["6.7L Cummins ISB 385"],"2019-2026":["6.7L Cummins HO 420"]}},"3500":{y:[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2010-2012":["6.7L Cummins ISB"],"2013-2018":["6.7L Cummins ISB 385"],"2019-2026":["6.7L Cummins HO 420"]}}},Ford:{"F-250":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1994-1997":["7.3L IDI Turbo Diesel"],"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-350":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1994-1997":["7.3L IDI Turbo Diesel"],"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-450":{y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"F-550":{y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},"Excursion":{y:[2000,2001,2002,2003,2004,2005],e:{"2000-2003":["7.3L Power Stroke"],"2003-2005":["6.0L Power Stroke"]}}},Chevrolet:{"Silverado 2500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}},"Silverado 3500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}}},GMC:{"Sierra 2500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}},"Sierra 3500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}}}};
+const DB = {
+  Dodge:{
+    "Ram 2500":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009],e:{"1994-1998":["5.9L 12V Cummins"],"1998-2002":["5.9L 24V Cummins ISB"],"2003-2007":["5.9L Cummins ISB 325"],"2007-2009":["6.7L Cummins ISB"]}},
+    "Ram 3500":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009],e:{"1994-1998":["5.9L 12V Cummins"],"1998-2002":["5.9L 24V Cummins ISB"],"2003-2007":["5.9L Cummins ISB 325"],"2007-2009":["6.7L Cummins ISB"]}}
+  },
+  Ram:{
+    "2500":{y:[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2010-2012":["6.7L Cummins ISB"],"2013-2018":["6.7L Cummins ISB 385"],"2019-2026":["6.7L Cummins HO 420"]}},
+    "3500":{y:[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2010-2012":["6.7L Cummins ISB"],"2013-2018":["6.7L Cummins ISB 385"],"2019-2026":["6.7L Cummins HO 420"]}}
+  },
+  Ford:{
+    "F-250":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1994-1997":["7.3L IDI Turbo Diesel"],"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},
+    "F-350":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1994-1997":["7.3L IDI Turbo Diesel"],"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},
+    "F-450":{y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},
+    "F-550":{y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},
+    "Excursion":{y:[2000,2001,2002,2003,2004,2005],e:{"2000-2003":["7.3L Power Stroke"],"2003-2005":["6.0L Power Stroke"]}}
+  },
+  Chevrolet:{
+    "Silverado 2500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}},
+    "Silverado 3500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}}
+  },
+  GMC:{
+    "Sierra 2500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}},
+    "Sierra 3500HD":{y:[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2001-2004":["6.6L Duramax LB7"],"2004-2006":["6.6L Duramax LLY"],"2006-2007":["6.6L Duramax LBZ"],"2007-2010":["6.6L Duramax LMM"],"2011-2016":["6.6L Duramax LML"],"2017-2019":["6.6L Duramax L5P"],"2020-2026":["6.6L Duramax L5P Gen2"]}}
+  }
+};
 
-// === State ===
-const V={year:null,make:null,model:null,engine:null};
-let ym='r';
-let isSignUp=false;
+const V = { year:null, make:null, model:null, engine:null };
+let ym = 'r';
+let isSignUp = false;
+let ACTIVE_USER = null;
+let ALL_PRODUCTS = [];
+let MATCHED_PRODUCTS = [];
+let PRODUCT_MAP = {};
+let cart = JSON.parse(localStorage.getItem('bsd_cart') || '[]');
 
-// === Auth ===
-function showErr(msg){const e=document.getElementById('authErr');e.textContent=msg;e.style.display='block'}
-function hideErr(){document.getElementById('authErr').style.display='none'}
+function showErr(msg){
+  const e = document.getElementById('authErr');
+  if(!e) return;
+  e.textContent = msg;
+  e.style.display = 'block';
+}
+function hideErr(){
+  const e = document.getElementById('authErr');
+  if(e) e.style.display = 'none';
+}
+
+function vehicleObjIsComplete(v){
+  return !!(v && v.year && v.make && v.model && v.engine);
+}
+
+function getStoredVehicle(){
+  try{
+    const raw = localStorage.getItem('bsd_vehicle');
+    if(!raw) return null;
+    const v = JSON.parse(raw);
+    return vehicleObjIsComplete(v) ? v : null;
+  }catch(e){
+    return null;
+  }
+}
+
+async function saveVehicleToAccount(){
+  const vehicle = { year:V.year, make:V.make, model:V.model, engine:V.engine };
+  localStorage.setItem('bsd_vehicle', JSON.stringify(vehicle));
+  if(!ACTIVE_USER) return;
+  try{
+    const md = ACTIVE_USER.user_metadata || {};
+    const updated = await sb.auth.updateUser({
+      data: Object.assign({}, md, { vehicle })
+    });
+    if(updated && updated.data && updated.data.user){
+      ACTIVE_USER = updated.data.user;
+    }
+  }catch(e){
+    console.error('Vehicle save failed', e);
+  }
+}
+
+async function clearVehicleFromAccount(){
+  localStorage.removeItem('bsd_vehicle');
+  if(!ACTIVE_USER) return;
+  try{
+    const md = Object.assign({}, ACTIVE_USER.user_metadata || {});
+    delete md.vehicle;
+    const updated = await sb.auth.updateUser({ data: md });
+    if(updated && updated.data && updated.data.user){
+      ACTIVE_USER = updated.data.user;
+    }
+  }catch(e){
+    console.error('Vehicle clear failed', e);
+  }
+}
 
 function toggleAuthMode(e){
   e.preventDefault();
-  isSignUp=!isSignUp;
+  isSignUp = !isSignUp;
   hideErr();
-  document.getElementById('authBtn').textContent=isSignUp?'Create Account':'Sign In';
-  document.getElementById('confirmWrap').style.display=isSignUp?'block':'none';
-  document.getElementById('authToggle').innerHTML=isSignUp
-    ?'Already have an account? <a href="#" onclick="toggleAuthMode(event)">Sign In</a>'
-    :'No account? <a href="#" onclick="toggleAuthMode(event)">Sign Up</a>';
+  document.getElementById('authBtn').textContent = isSignUp ? 'Create Account' : 'Sign In';
+  document.getElementById('confirmWrap').style.display = isSignUp ? 'block' : 'none';
+  document.getElementById('authToggle').innerHTML = isSignUp
+    ? 'Already have an account? <a href="#" onclick="toggleAuthMode(event)">Sign In</a>'
+    : 'No account? <a href="#" onclick="toggleAuthMode(event)">Sign Up</a>';
 }
 
 async function handleAuth(){
   hideErr();
-  const email=document.getElementById('authEmail').value.trim();
-  const pass=document.getElementById('authPass').value;
-  if(!email||!pass)return showErr('Please enter email and password');
+  const email = document.getElementById('authEmail').value.trim();
+  const pass = document.getElementById('authPass').value;
+
+  if(!email || !pass) return showErr('Please enter email and password');
+
   if(isSignUp){
-    const confirm=document.getElementById('authConfirm').value;
-    if(pass!==confirm)return showErr('Passwords do not match');
-    if(pass.length<6)return showErr('Password must be at least 6 characters');
+    const confirm = document.getElementById('authConfirm').value;
+    if(pass !== confirm) return showErr('Passwords do not match');
+    if(pass.length < 6) return showErr('Password must be at least 6 characters');
   }
-  const btn=document.getElementById('authBtn');
-  btn.textContent=isSignUp?'Creating account…':'Signing in…';
-  btn.style.opacity='.6';btn.style.pointerEvents='none';
+
+  const btn = document.getElementById('authBtn');
+  btn.textContent = isSignUp ? 'Creating account…' : 'Signing in…';
+  btn.style.opacity = '.6';
+  btn.style.pointerEvents = 'none';
+
   try{
     let res;
     if(isSignUp){
-      res=await sb.auth.signUp({email,password:pass});
+      res = await sb.auth.signUp({ email, password: pass });
     }else{
-      res=await sb.auth.signInWithPassword({email,password:pass});
+      res = await sb.auth.signInWithPassword({ email, password: pass });
     }
-    if(res.error)throw res.error;
-    if(isSignUp&&!res.data.session){
-      btn.textContent='Create Account';btn.style.opacity='1';btn.style.pointerEvents='auto';
+
+    if(res.error) throw res.error;
+
+    if(isSignUp && !res.data.session){
+      btn.textContent = 'Create Account';
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
       showErr('Check your email to confirm your account, then sign in.');
-      isSignUp=false;
-      document.getElementById('authBtn').textContent='Sign In';
-      document.getElementById('confirmWrap').style.display='none';
-      document.getElementById('authToggle').innerHTML='No account? <a href="#" onclick="toggleAuthMode(event)">Sign Up</a>';
+      isSignUp = false;
+      document.getElementById('authBtn').textContent = 'Sign In';
+      document.getElementById('confirmWrap').style.display = 'none';
+      document.getElementById('authToggle').innerHTML = 'No account? <a href="#" onclick="toggleAuthMode(event)">Sign Up</a>';
       return;
     }
-    onAuth(res.data.session.user);
+
+    const user = res.data && res.data.session ? res.data.session.user : (res.data ? res.data.user : null);
+    if(user) await onAuth(user);
   }catch(err){
-    showErr(err.message||'Authentication failed');
-    btn.textContent=isSignUp?'Create Account':'Sign In';
-    btn.style.opacity='1';btn.style.pointerEvents='auto';
+    showErr(err.message || 'Authentication failed');
+    btn.textContent = isSignUp ? 'Create Account' : 'Sign In';
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
   }
 }
 
 async function oAuth(provider){
   hideErr();
-  const{error}=await sb.auth.signInWithOAuth({provider,options:{redirectTo:window.location.origin+'/app/'}});
-  if(error)showErr(error.message);
+  const { error } = await sb.auth.signInWithOAuth({
+    provider,
+    options:{ redirectTo: window.location.origin + '/app/' }
+  });
+  if(error) showErr(error.message);
 }
 
-function onAuth(user){
-  const email=user.email||'';
-  const name=email.split('@')[0].split('.').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
-  const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  document.querySelector('.p-av').textContent=initials;
-  document.querySelector('.p-name').textContent=name;
-  document.getElementById('pEmail').textContent=email;
+function applyVehicle(){
+  const vsText = document.getElementById('vsText');
+  const aiBadge = document.getElementById('aiBadge');
+  const pTrk = document.getElementById('pTrk');
+  const pEng = document.getElementById('pEng');
+
+  if(vsText){
+    vsText.textContent = V.year
+      ? `Parts for: ${V.year} ${V.make} ${V.model}`
+      : 'Select your vehicle first';
+  }
+
+  if(aiBadge){
+    aiBadge.textContent = V.year
+      ? `${String(V.year).slice(-2)}' ${V.make.charAt(0)}. ${V.model}`
+      : '—';
+  }
+
+  if(pTrk){
+    pTrk.textContent = V.year ? `${V.year} ${V.make} ${V.model}` : 'No vehicle set';
+  }
+
+  if(pEng){
+    pEng.textContent = V.engine || 'Select your truck';
+  }
+}
+
+function updateProfileBasics(user){
+  const email = user.email || '';
+  const name = email.split('@')[0].split('.').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+
+  const av = document.querySelector('.p-av');
+  const nm = document.querySelector('.p-name');
+  const em = document.getElementById('pEmail');
+
+  if(av) av.textContent = initials || 'BS';
+  if(nm) nm.textContent = name || 'BlackStack User';
+  if(em) em.textContent = email;
+}
+
+async function onAuth(user){
+  ACTIVE_USER = user || null;
+  updateProfileBasics(user);
+
+  const acctVehicle = (user.user_metadata && user.user_metadata.vehicle) ? user.user_metadata.vehicle : null;
+  const saved = vehicleObjIsComplete(acctVehicle) ? acctVehicle : getStoredVehicle();
+
+  if(vehicleObjIsComplete(saved)){
+    V.year = saved.year;
+    V.make = saved.make;
+    V.model = saved.model;
+    V.engine = saved.engine;
+    applyVehicle();
+    go('mkt');
+    showNav();
+    if(!vehicleObjIsComplete(acctVehicle)) await saveVehicleToAccount();
+    await loadProducts();
+    return;
+  }
+
   go('veh');
+  hideNav();
+  await loadProducts();
 }
 
 async function handleSignOut(){
   await sb.auth.signOut();
-  document.getElementById('authEmail').value='';
-  document.getElementById('authPass').value='';
-  hideErr();hideNav();go('login');
+  ACTIVE_USER = null;
+  document.getElementById('authEmail').value = '';
+  document.getElementById('authPass').value = '';
+  hideErr();
+  hideNav();
+  go('login');
 }
 
 async function checkSession(){
   try{
-    const{data:{session}}=await sb.auth.getSession();
-    if(session&&session.user){onAuth(session.user)}
-  }catch(e){console.log('No session')}
+    const { data:{ session } } = await sb.auth.getSession();
+    if(session && session.user){
+      await onAuth(session.user);
+    }else{
+      await loadProducts();
+    }
+  }catch(e){
+    console.log('No session');
+    await loadProducts();
+  }
 }
 
-// === Nav ===
-function go(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.getElementById('s-'+id).classList.add('on')}
-function nav(el){document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));el.classList.add('on');go(el.dataset.s)}
-function showNav(){document.getElementById('bnav').classList.remove('hid')}
-function hideNav(){document.getElementById('bnav').classList.add('hid')}
-function toggleCart(){document.getElementById('cD').classList.toggle('op')}
+function go(id){
+  document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
+  const target = document.getElementById('s-' + id);
+  if(target) target.classList.add('on');
+}
+function nav(el){
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
+  el.classList.add('on');
+  go(el.dataset.s);
+}
+function showNav(){ document.getElementById('bnav').classList.remove('hid'); }
+function hideNav(){ document.getElementById('bnav').classList.add('hid'); }
+function toggleCart(){ document.getElementById('cD').classList.toggle('op'); }
 
-// === Vehicle Setup ===
-function uProg(s){for(let i=1;i<=4;i++){const e=document.getElementById('p'+i);e.className='pb';if(i<s)e.classList.add('done');else if(i===s)e.classList.add('cur')}}
-function sG(id){document.getElementById('vg-'+id).classList.remove('hid')}
-function hG(id){document.getElementById('vg-'+id).classList.add('hid')}
-function hPrev(){document.getElementById('vprev').classList.add('hid');document.getElementById('vBtn').classList.add('hid')}
-function sPrev(){document.getElementById('vpN').textContent=`${V.year} ${V.make} ${V.model}`;document.getElementById('vpE').textContent=V.engine;document.getElementById('vpT').innerHTML=`<div class="tag gs">🏋️ Diesel</div><div class="tag gs">${V.engine.split(' ')[0]}</div>`;document.getElementById('vprev').classList.remove('hid');document.getElementById('vBtn').classList.remove('hid')}
+function uProg(s){
+  for(let i=1;i<=4;i++){
+    const e = document.getElementById('p' + i);
+    e.className = 'pb';
+    if(i < s) e.classList.add('done');
+    else if(i === s) e.classList.add('cur');
+  }
+}
+function sG(id){ document.getElementById('vg-' + id).classList.remove('hid'); }
+function hG(id){ document.getElementById('vg-' + id).classList.add('hid'); }
+function hPrev(){
+  document.getElementById('vprev').classList.add('hid');
+  document.getElementById('vBtn').classList.add('hid');
+}
+function sPrev(){
+  document.getElementById('vpN').textContent = `${V.year} ${V.make} ${V.model}`;
+  document.getElementById('vpE').textContent = V.engine;
+  document.getElementById('vpT').innerHTML = `<div class="tag gs">Diesel</div><div class="tag gs">${V.engine.split(' ')[0]}</div>`;
+  document.getElementById('vprev').classList.remove('hid');
+  document.getElementById('vBtn').classList.remove('hid');
+}
+function mkPill(txt,fn){
+  const d = document.createElement('div');
+  d.className = 'pill';
+  d.textContent = txt;
+  d.onclick = () => {
+    d.parentElement.querySelectorAll('.pill').forEach(x => x.classList.remove('sel'));
+    d.classList.add('sel');
+    fn(txt);
+  };
+  return d;
+}
+function initYrs(){
+  ym='r';
+  const e = document.getElementById('yearP');
+  e.innerHTML = '';
+  ['2025-2026','2020-2024','2015-2019','2010-2014','2005-2009','2000-2004','1994-1999'].forEach(r => {
+    e.appendChild(mkPill(r,()=>expYrs(r)));
+  });
+}
+function expYrs(rng){
+  ym='i';
+  const [s,e] = rng.split('-').map(Number);
+  const yrs = new Set();
 
-function mkPill(txt,fn){const d=document.createElement('div');d.className='pill';d.textContent=txt;d.onclick=()=>{d.parentElement.querySelectorAll('.pill').forEach(x=>x.classList.remove('sel'));d.classList.add('sel');fn(txt)};return d}
+  Object.values(DB).forEach(mk =>
+    Object.values(mk).forEach(m =>
+      m.y.filter(y => y >= s && y <= e).forEach(y => yrs.add(y))
+    )
+  );
 
-function initYrs(){ym='r';const e=document.getElementById('yearP');e.innerHTML='';['2025-2026','2020-2024','2015-2019','2010-2014','2005-2009','2000-2004','1994-1999'].forEach(r=>{e.appendChild(mkPill(r,()=>expYrs(r)))})}
+  const el = document.getElementById('yearP');
+  el.innerHTML = '';
 
-function expYrs(rng){ym='i';const[s,e]=rng.split('-').map(Number);const yrs=new Set();Object.values(DB).forEach(mk=>Object.values(mk).forEach(m=>m.y.filter(y=>y>=s&&y<=e).forEach(y=>yrs.add(y))));const el=document.getElementById('yearP');el.innerHTML='';const bk=document.createElement('div');bk.className='pill';bk.textContent='← All Years';bk.style.color='var(--gold)';bk.style.fontSize='11px';bk.onclick=()=>{V.year=V.make=V.model=V.engine=null;hG('make');hG('model');hG('engine');hPrev();uProg(1);initYrs()};el.appendChild(bk);[...yrs].sort((a,b)=>b-a).forEach(y=>{el.appendChild(mkPill(String(y),t=>{V.year=parseInt(t);V.make=V.model=V.engine=null;hG('model');hG('engine');hPrev();uProg(2);ldMakes();sG('make')}))})}
+  const bk = document.createElement('div');
+  bk.className = 'pill';
+  bk.textContent = '← All Years';
+  bk.style.color = 'var(--gold)';
+  bk.style.fontSize = '11px';
+  bk.onclick = () => {
+    V.year = V.make = V.model = V.engine = null;
+    hG('make'); hG('model'); hG('engine'); hPrev(); uProg(1); initYrs();
+  };
+  el.appendChild(bk);
 
-function ldMakes(){const el=document.getElementById('makeP');el.innerHTML='';const ms=new Set();Object.entries(DB).forEach(([mk,mds])=>{Object.values(mds).forEach(m=>{if(m.y.includes(V.year))ms.add(mk)})});[...ms].sort().forEach(mk=>{el.appendChild(mkPill(mk,t=>{V.make=t;V.model=V.engine=null;hG('engine');hPrev();uProg(3);ldModels();sG('model')}))})}
+  [...yrs].sort((a,b)=>b-a).forEach(y => {
+    el.appendChild(mkPill(String(y), t => {
+      V.year = parseInt(t,10);
+      V.make = V.model = V.engine = null;
+      hG('model'); hG('engine'); hPrev(); uProg(2); ldMakes(); sG('make');
+    }));
+  });
+}
+function ldMakes(){
+  const el = document.getElementById('makeP');
+  el.innerHTML = '';
+  const ms = new Set();
 
-function ldModels(){const el=document.getElementById('modelP');el.innerHTML='';Object.keys(DB[V.make]).filter(m=>DB[V.make][m].y.includes(V.year)).forEach(m=>{el.appendChild(mkPill(m,t=>{V.model=t;V.engine=null;hPrev();uProg(4);ldEngs();sG('engine')}))})}
+  Object.entries(DB).forEach(([mk,mds]) => {
+    Object.values(mds).forEach(m => {
+      if(m.y.includes(V.year)) ms.add(mk);
+    });
+  });
 
-function ldEngs(){const el=document.getElementById('engineP');el.innerHTML='';const md=DB[V.make][V.model];let engs=[];Object.entries(md.e).forEach(([r,es])=>{const[s,e]=r.split('-').map(Number);if(V.year>=s&&V.year<=e)engs=engs.concat(es)});[...new Set(engs)].forEach(eng=>{el.appendChild(mkPill(eng,t=>{V.engine=t;sPrev()}))})}
+  [...ms].sort().forEach(mk => {
+    el.appendChild(mkPill(mk, t => {
+      V.make = t;
+      V.model = V.engine = null;
+      hG('engine'); hPrev(); uProg(3); ldModels(); sG('model');
+    }));
+  });
+}
+function ldModels(){
+  const el = document.getElementById('modelP');
+  el.innerHTML = '';
+  Object.keys(DB[V.make]).filter(m => DB[V.make][m].y.includes(V.year)).forEach(m => {
+    el.appendChild(mkPill(m, t => {
+      V.model = t;
+      V.engine = null;
+      hPrev(); uProg(4); ldEngs(); sG('engine');
+    }));
+  });
+}
+function ldEngs(){
+  const el = document.getElementById('engineP');
+  el.innerHTML = '';
+  const md = DB[V.make][V.model];
+  let engs = [];
+  Object.entries(md.e).forEach(([r,es]) => {
+    const [s,e] = r.split('-').map(Number);
+    if(V.year >= s && V.year <= e) engs = engs.concat(es);
+  });
+  [...new Set(engs)].forEach(eng => {
+    el.appendChild(mkPill(eng, t => {
+      V.engine = t;
+      sPrev();
+    }));
+  });
+}
+function vehBack(){
+  if(V.engine){
+    V.engine = null;
+    document.querySelectorAll('#engineP .pill').forEach(o => o.classList.remove('sel'));
+    hPrev(); uProg(4); return;
+  }
+  if(V.model){
+    V.model = V.engine = null;
+    hG('engine'); hPrev();
+    document.querySelectorAll('#modelP .pill').forEach(o => o.classList.remove('sel'));
+    uProg(3); return;
+  }
+  if(V.make){
+    V.make = V.model = V.engine = null;
+    hG('model'); hG('engine'); hPrev();
+    document.querySelectorAll('#makeP .pill').forEach(o => o.classList.remove('sel'));
+    uProg(2); return;
+  }
+  if(V.year){
+    V.year = V.make = V.model = V.engine = null;
+    hG('make'); hG('model'); hG('engine'); hPrev(); uProg(1);
+    if(ym==='i') initYrs();
+    else document.querySelectorAll('#yearP .pill').forEach(o => o.classList.remove('sel'));
+    return;
+  }
+  handleSignOut();
+}
 
-function vehBack(){if(V.engine){V.engine=null;document.querySelectorAll('#engineP .pill').forEach(o=>o.classList.remove('sel'));hPrev();uProg(4);return}if(V.model){V.model=V.engine=null;hG('engine');hPrev();document.querySelectorAll('#modelP .pill').forEach(o=>o.classList.remove('sel'));uProg(3);return}if(V.make){V.make=V.model=V.engine=null;hG('model');hG('engine');hPrev();document.querySelectorAll('#makeP .pill').forEach(o=>o.classList.remove('sel'));uProg(2);return}if(V.year){V.year=V.make=V.model=V.engine=null;hG('make');hG('model');hG('engine');hPrev();uProg(1);if(ym==='i')initYrs();else document.querySelectorAll('#yearP .pill').forEach(o=>o.classList.remove('sel'));return}handleSignOut()}
+async function confirmV(){
+  await saveVehicleToAccount();
+  applyVehicle();
+  go('mkt');
+  showNav();
+  await loadProducts();
+}
 
-function confirmV(){document.getElementById('vsText').textContent=`Parts for: ${V.year} ${V.make} ${V.model}`;document.getElementById('aiBadge').textContent=`${String(V.year).slice(-2)}' ${V.make.charAt(0)}. ${V.model}`;document.getElementById('pTrk').textContent=`${V.year} ${V.make} ${V.model}`;document.getElementById('pEng').textContent=V.engine;go('mkt');showNav()}
-function resetVeh(){V.year=V.make=V.model=V.engine=null;uProg(1);initYrs();hG('make');hG('model');hG('engine');hPrev();go('veh');hideNav()}
+async function resetVeh(){
+  V.year = V.make = V.model = V.engine = null;
+  await clearVehicleFromAccount();
+  uProg(1);
+  initYrs();
+  hG('make'); hG('model'); hG('engine'); hPrev();
+  applyVehicle();
+  go('veh');
+  hideNav();
+  await loadProducts();
+}
 
-// === Init ===
-uProg(1);initYrs();checkSession();
+function cleanImageUrl(v){
+  if(Array.isArray(v) && v.length) v = v[0];
+  let s = String(v || '').trim();
+  s = s.replace(/^"+|"+$/g,'').replace(/^'+|'+$/g,'');
+  if(!s || s === 'NA' || s === 'null' || s === 'undefined') return '';
+  if(s.startsWith('//')) s = 'https:' + s;
+  if(s.startsWith('http://')) s = s.replace('http://','https://');
+  return s;
+}
 
-// Enter key submits login
-document.getElementById('authPass').addEventListener('keydown',e=>{if(e.key==='Enter')handleAuth()});
+function getVehicleAliases(){
+  if(!V.year || !V.make || !V.model || !V.engine) return [];
+  let aliases = [String(V.year), V.make, V.model, V.engine];
+  const eng = V.engine.toLowerCase();
+  if(eng.includes('7.3')) aliases = aliases.concat(['7.3','7.3l','power stroke','powerstroke']);
+  if(eng.includes('6.0')) aliases = aliases.concat(['6.0','6.0l','power stroke','powerstroke']);
+  if(eng.includes('6.4')) aliases = aliases.concat(['6.4','6.4l','power stroke','powerstroke']);
+  if(eng.includes('6.7') && V.make === 'Ford') aliases = aliases.concat(['6.7','6.7l','power stroke','powerstroke']);
+  if(V.make === 'Ford' && V.model === 'F-250') aliases = aliases.concat(['f250','f-250','super duty']);
+  if(V.make === 'Ford' && V.model === 'F-350') aliases = aliases.concat(['f350','f-350','super duty']);
+  return aliases.map(x => String(x).toLowerCase());
+}
 
-// Marketplace interactions
-document.querySelectorAll('.ct').forEach(c=>c.onclick=()=>{document.querySelectorAll('.ct').forEach(x=>x.classList.remove('on'));c.classList.add('on')});
-document.querySelectorAll('.stg').forEach(b=>b.onclick=()=>b.classList.toggle('on'));
+function scoreProductForVehicle(p){
+  if(!V.year || !V.make || !V.model || !V.engine) return 0;
+  const text = [p.product_name,p.description,p.fitment_text,p.category,p.brand,p.sku].filter(Boolean).join(' ').toLowerCase();
+  let score = 0;
+  const aliases = getVehicleAliases();
+  aliases.forEach(a => { if(a && text.includes(a)) score += 2; });
+  if(text.includes(String(V.year))) score += 3;
+  if(text.includes(V.make.toLowerCase())) score += 4;
+  if(text.includes(V.model.toLowerCase()) || text.includes(V.model.toLowerCase().replace('-',''))) score += 5;
+  const eng = V.engine.toLowerCase();
+  if(text.includes(eng)) score += 7;
+  if((eng.includes('power stroke') || eng.includes('powerstroke')) && (text.includes('power stroke') || text.includes('powerstroke'))) score += 5;
+  if(eng.includes('7.3') && text.includes('7.3')) score += 8;
+  return score;
+}
 
-// PWA Service Worker
-if('serviceWorker' in navigator){navigator.serviceWorker.register('/app/sw.js').catch(()=>{})}
+function getCatEmoji(cat){
+  const map = {
+    injectors:'💉',
+    turbo:'🌀',
+    turbos:'🌀',
+    'head studs':'🔩',
+    egr:'🔧',
+    'fuel system':'⛽',
+    engine:'🔧',
+    exhaust:'💨',
+    tuning:'📟',
+    intake:'🌬️',
+    gauges:'📊',
+    cooling:'❄️'
+  };
+  return map[(cat || '').toLowerCase()] || '🔧';
+}
+
+function saveCart(){
+  localStorage.setItem('bsd_cart', JSON.stringify(cart));
+}
+function addToCart(id,name,brand,price,emoji){
+  const existing = cart.find(c => c.id === id);
+  if(existing) existing.qty++;
+  else cart.push({ id, name, brand, price, emoji, qty:1 });
+  saveCart();
+  renderCart();
+  if(!document.getElementById('cD').classList.contains('op')) toggleCart();
+}
+function removeFromCart(id){
+  const idx = cart.findIndex(c => c.id === id);
+  if(idx > -1){
+    if(cart[idx].qty > 1) cart[idx].qty--;
+    else cart.splice(idx,1);
+  }
+  saveCart();
+  renderCart();
+}
+
+function renderCart(){
+  const badge = document.getElementById('cartBadge');
+  const itemsEl = document.getElementById('cartItems');
+  const totalEl = document.getElementById('cartTotal');
+  const statItems = document.getElementById('statItems');
+
+  let total = 0;
+  let count = 0;
+
+  cart.forEach(c => {
+    total += (Number(c.price) || 0) * c.qty;
+    count += c.qty;
+  });
+
+  if(badge) badge.textContent = count;
+  if(statItems) statItems.textContent = count;
+  if(totalEl) totalEl.textContent = '$' + total.toLocaleString();
+
+  if(!itemsEl) return;
+
+  if(cart.length === 0){
+    itemsEl.innerHTML = '<div class="cd-e">Your cart is empty</div>';
+    return;
+  }
+
+  itemsEl.innerHTML = cart.map(c => `
+    <div class="cart-item">
+      <div class="cart-emoji">${c.emoji}</div>
+      <div class="cart-copy">
+        <h4>${escapeHtml(c.name)}</h4>
+        <p>${escapeHtml(c.brand || '')}${c.qty > 1 ? ' × ' + c.qty : ''}</p>
+      </div>
+      <div class="cart-right">
+        <div class="cart-price">$${((Number(c.price)||0) * c.qty).toLocaleString()}</div>
+        <button class="cart-remove" onclick="removeFromCart('${c.id}')">Remove</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(v){
+  return String(v || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+async function doCheckout(){
+  if(cart.length === 0){
+    alert('Your cart is empty.');
+    return;
+  }
+
+  const btn = document.getElementById('checkoutBtn');
+  btn.textContent = 'Redirecting...';
+  btn.style.opacity = '.6';
+  btn.style.pointerEvents = 'none';
+
+  try{
+    const vehicle = V.year ? `${V.year} ${V.make} ${V.model} — ${V.engine}` : '';
+    const email = ACTIVE_USER ? ACTIVE_USER.email : null;
+
+    const res = await fetch('/api/create-checkout', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({
+        items: cart.map(c => ({
+          id:c.id,
+          name:c.name,
+          brand:c.brand,
+          price:c.price,
+          qty:c.qty
+        })),
+        customer_email: email,
+        vehicle
+      })
+    });
+
+    const data = await res.json();
+    if(data.url){
+      window.location.href = data.url;
+      return;
+    }
+    throw new Error(data.error || 'Could not create checkout session');
+  }catch(err){
+    alert('Checkout error: ' + err.message);
+    btn.textContent = 'Checkout';
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
+  }
+}
+
+async function loadProducts(){
+  const grid = document.getElementById('pgrid');
+  if(!grid) return;
+
+  grid.innerHTML = '<div class="feed-msg">Loading products…</div>';
+
+  const res = await sb
+    .from('products')
+    .select('*')
+    .eq('status','active')
+    .order('created_at', { ascending:false });
+
+  if(res.error){
+    console.error(res.error);
+    grid.innerHTML = '<div class="feed-empty">Could not load products.</div>';
+    return;
+  }
+
+  if(!res.data || res.data.length === 0){
+    grid.innerHTML = '<div class="feed-empty">No products available yet.</div>';
+    return;
+  }
+
+  ALL_PRODUCTS = res.data.map(p => {
+    p.__img = cleanImageUrl(p.image_url || (Array.isArray(p.image_urls) && p.image_urls.length ? p.image_urls[0] : ''));
+    p.__score = scoreProductForVehicle(p);
+    p.__fit = p.__score >= 8;
+    PRODUCT_MAP[p.id] = p;
+    return p;
+  });
+
+  MATCHED_PRODUCTS = ALL_PRODUCTS.filter(p => p.__fit);
+  renderProducts();
+}
+
+function renderProducts(){
+  const grid = document.getElementById('pgrid');
+  if(!grid) return;
+
+  let products = (V.engine && MATCHED_PRODUCTS.length > 0) ? MATCHED_PRODUCTS.slice() : ALL_PRODUCTS.slice();
+
+  const activeCat = document.querySelector('.ct.on');
+  const catFilter = activeCat ? activeCat.textContent.trim().toLowerCase() : 'all';
+
+  const activeStages = [];
+  document.querySelectorAll('.stg.on').forEach(s => {
+    activeStages.push(s.textContent.trim().replace('Stage ',''));
+  });
+
+  const priceFilter = document.getElementById('priceDd').value;
+  const brandFilter = document.getElementById('brandDd').value.toLowerCase();
+  const sortFilter = document.getElementById('sortDd').value;
+  const searchQ = document.getElementById('searchInput').value.trim().toLowerCase();
+
+  products = products.filter(p => {
+    const cat = (p.category || '').toLowerCase();
+    const stage = String(p.stage || '');
+    const brand = (p.brand || '').toLowerCase();
+    const price = parseFloat(p.price) || 0;
+    const hay = [p.product_name,p.description,p.brand,p.category,p.sku].filter(Boolean).join(' ').toLowerCase();
+
+    if(catFilter !== 'all' && cat !== catFilter) return false;
+    if(activeStages.length > 0 && (!stage || activeStages.indexOf(stage) === -1)) return false;
+    if(brandFilter && brandFilter !== 'brand: all' && brand !== brandFilter.replace('brand: ','')) return false;
+    if(priceFilter === 'Under $100' && price >= 100) return false;
+    if(priceFilter === '$100–$500' && (price < 100 || price > 500)) return false;
+    if(priceFilter === '$500–$1K' && (price < 500 || price > 1000)) return false;
+    if(priceFilter === '$1K+' && price < 1000) return false;
+    if(searchQ && !hay.includes(searchQ)) return false;
+
+    return true;
+  });
+
+  if(sortFilter === 'Low → High'){
+    products.sort((a,b) => (parseFloat(a.price)||0) - (parseFloat(b.price)||0));
+  }else if(sortFilter === 'High → Low'){
+    products.sort((a,b) => (parseFloat(b.price)||0) - (parseFloat(a.price)||0));
+  }else{
+    products.sort((a,b) => (b.__score||0) - (a.__score||0));
+  }
+
+  const cats = new Set();
+  const brands = new Set();
+  ALL_PRODUCTS.forEach(p => {
+    if(p.category) cats.add(p.category);
+    if(p.brand) brands.add(p.brand);
+  });
+
+  const catTabs = document.getElementById('catTabs');
+  if(catTabs){
+    let catHtml = '<div class="ct on">All</div>';
+    Array.from(cats).sort().forEach(c => {
+      const active = activeCat && activeCat.textContent.trim() === c ? ' on' : '';
+      catHtml += `<div class="ct${active}">${escapeHtml(c)}</div>`;
+    });
+    catTabs.innerHTML = catHtml;
+    document.querySelectorAll('.ct').forEach(c => {
+      c.onclick = () => {
+        document.querySelectorAll('.ct').forEach(x => x.classList.remove('on'));
+        c.classList.add('on');
+        renderProducts();
+      };
+    });
+    if(activeCat && activeCat.textContent.trim() === 'All'){
+      const first = catTabs.querySelector('.ct');
+      if(first) first.classList.add('on');
+    }
+  }
+
+  const brandDd = document.getElementById('brandDd');
+  if(brandDd){
+    const current = brandDd.value || 'Brand: All';
+    let brandHtml = '<option>Brand: All</option>';
+    Array.from(brands).sort().forEach(b => {
+      brandHtml += `<option>${escapeHtml(b)}</option>`;
+    });
+    brandDd.innerHTML = brandHtml;
+    brandDd.value = Array.from(brandDd.options).some(o => o.value === current) ? current : 'Brand: All';
+  }
+
+  let html = '';
+  if(V.engine && MATCHED_PRODUCTS.length > 0){
+    html += `<div class="feed-msg">Showing ${MATCHED_PRODUCTS.length.toLocaleString()} likely matches for your ${escapeHtml(V.year + ' ' + V.make + ' ' + V.model)} • ${escapeHtml(V.engine)}</div>`;
+  }
+
+  if(products.length === 0){
+    html += '<div class="feed-empty">No parts match your current filters.</div>';
+    grid.innerHTML = html;
+    return;
+  }
+
+  html += products.map(p => {
+    const emoji = getCatEmoji(p.category);
+    const img = p.__img;
+    const price = parseFloat(p.price) || 0;
+    const stg = p.stage || '';
+    const fit = p.__fit ? '<div class="pc-fit">✓ Fits</div>' : '';
+    let stgClass = '';
+    if(String(stg) === '1') stgClass = 's1';
+    if(String(stg) === '2') stgClass = 's2';
+    if(String(stg) === '3') stgClass = 's3';
+
+    return `
+      <div class="pc g">
+        <div class="pc-img">
+          ${img ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(p.product_name || 'Product')}" loading="lazy">` : emoji}
+          ${fit}
+          ${stg ? `<div class="pc-stg ${stgClass}">STG ${escapeHtml(stg)}</div>` : ''}
+        </div>
+        <div class="pc-bd">
+          <div class="pc-br">${escapeHtml(p.brand || '')}</div>
+          <h4>${escapeHtml(p.product_name || 'Product')}</h4>
+          <div class="pc-bt">
+            <div class="pc-pr mono">$${price.toLocaleString()}</div>
+            <button class="ab" onclick="event.stopPropagation();addToCart('${escapeHtml(String(p.id))}','${String(p.product_name || '').replace(/'/g,"\\'")}','${String(p.brand || '').replace(/'/g,"\\'")}',${price},'${emoji}')">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  grid.innerHTML = html;
+}
+
+uProg(1);
+initYrs();
+renderCart();
+checkSession();
+
+document.getElementById('authPass').addEventListener('keydown', e => {
+  if(e.key === 'Enter') handleAuth();
+});
+
+document.querySelectorAll('.stg').forEach(b => {
+  b.onclick = () => {
+    b.classList.toggle('on');
+    renderProducts();
+  };
+});
+
+document.getElementById('priceDd').addEventListener('change', renderProducts);
+document.getElementById('brandDd').addEventListener('change', renderProducts);
+document.getElementById('sortDd').addEventListener('change', renderProducts);
+document.getElementById('searchInput').addEventListener('input', renderProducts);
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/app/sw.js').catch(()=>{});
+}
 </script>
 </body>
 </html>
