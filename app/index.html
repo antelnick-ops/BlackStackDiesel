@@ -608,6 +608,8 @@ function renderCart(){
   var badge=document.querySelector('.cbdg');
   var totalEl=document.getElementById('cartTotal');
   var countEl=document.getElementById('cartCount');
+  if(!el || !badge || !totalEl || !countEl) return;
+
   var total=0,count=0;
 
   cart.forEach(function(c){
