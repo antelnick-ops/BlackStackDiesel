@@ -1042,39 +1042,59 @@ async function doCheckout(){
   }
 }
 
-async function loadProducts(){
-  const grid = document.getElementById('pgrid');
-  if(!grid) return;
+async function loadProducts() {
+  const grid = document.getElementById('productGrid');
+  if (grid) {
+    grid.innerHTML = '<div class="loading">Loading Products...</div>';
+  }
 
-  grid.innerHTML = '<div class="feed-msg">Loading products…</div>';
-
-  const res = await sb
+  const { data, error } = await sb
     .from('products')
     .select('*')
-    .eq('status','active')
-    .order('created_at', { ascending:false });
+    .eq('is_visible', true)
+    .order('brand', { ascending: true })
+    .order('product_name', { ascending: true });
 
-  if(res.error){
-    console.error(res.error);
-    grid.innerHTML = '<div class="feed-empty">Could not load products.</div>';
+  if (error) {
+    console.error('Product load error:', error);
+
+    if (grid) {
+      grid.innerHTML = '<div class="loading">Failed to load products.</div>';
+    }
     return;
   }
 
-  if(!res.data || res.data.length === 0){
-    grid.innerHTML = '<div class="feed-empty">No products available yet.</div>';
-    return;
-  }
+  ALL_PRODUCTS = Array.isArray(data) ? data : [];
 
-  ALL_PRODUCTS = res.data.map(p => {
-    p.__img = cleanImageUrl(p.image_url || (Array.isArray(p.image_urls) && p.image_urls.length ? p.image_urls[0] : ''));
+  MATCHED_PRODUCTS = [];
+
+  const V = CURRENT_VEHICLE || {};
+
+  ALL_PRODUCTS.forEach(function (p) {
     p.__score = scoreProductForVehicle(p);
-    p.__fit = p.__score >= 8;
-    PRODUCT_MAP[p.id] = p;
-    return p;
+
+    p.__fit = p.__score >= 4;
+
+    if (p.__fit) {
+      MATCHED_PRODUCTS.push(p);
+    }
   });
 
-  MATCHED_PRODUCTS = ALL_PRODUCTS.filter(p => p.__fit);
-  renderProducts();
+  let products = ALL_PRODUCTS.slice();
+
+  products.sort(function (a, b) {
+    if ((b.__fit ? 1 : 0) !== (a.__fit ? 1 : 0)) {
+      return (b.__fit ? 1 : 0) - (a.__fit ? 1 : 0);
+    }
+
+    if ((b.__score || 0) !== (a.__score || 0)) {
+      return (b.__score || 0) - (a.__score || 0);
+    }
+
+    return String(a.product_name || '').localeCompare(String(b.product_name || ''));
+  });
+
+  renderProducts(products);
 }
 
 function renderProducts(){
