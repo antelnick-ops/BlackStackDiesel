@@ -1150,8 +1150,26 @@ async function queryProducts(filters, page, pageSize){
 
   if(V.make && V.engine){
     const universalList = UNIVERSAL_CATEGORIES.map(c => '"' + c + '"').join(',');
-    const vehicleFilter = 'fitment_makes.cs.{' + V.make + '},fitment_engines.cs.{' + V.engine + '},category.in.(' + universalList + ')';
-    console.log('[BSD] Vehicle filter:', vehicleFilter);
+    // Extract engine keywords for text matching (e.g. "7.3L Power Stroke" -> ["7.3L", "Power", "Stroke"])
+    const engineWords = V.engine.match(/\d+\.\d+L?|[A-Z][a-z]+(?:\s[A-Z][a-z]+)*/g) || [];
+    const engineFilters = [];
+    engineWords.forEach(w => {
+      const safe = w.replace(/[%_]/g, '\\$&');
+      engineFilters.push('fitment_text.ilike.%' + safe + '%');
+      engineFilters.push('product_name.ilike.%' + safe + '%');
+      engineFilters.push('description.ilike.%' + safe + '%');
+    });
+    // Also match on model and year
+    const modelSafe = String(V.model).replace(/[%_]/g, '\\$&');
+    const yearStr = String(V.year);
+    engineFilters.push('fitment_text.ilike.%' + modelSafe + '%');
+    engineFilters.push('product_name.ilike.%' + modelSafe + '%');
+    engineFilters.push('fitment_years.cs.{' + yearStr + '}');
+    engineFilters.push('fitment_engines.cs.{"' + V.engine + '"}');
+    // Plus universal categories (fluids, tools, apparel)
+    engineFilters.push('category.in.(' + universalList + ')');
+    const vehicleFilter = engineFilters.join(',');
+    console.log('[BSD] Vehicle filter built (first 200 chars):', vehicleFilter.substring(0, 200));
     query = query.or(vehicleFilter);
   }
 
@@ -1191,7 +1209,26 @@ async function queryTotalCount(filters){
 
   if(V.make && V.engine){
     const universalList = UNIVERSAL_CATEGORIES.map(c => '"' + c + '"').join(',');
-    const vehicleFilter = 'fitment_makes.cs.{' + V.make + '},fitment_engines.cs.{' + V.engine + '},category.in.(' + universalList + ')';
+    // Extract engine keywords for text matching (e.g. "7.3L Power Stroke" -> ["7.3L", "Power", "Stroke"])
+    const engineWords = V.engine.match(/\d+\.\d+L?|[A-Z][a-z]+(?:\s[A-Z][a-z]+)*/g) || [];
+    const engineFilters = [];
+    engineWords.forEach(w => {
+      const safe = w.replace(/[%_]/g, '\\$&');
+      engineFilters.push('fitment_text.ilike.%' + safe + '%');
+      engineFilters.push('product_name.ilike.%' + safe + '%');
+      engineFilters.push('description.ilike.%' + safe + '%');
+    });
+    // Also match on model and year
+    const modelSafe = String(V.model).replace(/[%_]/g, '\\$&');
+    const yearStr = String(V.year);
+    engineFilters.push('fitment_text.ilike.%' + modelSafe + '%');
+    engineFilters.push('product_name.ilike.%' + modelSafe + '%');
+    engineFilters.push('fitment_years.cs.{' + yearStr + '}');
+    engineFilters.push('fitment_engines.cs.{"' + V.engine + '"}');
+    // Plus universal categories (fluids, tools, apparel)
+    engineFilters.push('category.in.(' + universalList + ')');
+    const vehicleFilter = engineFilters.join(',');
+    console.log('[BSD] Vehicle filter built (first 200 chars):', vehicleFilter.substring(0, 200));
     query = query.or(vehicleFilter);
   }
   if(filters.category && filters.category !== 'all'){
