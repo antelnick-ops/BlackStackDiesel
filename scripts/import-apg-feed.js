@@ -42,7 +42,34 @@ const HARD_EXCLUDE = [
   /\bLincoln\b/i, /\bMark\s+LT\b/i,
   /\bmotorcycle\b/i, /\bATV\b/i, /\bUTV\b/i, /\bsnowmobile\b/i, /\bside-?by-?side\b/i,
   /\bdirt\s*bike\b/i, /\bquad\b/i,
-  /\bNeon\b/i, /\bMiata\b/i, /\bLotus\b/i, /\bFerrari\b/i, /\bLamborghini\b/i
+  /\bNeon\b/i, /\bMiata\b/i, /\bLotus\b/i, /\bFerrari\b/i, /\bLamborghini\b/i,
+  // Mercedes sub-models (often appear without "Mercedes-Benz" prefix)
+  /\bCLK\b/i, /\bSL-?Class\b/i, /\bSL\d+\b/i, /\bCLS\b/i, /\bCLA\b/i,
+  /\bGL[A-Z]?\b/i, /\bML\b/i, /\bGLK\b/i, /\bSmart\b/i,
+  // More Euro car models
+  /\bSaab\s*\d/i, /\bAlfa\s*Romeo\b/i, /\bBentley\b/i, /\bMaserati\b/i,
+  /\bAston\s*Martin\b/i, /\bMaybach\b/i, /\bSmart\s*Car\b/i,
+  // More light-duty GM/Ford/Dodge cars
+  /\bCavalier\b/i, /\bSonic\b/i, /\bCruze\b/i, /\bImpala\b/i, /\bMalibu\b/i,
+  /\bEquinox\b/i, /\bTerrain\b/i, /\bAcadia\b/i, /\bTraverse\b/i,
+  /\bCobalt\b/i, /\bAveo\b/i, /\bHHR\b/i, /\bLumina\b/i, /\bMonte\s*Carlo\b/i,
+  /\bFocus\b/i, /\bFusion\b/i, /\bTaurus\b/i, /\bFiesta\b/i, /\bContour\b/i,
+  /\bExpedition\b/i, /\bFlex\b/i, /\bFive\s*Hundred\b/i,
+  /\bCaliber\b/i, /\bAvenger\b/i, /\bStratus\b/i, /\bMagnum\b/i,
+  /\bPT\s*Cruiser\b/i, /\bAspen\b/i, /\bCrossfire\b/i,
+  // More Japanese/Korean cars that slipped through
+  /\bSentra\b/i, /\bAltima\b/i, /\bMaxima\b/i, /\bQuest\b/i, /\bMurano\b/i,
+  /\bArmada\b/i, /\bPathfinder\b/i, /\bXterra\b/i, /\bJuke\b/i,
+  /\bCamry\b/i, /\bCorolla\b/i, /\bPrius\b/i, /\bRAV4\b/i, /\b4Runner\b/i,
+  /\bHighlander\b/i, /\bSequoia\b/i, /\bSienna\b/i, /\bAvalon\b/i,
+  /\bCivic\b/i, /\bAccord\b/i, /\bCR-?V\b/i, /\bPilot\b/i, /\bOdyssey\b/i,
+  /\bPassport\b/i, /\bFit\b/i, /\bS2000\b/i, /\bNSX\b/i,
+  /\bImpreza\b/i, /\bLegacy\b/i, /\bOutback\b/i, /\bForester\b/i, /\bWRX\b/i,
+  /\bSonata\b/i, /\bElantra\b/i, /\bTucson\b/i, /\bSantaFe\b/i, /\bSanta\s*Fe\b/i,
+  /\bSorento\b/i, /\bSportage\b/i, /\bOptima\b/i, /\bRio\b/i, /\bSoul\b/i,
+  // More powersports / non-car brands
+  /\bAprilia\b/i, /\bVespa\b/i, /\bMoto\s*Guzzi\b/i, /\bPiaggio\b/i,
+  /\bTriumph\b/i, /\bBSA\b/i, /\bVictory\b/i, /\bIndian\s*Motorcycle\b/i
 ];
 
 const HD_DIESEL_TRUCK = [
@@ -72,7 +99,6 @@ const DIESEL_ENGINE = [
 const TRULY_UNIVERSAL_SUBCATEGORIES = new Set([
   'Functional Fluid Lubricant Grease (including Additives)',
   'Cleaning Products',
-  'Filters',
   'Hand Tools',
   'Shop Equipment',
   'Fuel System Service',
@@ -357,9 +383,9 @@ async function main() {
 
   if (DRY_RUN) {
     console.log('\nDRY RUN — no writes to Supabase.');
-    console.log('\n=== 10 random samples ===');
+    console.log('\n=== 15 random samples ===');
     const shuffled = [...mapped].sort(() => Math.random() - 0.5);
-    for (let i = 0; i < Math.min(10, shuffled.length); i++) {
+    for (let i = 0; i < Math.min(15, shuffled.length); i++) {
       const p = shuffled[i];
       console.log(`\n${i + 1}. ${p.product_name.substring(0, 90)}`);
       console.log(`   Brand: ${p.brand} | Category: ${p.category} | $${p.price}`);
