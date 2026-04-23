@@ -171,6 +171,7 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 .pc-bd h4{font-size:11.5px;font-weight:600;line-height:1.4;margin-bottom:8px;color:var(--t1)}
 .pc-bt{display:flex;justify-content:space-between;align-items:center}
 .pc-pr{font-size:16px;font-weight:800;color:var(--gold);font-family:'DM Mono',monospace;letter-spacing:-.5px}
+.pc-core{font-size:9px;color:var(--gold);font-weight:500;margin-top:2px;letter-spacing:0.3px}
 .ab{width:32px;height:32px;background:var(--goldg);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;transition:.15s;box-shadow:0 2px 10px rgba(237,174,10,.1)}
 .ab:active{transform:scale(.8)}
 .ab svg{width:14px;height:14px;stroke:#0a0a0a;stroke-width:2.5;fill:none}
@@ -252,6 +253,11 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 .pc:nth-child(2){animation-delay:.05s}.pc:nth-child(3){animation-delay:.1s}
 .pc:nth-child(4){animation-delay:.15s}.pc:nth-child(5){animation-delay:.2s}.pc:nth-child(6){animation-delay:.25s}
 .pdm-overlay{position:absolute;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:500;opacity:0;pointer-events:none;transition:opacity .3s var(--ease)}
+.modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:600;opacity:0;pointer-events:none;transition:opacity .25s var(--ease);display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.on{opacity:1;pointer-events:auto}
+.modal-panel{background:var(--c2);border:1px solid var(--glb);border-radius:14px;padding:22px 20px;position:relative;max-height:80vh;overflow-y:auto;width:100%}
+.modal-close{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--t2);font-size:22px;cursor:pointer;line-height:1;padding:4px 8px}
+.modal-close:hover{color:var(--t1)}
 .pdm-overlay.on{opacity:1;pointer-events:auto}
 .pdm{position:absolute;bottom:0;left:0;right:0;max-height:90%;background:var(--c1);border-top-left-radius:28px;border-top-right-radius:28px;border-top:1px solid var(--glb);transform:translateY(100%);transition:transform .4s var(--ease);overflow-y:auto;scrollbar-width:none;box-shadow:0 -20px 60px rgba(0,0,0,.5)}
 .pdm::-webkit-scrollbar{display:none}
@@ -267,6 +273,10 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 .pdm-name{font-size:22px;font-weight:800;letter-spacing:-.4px;line-height:1.25;margin-bottom:6px}
 .pdm-cat{font-size:12px;color:var(--t3);font-weight:500;margin-bottom:16px}
 .pdm-price-row{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-top:1px solid var(--glb);border-bottom:1px solid var(--glb);margin-bottom:20px}
+.pdm-core-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:10px;margin-top:-10px;margin-bottom:14px}
+.pdm-core-amount{font-size:11px;font-weight:600;color:var(--gold)}
+.pdm-core-info{background:none;border:1px solid var(--goldb);color:var(--gold);border-radius:6px;padding:4px 10px;font-size:9px;font-weight:500;cursor:pointer}
+.pdm-core-info:hover{background:var(--goldgl)}
 .pdm-price{font-size:28px;font-weight:800;font-family:'DM Mono',monospace;color:var(--t1)}
 .pdm-compare{font-size:14px;color:var(--t3);text-decoration:line-through;margin-left:10px}
 .pdm-fit-badge{padding:6px 12px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
@@ -518,6 +528,31 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
         </div>
         <div class="pdm-img" id="pdmImg"></div>
         <div class="pdm-body" id="pdmBody"></div>
+      </div>
+    </div>
+
+    <div id="coreInfoOverlay" class="modal-overlay" onclick="if(event.target===this)closeCoreInfoModal()">
+      <div class="modal-panel" style="max-width:460px">
+        <button class="modal-close" onclick="closeCoreInfoModal()">×</button>
+        <h2 style="margin:0 0 12px;font-size:16px">What’s a core charge?</h2>
+        <div style="font-size:11px;line-height:1.6;color:var(--t2)">
+          <p style="margin:0 0 10px">A core charge is a refundable deposit added to certain rebuildable parts — alternators, starters, injectors, turbos, transmissions, and engine components.</p>
+          <p style="margin:0 0 10px"><strong style="color:var(--t1)">How it works:</strong></p>
+          <ul style="margin:0 0 10px;padding-left:20px">
+            <li style="margin-bottom:6px">You pay the core deposit when you place your order.</li>
+            <li style="margin-bottom:6px">After you install the new part, box up your old (broken) part.</li>
+            <li style="margin-bottom:6px">Ship the old part back to us.</li>
+            <li style="margin-bottom:6px">We refund your core charge once we receive it.</li>
+          </ul>
+          <p style="margin:0 0 10px"><strong style="color:var(--t1)">Tips:</strong></p>
+          <ul style="margin:0 0 10px;padding-left:20px">
+            <li style="margin-bottom:6px">You have up to 30 days to return the core.</li>
+            <li style="margin-bottom:6px">The old part must be complete and rebuildable (no missing pieces).</li>
+            <li style="margin-bottom:6px">Reuse the shipping box the new part came in.</li>
+          </ul>
+          <p style="margin:0;color:var(--t3);font-size:10px">Have questions? Contact us before ordering if you’re unsure about core requirements.</p>
+        </div>
+        <button onclick="closeCoreInfoModal()" class="btn-g" style="width:100%;margin-top:12px">Got it</button>
       </div>
     </div>
 
@@ -1566,6 +1601,7 @@ function appendProductCards(products){
             '<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
           '</button>' +
         '</div>' +
+        (p.has_core && p.core_charge > 0 ? '<div class="pc-core">+$' + Number(p.core_charge).toLocaleString() + ' core</div>' : '') +
       '</div>' +
     '</div>';
   }).join('');
@@ -1676,11 +1712,20 @@ function renderProductDetail(p){
       '</span><span class="pdm-compare">$' + compareAt.toLocaleString() + '</span></div>';
   }
 
+  var coreHtml = '';
+  if(p.has_core && p.core_charge > 0){
+    coreHtml = '<div class="pdm-core-row">' +
+      '<div class="pdm-core-amount">+ $' + Number(p.core_charge).toLocaleString() + ' core charge</div>' +
+      '<button class="pdm-core-info" onclick="openCoreInfoModal()">What’s this?</button>' +
+      '</div>';
+  }
+
   bodyEl.innerHTML =
     '<div class="pdm-brand">' + escapeHtml(p.brand || 'Unbranded') + stgPill + '</div>' +
     '<div class="pdm-name">' + escapeHtml(p.product_name || 'Product') + '</div>' +
     (p.category ? '<div class="pdm-cat">' + escapeHtml(p.category) + '</div>' : '') +
     '<div class="pdm-price-row">' + priceHtml + fitBadge + '</div>' +
+    coreHtml +
     (p.short_description ? '<div class="pdm-section"><div class="pdm-desc">' + escapeHtml(p.short_description) + '</div></div>' : '') +
     featuresHtml +
     specsHtml +
@@ -1699,6 +1744,13 @@ function renderProductDetail(p){
 function pdmQty(delta){
   PDM_QTY = Math.max(1, PDM_QTY + delta);
   document.getElementById('pdmQtyVal').textContent = PDM_QTY;
+}
+
+function openCoreInfoModal(){
+  document.getElementById('coreInfoOverlay').classList.add('on');
+}
+function closeCoreInfoModal(){
+  document.getElementById('coreInfoOverlay').classList.remove('on');
 }
 
 function pdmAddToCart(productId){
