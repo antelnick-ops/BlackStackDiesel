@@ -1173,7 +1173,6 @@ async function queryProducts(filters, page, pageSize){
 
   let vehicleClauses = null;
   if(V.make && V.engine){
-    const universalList = UNIVERSAL_CATEGORIES.map(c => '"' + c + '"').join(',');
     const engineWords = V.engine.match(/\d+\.\d+L?|[A-Z][a-z]+(?:\s[A-Z][a-z]+)*/g) || [];
     vehicleClauses = [];
     engineWords.forEach(w => {
@@ -1188,7 +1187,6 @@ async function queryProducts(filters, page, pageSize){
     vehicleClauses.push('product_name.ilike.%' + modelSafe + '%');
     vehicleClauses.push('fitment_years.cs.{' + yearStr + '}');
     vehicleClauses.push('fitment_engines.cs.{"' + V.engine + '"}');
-    vehicleClauses.push('category.in.(' + universalList + ')');
   }
 
   if(filters.category && filters.category !== 'all'){
@@ -1245,7 +1243,6 @@ async function queryTotalCount(filters){
 
   let vehicleClauses = null;
   if(V.make && V.engine){
-    const universalList = UNIVERSAL_CATEGORIES.map(c => '"' + c + '"').join(',');
     const engineWords = V.engine.match(/\d+\.\d+L?|[A-Z][a-z]+(?:\s[A-Z][a-z]+)*/g) || [];
     vehicleClauses = [];
     engineWords.forEach(w => {
@@ -1260,7 +1257,6 @@ async function queryTotalCount(filters){
     vehicleClauses.push('product_name.ilike.%' + modelSafe + '%');
     vehicleClauses.push('fitment_years.cs.{' + yearStr + '}');
     vehicleClauses.push('fitment_engines.cs.{"' + V.engine + '"}');
-    vehicleClauses.push('category.in.(' + universalList + ')');
   }
   if(filters.category && filters.category !== 'all'){
     query = query.eq('category', filters.category);
