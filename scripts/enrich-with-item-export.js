@@ -113,7 +113,7 @@ async function main() {
   }
   console.log(`\nFound ${skuToId.size} APG products in DB`);
 
-  console.log('\nApplying updates in batches of 500...');
+  console.log('\nApplying updates in batches of 500 via RPC...');
   const BATCH = 500;
   let batch = [];
   let processed = 0;
@@ -126,29 +126,29 @@ async function main() {
     batch.push({ id, ...payload });
 
     if (batch.length >= BATCH) {
-      const { error } = await supabase
-        .from('products')
-        .upsert(batch, { onConflict: 'id', ignoreDuplicates: false });
+      const { data, error } = await supabase.rpc('enrich_product_wholesale', {
+        updates: batch
+      });
       if (error) {
-        console.error('\nBatch failed:', error.message);
+        console.error('\nRPC batch failed:', error.message);
         throw error;
       }
-      processed += batch.length;
-      process.stdout.write(`\r  Batched ${processed} updates (${skipped} skipped)`);
+      processed += data;
+      process.stdout.write(`\r  Updated ${processed} products (${skipped} skipped)`);
       batch = [];
     }
   }
 
   // Flush final partial batch
   if (batch.length > 0) {
-    const { error } = await supabase
-      .from('products')
-      .upsert(batch, { onConflict: 'id', ignoreDuplicates: false });
+    const { data, error } = await supabase.rpc('enrich_product_wholesale', {
+      updates: batch
+    });
     if (error) throw error;
-    processed += batch.length;
+    processed += data;
   }
 
-  console.log(`\n\nDone. Processed ${processed} batched updates, ${skipped} skipped.`);
+  console.log(`\n\nDone. Updated ${processed} products, ${skipped} skipped.`);
 
   // Stocking summary
   const stockingCount = [...updates.values()].filter(u => u.is_stocking_item).length;
