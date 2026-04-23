@@ -293,6 +293,7 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 .pdm-fit-yes{background:rgba(52,211,153,.1);color:var(--grn);border:1px solid rgba(52,211,153,.2)}
 .pdm-fit-maybe{background:var(--gl);color:var(--t2);border:1px solid var(--glb)}
 .pdm-fit-unknown{background:rgba(156,163,175,.08);color:var(--t3);border:1px solid var(--glb)}
+.pdm-fit-no{background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.3)}
 .pdm-stg-pill{display:inline-block;padding:4px 10px;border-radius:8px;margin-left:8px;font-size:10px;font-weight:700;letter-spacing:.5px;background:var(--goldgl);color:var(--gold);border:1px solid var(--goldb)}
 .pdm-section{margin-bottom:20px}
 .pdm-section h3{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
@@ -1130,27 +1131,49 @@ function getVehicleAliases(){
 }
 
 function scoreProductForVehicle(p){
-  if(!V.make || !V.engine) return 0;
+  if(!V.year || !V.make || !V.model || !V.engine) return 0;
 
-  const hasAnyFitmentData =
-    (Array.isArray(p.fitment_years) && p.fitment_years.length > 0) ||
-    (Array.isArray(p.fitment_engines) && p.fitment_engines.length > 0) ||
-    (Array.isArray(p.fitment_makes) && p.fitment_makes.length > 0);
-
+  const userYear = parseInt(V.year, 10);
   const engineLower = V.engine.toLowerCase();
-  const makeLower = V.make.toLowerCase();
   const nameLower = (p.product_name || '').toLowerCase();
-  let score = 0;
-  if(Array.isArray(p.fitment_engines) && p.fitment_engines.some(e => String(e).toLowerCase() === engineLower)){
-    score = 15;
-  } else if((p.fitment_text || '').toLowerCase().includes(engineLower)){
-    score = 12;
-  } else if(nameLower.includes(makeLower)){
-    score = 12;
+  const fitText = (p.fitment_text || '').toLowerCase();
+  const hasYearArray = Array.isArray(p.fitment_years) && p.fitment_years.length > 0;
+  const hasEngineArray = Array.isArray(p.fitment_engines) && p.fitment_engines.length > 0;
+
+  if(hasYearArray){
+    const years = p.fitment_years.map(y => parseInt(y, 10)).filter(y => !isNaN(y));
+    if(years.length > 0){
+      let minY, maxY;
+      if(years.length === 2 && years[1] - years[0] > 1){
+        minY = Math.min(years[0], years[1]);
+        maxY = Math.max(years[0], years[1]);
+      } else {
+        minY = Math.min(...years);
+        maxY = Math.max(...years);
+      }
+      if(userYear < minY || userYear > maxY){
+        return -999;
+      }
+    }
   }
 
-  if(!hasAnyFitmentData && score === 0) return -1;
-  return score;
+  if(hasEngineArray){
+    const matches = p.fitment_engines.some(e => String(e).toLowerCase() === engineLower);
+    if(!matches) return -999;
+  }
+
+  if(hasYearArray && hasEngineArray) return 20;
+
+  if(hasYearArray){
+    if(fitText.includes(engineLower) || nameLower.includes(engineLower)) return 15;
+    return 10;
+  }
+
+  if(hasEngineArray) return 15;
+
+  if(fitText.includes(engineLower) || nameLower.includes(engineLower)) return 12;
+
+  return -1;
 }
 
 function getCatEmoji(cat){
@@ -1660,16 +1683,33 @@ function appendProductCards(products){
     p.__score = scoreProductForVehicle(p);
     p.__fit = p.__score >= 12;
     p.__unknown = p.__score === -1;
+    p.__wrongFit = p.__score === -999;
   });
+
+  products = products.filter(p => !p.__wrongFit);
+
+  const sortEl = document.getElementById('sortDd');
+  const userSortVal = sortEl ? sortEl.value : '';
+  const hasUserSort = userSortVal === 'Low → High' || userSortVal === 'High → Low';
+
+  if(V.year && !hasUserSort){
+    products.sort(function(a, b){
+      if(a.__score !== b.__score) return b.__score - a.__score;
+      return (a.brand || '').localeCompare(b.brand || '');
+    });
+  }
 
   var html = products.map(function(p){
     var emoji = getCatEmoji(p.category);
     var img = p.__img;
     var price = parseFloat(p.price) || 0;
     var stg = (p.stage !== null && p.stage !== undefined) ? p.stage : '';
-    var fit = p.__unknown
-      ? '<div class="pc-fit pc-unknown">? Fit Unknown</div>'
-      : p.__fit ? '<div class="pc-fit">\u2713 Fits</div>' : '';
+    var fit = '';
+    if(p.__fit){
+      fit = '<div class="pc-fit">\u2713 Fits</div>';
+    } else if(p.__unknown){
+      fit = '<div class="pc-fit pc-unknown">? Fit Unknown</div>';
+    }
     var stgClass = '';
     if(String(stg) === '0') stgClass = 's0';
     if(String(stg) === '1') stgClass = 's1';
@@ -1748,7 +1788,9 @@ function renderProductDetail(p){
 
   var fitBadge = '';
   if(hasVehicle){
-    if(score === -1){
+    if(score === -999){
+      fitBadge = '<div class="pdm-fit-badge pdm-fit-no">\u00d7 Does NOT fit your truck</div>';
+    } else if(score === -1){
       fitBadge = '<div class="pdm-fit-badge pdm-fit-unknown">? Fit Unknown</div>';
     } else if(fits){
       fitBadge = '<div class="pdm-fit-badge pdm-fit-yes">\u2713 Fits your truck</div>';
