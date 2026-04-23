@@ -340,7 +340,8 @@ function mapRow(row) {
     weight_lbs: weight,
     source: 'distributor',
     source_ref: sku,
-    status
+    status,
+    is_visible: true
   };
 }
 
