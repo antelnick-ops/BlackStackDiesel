@@ -161,6 +161,7 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 .pc-img img{width:100%;height:100%;object-fit:contain}
 .pc-fit{position:absolute;top:7px;left:7px;padding:3px 8px;border-radius:7px;font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;background:rgba(52,211,153,.06);color:var(--grn);border:1px solid rgba(52,211,153,.1)}
 .pc-stg{position:absolute;top:7px;right:7px;padding:3px 8px;border-radius:7px;font-size:7px;font-weight:800;letter-spacing:.8px;text-transform:uppercase}
+.s0{background:var(--gl);color:var(--t2);border:1px solid var(--glb)}
 .s1{background:rgba(96,165,250,.06);color:var(--blu);border:1px solid rgba(96,165,250,.1)}
 .s2{background:var(--goldgl);color:var(--gold);border:1px solid var(--goldb)}
 .s3{background:rgba(248,113,113,.06);color:var(--red);border:1px solid rgba(248,113,113,.1)}
@@ -416,6 +417,7 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
       </div>
 
       <div class="stg-row">
+        <div class="stg">OEM</div>
         <div class="stg">Stage 1</div>
         <div class="stg">Stage 2</div>
         <div class="stg">Stage 3</div>
@@ -1177,7 +1179,9 @@ function buildQueryFilters(){
   const catText = activeCat ? activeCat.textContent.trim() : 'All';
   const activeStages = [];
   document.querySelectorAll('.stg.on').forEach(s => {
-    activeStages.push(s.textContent.trim().replace('Stage ',''));
+    const text = s.textContent.trim();
+    if(text === 'OEM') activeStages.push('0');
+    else activeStages.push(text.replace('Stage ',''));
   });
   return {
     category: catText === 'All' ? 'all' : catText,
@@ -1464,13 +1468,13 @@ function appendProductCards(products){
       const name = (p.product_name || '').toLowerCase();
       const desc = (p.description || '').toLowerCase();
       const combined = name + ' ' + desc;
+      const userMakeLower = V.make.toLowerCase();
+      const dispLower = userDisp ? (userDisp + 'l') : null;
+      const hasUserMake = combined.includes(userMakeLower);
+      const hasUserDisp = dispLower && combined.includes(dispLower);
 
       for(const pattern of wrongMakePatterns){
         if(combined.includes(pattern)){
-          const userMakeLower = V.make.toLowerCase();
-          const dispLower = userDisp ? (userDisp + 'l').toLowerCase() : null;
-          const hasUserMake = combined.includes(userMakeLower);
-          const hasUserDisp = dispLower && combined.includes(dispLower);
           if(!hasUserMake && !hasUserDisp){
             return false;
           }
@@ -1481,7 +1485,6 @@ function appendProductCards(products){
         for(const otherDisp of otherDisps){
           const otherLower = otherDisp.toLowerCase();
           if(name.includes(otherLower)){
-            const dispLower = userDisp ? (userDisp + 'l').toLowerCase() : null;
             if(!dispLower || !name.includes(dispLower)){
               return false;
             }
@@ -1503,9 +1506,10 @@ function appendProductCards(products){
     var emoji = getCatEmoji(p.category);
     var img = p.__img;
     var price = parseFloat(p.price) || 0;
-    var stg = p.stage || '';
+    var stg = (p.stage !== null && p.stage !== undefined) ? p.stage : '';
     var fit = p.__fit ? '<div class="pc-fit">\u2713 Fits</div>' : '';
     var stgClass = '';
+    if(String(stg) === '0') stgClass = 's0';
     if(String(stg) === '1') stgClass = 's1';
     if(String(stg) === '2') stgClass = 's2';
     if(String(stg) === '3') stgClass = 's3';
@@ -1514,7 +1518,7 @@ function appendProductCards(products){
       '<div class="pc-img">' +
         (img ? '<img src="' + escapeHtml(img) + '" alt="' + escapeHtml(p.product_name || 'Product') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'"><span class="pc-emoji-fallback" style="display:none">' + emoji + '</span>' : '<span class="pc-emoji-fallback">' + emoji + '</span>') +
         fit +
-        (stg ? '<div class="pc-stg ' + stgClass + '">STG ' + escapeHtml(stg) + '</div>' : '') +
+        (stg !== null && stg !== undefined && stg !== '' ? '<div class="pc-stg ' + stgClass + '">' + (String(stg) === '0' ? 'OEM' : 'STG ' + escapeHtml(stg)) + '</div>' : '') +
       '</div>' +
       '<div class="pc-bd">' +
         '<div class="pc-br">' + escapeHtml(p.brand || '') + '</div>' +
