@@ -131,6 +131,28 @@ const DIESEL_AGNOSTIC_CATEGORIES = new Set([
   'Lighting and Electrical Body',
 ]);
 
+const UNIVERSAL_PART_KEYWORDS = [
+  /\balternator\b/i,
+  /\bstarter\s+(motor|drive|solenoid)?/i,
+  /\bbattery\s+(terminal|cable|tray|hold.?down|post|isolator)?/i,
+  /\bstereo\b/i, /\bhead\s*unit\b/i, /\bsubwoofer\b/i, /\bamplifier\b/i,
+  /\bspeaker\b/i, /\btweeter\b/i,
+  /\bgauge\s+(set|kit|cluster|pod)?/i,
+  /\blight\s*bar\b/i, /\brock\s*light/i,
+  /\bwinch\b/i,
+  /\bbull\s*bar\b/i, /\bgrille\s+guard\b/i,
+  /\bbed\s*liner\b/i, /\bbed\s*mat\b/i,
+  /\bfloor\s*mat\b/i, /\bseat\s*cover\b/i,
+  /\btool\s*box\b/i,
+  /\bfifth\s*wheel\b/i, /\bgooseneck\b/i,
+  /\btrailer\s+(hitch|brake|plug)/i,
+  /\bair\s*compressor\b/i,
+  /\bfire\s+extinguisher\b/i,
+  /\bfirst\s+aid\b/i,
+  /\bcb\s+radio\b/i, /\bham\s+radio\b/i,
+  /\bgps\b/i, /\bdash\s*cam\b/i,
+];
+
 const TRUCK_SPECIFIC_CATEGORIES = new Set([
   'Body', 'Engine', 'Driveline and Axles', 'Air and Fuel Delivery',
   'Exhaust', 'Suspension', 'Brake', 'Transmission', 'Belts and Cooling',
@@ -296,6 +318,10 @@ function shouldImport(row) {
   if (subcategory && TRULY_UNIVERSAL_SUBCATEGORIES.has(subcategory)) return true;
 
   if (category && DIESEL_AGNOSTIC_CATEGORIES.has(category)) return true;
+
+  if (productName && matchesAnyPattern(productName, UNIVERSAL_PART_KEYWORDS)) {
+    return true;
+  }
 
   if (category && TRUCK_SPECIFIC_CATEGORIES.has(category)) return false;
 
