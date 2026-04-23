@@ -1046,10 +1046,14 @@ function scoreProductForVehicle(p){
     (Array.isArray(p.fitment_makes) && p.fitment_makes.length > 0);
 
   const engineLower = V.engine.toLowerCase();
+  const makeLower = V.make.toLowerCase();
+  const nameLower = (p.product_name || '').toLowerCase();
   let score = 0;
   if(Array.isArray(p.fitment_engines) && p.fitment_engines.some(e => String(e).toLowerCase() === engineLower)){
     score = 15;
   } else if((p.fitment_text || '').toLowerCase().includes(engineLower)){
+    score = 12;
+  } else if(nameLower.includes(makeLower)){
     score = 12;
   }
 
@@ -1266,14 +1270,11 @@ async function queryProducts(filters, page, pageSize){
 
   // Apply combined or-filter so vehicle and search don't overwrite each other
   if(vehicleClauses && searchClauses){
-    const combined = 'and(or(' + vehicleClauses.join(',') + '),or(' + searchClauses.join(',') + '))';
-    console.log('[BSD] Combined filter (first 300 chars):', combined.substring(0, 300));
-    query = query.or(combined);
+    console.log('[BSD] Search-first filter (vehicle via badge only)');
+    query = query.or(searchClauses.join(','));
   } else if(vehicleClauses){
-    console.log('[BSD] Vehicle-only filter + universal');
-    const universalClause = 'and(fitment_years.eq.{},fitment_engines.eq.{})';
-    const vehicleOR = vehicleClauses.join(',');
-    query = query.or(vehicleOR + ',' + universalClause);
+    console.log('[BSD] Vehicle-only filter (strict, no universals)');
+    query = query.or(vehicleClauses.join(','));
   } else if(searchClauses){
     console.log('[BSD] Search-only filter');
     query = query.or(searchClauses.join(','));
@@ -1348,14 +1349,11 @@ async function queryTotalCount(filters){
 
   // Apply combined or-filter so vehicle and search don't overwrite each other
   if(vehicleClauses && searchClauses){
-    const combined = 'and(or(' + vehicleClauses.join(',') + '),or(' + searchClauses.join(',') + '))';
-    console.log('[BSD] Combined filter (first 300 chars):', combined.substring(0, 300));
-    query = query.or(combined);
+    console.log('[BSD] Search-first filter (vehicle via badge only)');
+    query = query.or(searchClauses.join(','));
   } else if(vehicleClauses){
-    console.log('[BSD] Vehicle-only filter + universal');
-    const universalClause = 'and(fitment_years.eq.{},fitment_engines.eq.{})';
-    const vehicleOR = vehicleClauses.join(',');
-    query = query.or(vehicleOR + ',' + universalClause);
+    console.log('[BSD] Vehicle-only filter (strict, no universals)');
+    query = query.or(vehicleClauses.join(','));
   } else if(searchClauses){
     console.log('[BSD] Search-only filter');
     query = query.or(searchClauses.join(','));
