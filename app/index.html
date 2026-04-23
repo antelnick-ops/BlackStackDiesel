@@ -530,8 +530,8 @@ const DB = {
     "3500":{y:[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"2010-2012":["6.7L Cummins ISB"],"2013-2018":["6.7L Cummins ISB 385"],"2019-2026":["6.7L Cummins HO 420"]}}
   },
   Ford:{
-    "F-250":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1994-1997":["7.3L IDI Turbo Diesel"],"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},
-    "F-350":{y:[1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1994-1997":["7.3L IDI Turbo Diesel"],"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},
+    "F-250":{y:[1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1988-1992":["7.3L IDI"],"1993-1993":["7.3L IDI","7.3L IDI Turbo Diesel"],"1994-1997":["7.3L Power Stroke"],"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},
+    "F-350":{y:[1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1988-1992":["7.3L IDI"],"1993-1993":["7.3L IDI","7.3L IDI Turbo Diesel"],"1994-1997":["7.3L Power Stroke"],"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},
     "F-450":{y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},
     "F-550":{y:[1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],e:{"1999-2003":["7.3L Power Stroke"],"2003-2007":["6.0L Power Stroke"],"2008-2010":["6.4L Power Stroke"],"2011-2016":["6.7L Power Stroke"],"2017-2019":["6.7L Power Stroke Gen2"],"2020-2026":["6.7L Power Stroke Gen3"]}},
     "Excursion":{y:[2000,2001,2002,2003,2004,2005],e:{"2000-2003":["7.3L Power Stroke"],"2003-2005":["6.0L Power Stroke"]}}
@@ -1171,29 +1171,24 @@ async function queryProducts(filters, page, pageSize){
     .not('status', 'in', '("archived","discontinued","draft")')
     .range(from, to);
 
+  let vehicleClauses = null;
   if(V.make && V.engine){
     const universalList = UNIVERSAL_CATEGORIES.map(c => '"' + c + '"').join(',');
-    // Extract engine keywords for text matching (e.g. "7.3L Power Stroke" -> ["7.3L", "Power", "Stroke"])
     const engineWords = V.engine.match(/\d+\.\d+L?|[A-Z][a-z]+(?:\s[A-Z][a-z]+)*/g) || [];
-    const engineFilters = [];
+    vehicleClauses = [];
     engineWords.forEach(w => {
       const safe = w.replace(/[%_]/g, '\\$&');
-      engineFilters.push('fitment_text.ilike.%' + safe + '%');
-      engineFilters.push('product_name.ilike.%' + safe + '%');
-      engineFilters.push('description.ilike.%' + safe + '%');
+      vehicleClauses.push('fitment_text.ilike.%' + safe + '%');
+      vehicleClauses.push('product_name.ilike.%' + safe + '%');
+      vehicleClauses.push('description.ilike.%' + safe + '%');
     });
-    // Also match on model and year
     const modelSafe = String(V.model).replace(/[%_]/g, '\\$&');
     const yearStr = String(V.year);
-    engineFilters.push('fitment_text.ilike.%' + modelSafe + '%');
-    engineFilters.push('product_name.ilike.%' + modelSafe + '%');
-    engineFilters.push('fitment_years.cs.{' + yearStr + '}');
-    engineFilters.push('fitment_engines.cs.{"' + V.engine + '"}');
-    // Plus universal categories (fluids, tools, apparel)
-    engineFilters.push('category.in.(' + universalList + ')');
-    const vehicleFilter = engineFilters.join(',');
-    console.log('[BSD] Vehicle filter built (first 200 chars):', vehicleFilter.substring(0, 200));
-    query = query.or(vehicleFilter);
+    vehicleClauses.push('fitment_text.ilike.%' + modelSafe + '%');
+    vehicleClauses.push('product_name.ilike.%' + modelSafe + '%');
+    vehicleClauses.push('fitment_years.cs.{' + yearStr + '}');
+    vehicleClauses.push('fitment_engines.cs.{"' + V.engine + '"}');
+    vehicleClauses.push('category.in.(' + universalList + ')');
   }
 
   if(filters.category && filters.category !== 'all'){
@@ -1210,9 +1205,27 @@ async function queryProducts(filters, page, pageSize){
   else if(filters.priceRange === '$500\u2013$1K') query = query.gte('price', 500).lte('price', 1000);
   else if(filters.priceRange === '$1K+') query = query.gte('price', 1000);
 
+  let searchClauses = null;
   if(filters.search && filters.search.length >= 2){
     const q = '%' + filters.search + '%';
-    query = query.or('product_name.ilike.' + q + ',brand.ilike.' + q + ',fitment_text.ilike.' + q);
+    searchClauses = [
+      'product_name.ilike.' + q,
+      'brand.ilike.' + q,
+      'fitment_text.ilike.' + q
+    ];
+  }
+
+  // Apply combined or-filter so vehicle and search don't overwrite each other
+  if(vehicleClauses && searchClauses){
+    const combined = 'and(or(' + vehicleClauses.join(',') + '),or(' + searchClauses.join(',') + '))';
+    console.log('[BSD] Combined filter (first 300 chars):', combined.substring(0, 300));
+    query = query.or(combined);
+  } else if(vehicleClauses){
+    console.log('[BSD] Vehicle-only filter');
+    query = query.or(vehicleClauses.join(','));
+  } else if(searchClauses){
+    console.log('[BSD] Search-only filter');
+    query = query.or(searchClauses.join(','));
   }
 
   if(filters.sort === 'Low \u2192 High') query = query.order('price', { ascending: true });
@@ -1230,29 +1243,24 @@ async function queryTotalCount(filters){
     .eq('is_visible', true)
     .not('status', 'in', '("archived","discontinued","draft")');
 
+  let vehicleClauses = null;
   if(V.make && V.engine){
     const universalList = UNIVERSAL_CATEGORIES.map(c => '"' + c + '"').join(',');
-    // Extract engine keywords for text matching (e.g. "7.3L Power Stroke" -> ["7.3L", "Power", "Stroke"])
     const engineWords = V.engine.match(/\d+\.\d+L?|[A-Z][a-z]+(?:\s[A-Z][a-z]+)*/g) || [];
-    const engineFilters = [];
+    vehicleClauses = [];
     engineWords.forEach(w => {
       const safe = w.replace(/[%_]/g, '\\$&');
-      engineFilters.push('fitment_text.ilike.%' + safe + '%');
-      engineFilters.push('product_name.ilike.%' + safe + '%');
-      engineFilters.push('description.ilike.%' + safe + '%');
+      vehicleClauses.push('fitment_text.ilike.%' + safe + '%');
+      vehicleClauses.push('product_name.ilike.%' + safe + '%');
+      vehicleClauses.push('description.ilike.%' + safe + '%');
     });
-    // Also match on model and year
     const modelSafe = String(V.model).replace(/[%_]/g, '\\$&');
     const yearStr = String(V.year);
-    engineFilters.push('fitment_text.ilike.%' + modelSafe + '%');
-    engineFilters.push('product_name.ilike.%' + modelSafe + '%');
-    engineFilters.push('fitment_years.cs.{' + yearStr + '}');
-    engineFilters.push('fitment_engines.cs.{"' + V.engine + '"}');
-    // Plus universal categories (fluids, tools, apparel)
-    engineFilters.push('category.in.(' + universalList + ')');
-    const vehicleFilter = engineFilters.join(',');
-    console.log('[BSD] Vehicle filter built (first 200 chars):', vehicleFilter.substring(0, 200));
-    query = query.or(vehicleFilter);
+    vehicleClauses.push('fitment_text.ilike.%' + modelSafe + '%');
+    vehicleClauses.push('product_name.ilike.%' + modelSafe + '%');
+    vehicleClauses.push('fitment_years.cs.{' + yearStr + '}');
+    vehicleClauses.push('fitment_engines.cs.{"' + V.engine + '"}');
+    vehicleClauses.push('category.in.(' + universalList + ')');
   }
   if(filters.category && filters.category !== 'all'){
     query = query.eq('category', filters.category);
@@ -1268,9 +1276,27 @@ async function queryTotalCount(filters){
   else if(filters.priceRange === '$500\u2013$1K') query = query.gte('price', 500).lte('price', 1000);
   else if(filters.priceRange === '$1K+') query = query.gte('price', 1000);
 
+  let searchClauses = null;
   if(filters.search && filters.search.length >= 2){
     const q = '%' + filters.search + '%';
-    query = query.or('product_name.ilike.' + q + ',brand.ilike.' + q + ',fitment_text.ilike.' + q);
+    searchClauses = [
+      'product_name.ilike.' + q,
+      'brand.ilike.' + q,
+      'fitment_text.ilike.' + q
+    ];
+  }
+
+  // Apply combined or-filter so vehicle and search don't overwrite each other
+  if(vehicleClauses && searchClauses){
+    const combined = 'and(or(' + vehicleClauses.join(',') + '),or(' + searchClauses.join(',') + '))';
+    console.log('[BSD] Combined filter (first 300 chars):', combined.substring(0, 300));
+    query = query.or(combined);
+  } else if(vehicleClauses){
+    console.log('[BSD] Vehicle-only filter');
+    query = query.or(vehicleClauses.join(','));
+  } else if(searchClauses){
+    console.log('[BSD] Search-only filter');
+    query = query.or(searchClauses.join(','));
   }
 
   const { count, error } = await query;
