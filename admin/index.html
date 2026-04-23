@@ -343,7 +343,14 @@ function showDash(user){
 document.getElementById('loginScreen').classList.add('hidden');
 document.getElementById('dash').classList.remove('hidden');
 document.getElementById('userBox').textContent=user.email;
-window.scrollTo({top: 0, behavior: 'instant'});
+document.documentElement.scrollTop = 0;
+document.body.scrollTop = 0;
+window.scrollTo(0, 0);
+requestAnimationFrame(() => {
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+  window.scrollTo(0, 0);
+});
 refreshAll();
 }
 
