@@ -330,6 +330,7 @@ setMsg('Access denied');
 return;
 }
 
+setMsg('');
 showDash(r.data.user);
 }
 
@@ -342,6 +343,7 @@ function showDash(user){
 document.getElementById('loginScreen').classList.add('hidden');
 document.getElementById('dash').classList.remove('hidden');
 document.getElementById('userBox').textContent=user.email;
+window.scrollTo({top: 0, behavior: 'instant'});
 refreshAll();
 }
 
@@ -428,7 +430,7 @@ rows.innerHTML+=`
 <td>${v.business_name||''}</td>
 <td>${v.contact_name||''}</td>
 <td>${v.email||''}</td>
-<td>${Math.round((v.commission_rate||0.12)*100)}%</td>
+<td>${v.commission_rate != null ? Math.round(v.commission_rate * 100) + '%' : '—'}</td>
 </tr>`;
 });
 }
@@ -445,18 +447,37 @@ let prodPage = 0;
 const PROD_PER_PAGE = 50;
 
 async function loadProducts(){
-  document.getElementById('prodRows').innerHTML = '<tr><td colspan="9" class="empty">Loading products...</td></tr>';
+  document.getElementById('prodRows').innerHTML = '<tr><td colspan="9" class="empty">Loading all products...</td></tr>';
 
-  const r = await sb.from('products_admin').select('*').limit(5000);
+  const PAGE_SIZE = 1000;
+  let allData = [];
+  let from = 0;
 
-  if(r.error){
-    console.error('Products query error:', r.error);
+  while(true){
+    const r = await sb.from('products_admin')
+      .select('*')
+      .range(from, from + PAGE_SIZE - 1);
+
+    if(r.error){
+      console.error('Products query error:', r.error);
+      document.getElementById('prodRows').innerHTML =
+        '<tr><td colspan="9" style="color:#fca5a5">Error: ' + r.error.message + '</td></tr>';
+      return;
+    }
+
+    if(!r.data || r.data.length === 0) break;
+
+    allData = allData.concat(r.data);
+    from += PAGE_SIZE;
+
     document.getElementById('prodRows').innerHTML =
-      '<tr><td colspan="9" style="color:#fca5a5">Error: ' + r.error.message + '</td></tr>';
-    return;
+      '<tr><td colspan="9" class="empty">Loaded ' + allData.length.toLocaleString() + ' products...</td></tr>';
+
+    if(r.data.length < PAGE_SIZE) break;
+    if(allData.length >= 50000) break;
   }
 
-  allProducts = r.data || [];
+  allProducts = allData;
 
   const active = allProducts.filter(p => p.status === 'active');
   const stocking = active.filter(p => p.is_stocking_item === true);
