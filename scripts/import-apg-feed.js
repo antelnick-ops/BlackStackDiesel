@@ -15,6 +15,12 @@ const FEED_PATH = path.join(process.cwd(), 'tmp', 'premier_data_feed_master.csv'
 const IMPORT_LIMIT = 0;   // 0 = no limit
 const DRY_RUN = true;     // set false to actually write to Supabase
 
+// SKUs with known-bad images in Premier's feed (force null).
+// When you find more, add the SKU here.
+const IMAGE_BLACKLIST = new Set([
+  'BDD1045297',  // Premier has BMW image for BD Diesel S366SXE Dodge Cummins turbo
+]);
+
 // =====================================================================
 // THE FILTER
 // =====================================================================
@@ -178,8 +184,9 @@ function matchesAnyPattern(text, patterns) {
   return patterns.some(p => p.test(text));
 }
 
-function rewriteImageUrl(url) {
+function rewriteImageUrl(url, sku) {
   if (!url) return null;
+  if (sku && IMAGE_BLACKLIST.has(sku)) return null;
   return url.replace(
     'https://dealer.premierwd.com/ManagedResources/Images/ProductImages',
     'https://images.black-stack-diesel.com'
@@ -336,7 +343,7 @@ function mapRow(row) {
     fitment_engines: fitment.engines,
     fitment_years: fitment.years,
     description,
-    image_url: rewriteImageUrl(clean(row['ImageURL'])),
+    image_url: rewriteImageUrl(clean(row['ImageURL']), sku),
     weight_lbs: weight,
     source: 'distributor',
     source_ref: sku,
