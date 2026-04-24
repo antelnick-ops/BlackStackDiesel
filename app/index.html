@@ -1386,6 +1386,7 @@ async function queryProducts(filters, page, pageSize){
   let query = sb.from('products')
     .select('*')
     .eq('is_visible', true)
+    .eq('has_margin', true)
     .not('status', 'in', '("archived","discontinued","draft")')
     .range(from, to);
 
@@ -1466,6 +1467,7 @@ async function queryTotalCount(filters){
   let query = sb.from('products')
     .select('*', { count: 'exact', head: true })
     .eq('is_visible', true)
+    .eq('has_margin', true)
     .not('status', 'in', '("archived","discontinued","draft")');
 
   let vehicleClauses = null;
@@ -1785,10 +1787,19 @@ async function openProductDetail(productId){
 
   var p = PDM_PRODUCT_CACHE[productId];
   if(!p){
-    var result = await sb.from('products').select('*').eq('id', productId).single();
+    var result = await sb.from('products')
+      .select('*')
+      .eq('id', productId)
+      .eq('has_margin', true)
+      .single();
     if(result.error){
       console.error('[BSD] Product detail load error:', result.error.message);
-      bodyEl.innerHTML = '<div style="padding:40px;text-align:center;color:var(--red)">Could not load product.</div>';
+      var fallback = await sb.from('products').select('id').eq('id', productId).single();
+      if(fallback.data){
+        bodyEl.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">This product is temporarily unavailable. Please browse similar items in the same category.</div>';
+      } else {
+        bodyEl.innerHTML = '<div style="padding:40px;text-align:center;color:var(--red)">Could not load product. Please try again.</div>';
+      }
       return;
     }
     p = result.data;
