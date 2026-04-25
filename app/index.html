@@ -270,6 +270,12 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 .modal-panel{background:var(--c2);border:1px solid var(--glb);border-radius:14px;padding:22px 20px;position:relative;max-height:80vh;overflow-y:auto;width:100%}
 .modal-close{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--t2);font-size:22px;cursor:pointer;line-height:1;padding:4px 8px}
 .modal-close:hover{color:var(--t1)}
+.banner-paused{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:8px;padding:10px 12px;margin:0 0 12px 0;background:rgba(255,107,44,.12);color:#FF6B2C;border:1px solid rgba(255,107,44,.25);border-radius:10px;font-size:11px;font-weight:600;line-height:1.35}
+.banner-paused-text{flex:1}
+.banner-paused-x{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:none;border:none;color:#FF6B2C;cursor:pointer;opacity:.7;font-size:14px;line-height:1;padding:0;font-family:inherit;flex-shrink:0;transition:opacity .15s,background .15s}
+.banner-paused-x:hover,.banner-paused-x:active{opacity:1;background:rgba(255,107,44,.1)}
+.btn-disabled{background:var(--c4)!important;color:var(--t2)!important;cursor:pointer}
+.btn-disabled:hover{background:var(--c4)!important}
 .toggle{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0}
 .toggle input{opacity:0;width:0;height:0}
 .toggle .slider{position:absolute;inset:0;background:var(--c4);border-radius:24px;cursor:pointer;transition:.2s var(--ease)}
@@ -433,6 +439,10 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
     </div>
 
     <div class="scr" id="s-mkt">
+      <div id="checkoutPausedBanner" class="banner-paused" style="display:none">
+        <span class="banner-paused-text">🔧 Pricing system update in progress — checkout temporarily paused. Browse freely!</span>
+        <button type="button" class="banner-paused-x" aria-label="Dismiss" onclick="dismissCheckoutBanner()">&times;</button>
+      </div>
       <div class="mk-top">
         <h2>Marketplace</h2>
         <div class="cbtn gs" onclick="toggleCart()">
@@ -540,7 +550,7 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
         <div class="cd-t">Your Cart</div>
         <div id="cartItems" class="cart-list"></div>
         <div class="cd-tot"><span>Total</span><strong class="mono" id="cartTotal">$0</strong></div>
-        <button class="btn-g" id="checkoutBtn" onclick="doCheckout()">Checkout</button>
+        <button class="btn-g btn-disabled" id="checkoutBtn" onclick="doCheckout()">Checkout Paused — See Cart</button>
       </div>
     </div>
 
@@ -641,6 +651,11 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 </div>
 
 <script>
+// Set to true to re-enable checkout. When false, the cart still works but
+// the "Checkout" button shows the paused-checkout modal instead of calling
+// /api/create-checkout. Pair flips with a sw.js cache bump.
+const CHECKOUT_ENABLED = false;
+
 const sb = supabase.createClient(
   'https://jfjbilfsiebifzddveof.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamJpbGZzaWViaWZ6ZGR2ZW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2OTg4ODUsImV4cCI6MjA4NzI3NDg4NX0.bbTQ0l4HsHoKUzoKACBvbXJ0TbnUM5tltK4YLKyuMr8'
@@ -1313,9 +1328,24 @@ function escapeHtml(v){
   return String(v || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
+function showCheckoutPausedModal(){
+  showModal('Checkout Temporarily Unavailable', ''
+    + '<div style="padding:8px 0;">'
+    + '<p style="color:#ccc;line-height:1.6;margin-bottom:14px;">We\'re updating our pricing and inventory systems with our distributor and have temporarily paused new orders.</p>'
+    + '<p style="color:#ccc;line-height:1.6;margin-bottom:14px;">Your cart will be saved — please check back soon. Expected to reopen within the next few days.</p>'
+    + '<p style="color:#ccc;line-height:1.6;margin-bottom:18px;">Questions? Email <a href="mailto:help@black-stack-diesel.com" style="color:#FF6B2C;">help@black-stack-diesel.com</a></p>'
+    + '<button onclick="closeAppModal()" class="btn-g" style="width:100%">Got it</button>'
+    + '</div>');
+}
+
 async function doCheckout(){
   if(cart.length === 0){
     alert('Your cart is empty.');
+    return;
+  }
+
+  if(!CHECKOUT_ENABLED){
+    showCheckoutPausedModal();
     return;
   }
 
@@ -2200,10 +2230,31 @@ async function onFilterChange(){
   updateLoadMoreButton();
 }
 
+function dismissCheckoutBanner(){
+  localStorage.setItem('bsd_checkout_banner_dismissed', '1');
+  var el = document.getElementById('checkoutPausedBanner');
+  if(el) el.style.display = 'none';
+}
+
+function initCheckoutBanner(){
+  var el = document.getElementById('checkoutPausedBanner');
+  if(!el) return;
+  if(CHECKOUT_ENABLED){
+    el.style.display = 'none';
+    return;
+  }
+  if(localStorage.getItem('bsd_checkout_banner_dismissed') === '1'){
+    el.style.display = 'none';
+    return;
+  }
+  el.style.display = 'flex';
+}
+
 uProg(1);
 initYrs();
 renderCart();
 checkSession();
+initCheckoutBanner();
 
 document.getElementById('authPass').addEventListener('keydown', e => {
   if(e.key === 'Enter') handleAuth();
