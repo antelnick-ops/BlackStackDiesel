@@ -11,6 +11,7 @@
 <link rel="manifest" href="/app/manifest.json">
 <link rel="apple-touch-icon" href="/app/icon-192.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="/shared/shipping.js"></script>
 <title>Black Stack Diesel — Cummins, Duramax, Power Stroke Parts</title>
 <meta name="description" content="Diesel parts marketplace for Cummins, Duramax, and Power Stroke trucks. Real fitment by year, make, model, and engine.">
 <meta property="og:title" content="Black Stack Diesel — Cummins, Duramax, Power Stroke Parts">
@@ -211,6 +212,15 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 .cart-subtotals{margin-top:14px;padding-top:12px;border-top:1px solid var(--glb)}
 .cart-subtotal-row{display:flex;justify-content:space-between;padding:6px 0;font-size:11px;color:var(--t2)}
 .cart-subtotal-row.cart-subtotal-grand{padding-top:8px;margin-top:4px;border-top:1px solid var(--glb);font-size:13px;font-weight:600;color:var(--t1)}
+.cart-ship-nudge{padding:6px 0;font-size:11px;color:#FF6B2C;font-weight:600}
+.cart-ship-oversize-note{padding:4px 0 6px;font-size:10px;color:var(--t2);font-style:italic;line-height:1.4}
+.cart-ship-quote-banner{margin-top:8px;padding:10px 12px;background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.3);border-radius:6px;color:#dc2626;font-size:11px;line-height:1.4;font-weight:500}
+.pc-quote-badge{display:inline-block;padding:3px 8px;background:rgba(255,107,44,.12);color:#FF6B2C;border:1px solid rgba(255,107,44,.3);border-radius:6px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:6px 0}
+.pc-quote-btn{width:100%;padding:8px;background:rgba(255,107,44,.1);color:#FF6B2C;border:1px solid #FF6B2C;border-radius:8px;font-weight:600;font-size:11px;cursor:pointer;font-family:inherit}
+.pc-quote-btn:hover{background:rgba(255,107,44,.2)}
+.pdm-quote-notice{padding:10px 12px;margin:12px 0;background:rgba(255,107,44,.08);border:1px solid rgba(255,107,44,.3);border-radius:8px;color:var(--t1);font-size:12px;line-height:1.5}
+.pdm-quote-btn{width:100%;padding:12px;background:#FF6B2C;color:#fff;border:none;border-radius:10px;font-weight:600;font-size:13px;cursor:pointer;font-family:inherit}
+.pdm-quote-btn:hover{background:#e55a1f}
 .cart-core-disclosure{margin-top:10px;padding:8px 10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);border-radius:6px;font-size:9px;line-height:1.4;color:var(--gold)}
 .cd-tot{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-top:1px solid var(--glb);margin:14px 0}
 .cd-tot span{font-size:12px;color:var(--t2);font-weight:500}
@@ -694,6 +704,39 @@ src="https://www.facebook.com/tr?id=2798529717175247&ev=PageView&noscript=1"
         <button class="modal-close" onclick="closeAppModal()">×</button>
         <h2 id="appModalTitle" style="margin:0 0 12px;font-size:16px;padding-right:24px"></h2>
         <div id="appModalBody" style="font-size:13px;color:var(--t2)"></div>
+      </div>
+    </div>
+
+    <div id="freightQuoteOverlay" class="modal-overlay" onclick="if(event.target===this)closeFreightQuoteModal()">
+      <div class="modal-panel" style="max-width:500px">
+        <button class="modal-close" onclick="closeFreightQuoteModal()">×</button>
+        <div id="freightQuoteForm">
+          <h2 style="margin:0 0 6px;font-size:16px;padding-right:24px">Request Freight Quote</h2>
+          <p style="font-size:11px;color:var(--t2);margin:0 0 14px;line-height:1.5">We'll get back to you within 48 business hours with shipping cost and lead time.</p>
+          <div id="freightQuoteProductInfo" style="font-size:11px;color:var(--t2);padding:8px 10px;background:var(--gl);border-radius:6px;margin-bottom:14px"></div>
+          <input type="hidden" id="fqProductId">
+          <input type="hidden" id="fqProductSku">
+          <input type="hidden" id="fqProductName">
+          <label style="font-size:11px;color:var(--t2);font-weight:500">Name *</label>
+          <input id="fqName" type="text" style="width:100%;padding:9px 10px;margin:4px 0 10px;border-radius:8px;background:var(--c4);border:1px solid var(--glb);color:var(--t1);font-size:13px;font-family:inherit">
+          <label style="font-size:11px;color:var(--t2);font-weight:500">Email *</label>
+          <input id="fqEmail" type="email" style="width:100%;padding:9px 10px;margin:4px 0 10px;border-radius:8px;background:var(--c4);border:1px solid var(--glb);color:var(--t1);font-size:13px;font-family:inherit">
+          <label style="font-size:11px;color:var(--t2);font-weight:500">Phone <span style="opacity:.6">(optional)</span></label>
+          <input id="fqPhone" type="tel" style="width:100%;padding:9px 10px;margin:4px 0 10px;border-radius:8px;background:var(--c4);border:1px solid var(--glb);color:var(--t1);font-size:13px;font-family:inherit">
+          <label style="font-size:11px;color:var(--t2);font-weight:500">Notes <span style="opacity:.6">(optional)</span></label>
+          <textarea id="fqNotes" rows="3" placeholder="Anything we should know? Delivery address type (residential/business), liftgate needed, deadline, etc." style="width:100%;padding:9px 10px;margin:4px 0 12px;border-radius:8px;background:var(--c4);border:1px solid var(--glb);color:var(--t1);font-size:13px;font-family:inherit;resize:vertical"></textarea>
+          <div id="fqStatus" style="font-size:11px;min-height:14px;margin-bottom:8px"></div>
+          <div style="display:flex;gap:8px">
+            <button onclick="closeFreightQuoteModal()" class="btn-gh" style="flex:1">Cancel</button>
+            <button onclick="submitFreightQuote()" id="fqSubmit" class="btn-g" style="flex:2;background:#FF6B2C;color:#fff">Request Quote</button>
+          </div>
+        </div>
+        <div id="freightQuoteSuccess" style="display:none">
+          <h2 style="margin:0 0 12px;font-size:16px">✅ Quote requested</h2>
+          <p style="font-size:13px;color:var(--t2);line-height:1.6;margin:0 0 8px">Reference: <strong style="color:var(--t1);font-family:monospace" id="fqReference"></strong></p>
+          <p style="font-size:13px;color:var(--t2);line-height:1.6;margin:0 0 16px">We'll email you at <strong style="color:var(--t1)" id="fqEmailEcho"></strong> within 48 business hours.</p>
+          <button onclick="closeFreightQuoteModal()" class="btn-g" style="width:100%">Close</button>
+        </div>
       </div>
     </div>
 
@@ -1312,13 +1355,14 @@ function getCatEmoji(cat){
 function saveCart(){
   localStorage.setItem('bsd_cart', JSON.stringify(cart));
 }
-function addToCart(id,name,brand,price,emoji,core_charge,has_core){
+function addToCart(id,name,brand,price,emoji,core_charge,has_core,weight_lbs){
   const existing = cart.find(c => c.id === id);
   if(existing) existing.qty++;
   else cart.push({
     id, name, brand, price, emoji, qty:1,
     core_charge: Number(core_charge || 0),
-    has_core: Boolean(has_core && Number(core_charge || 0) > 0)
+    has_core: Boolean(has_core && Number(core_charge || 0) > 0),
+    weight_lbs: Number(weight_lbs) || 0
   });
   saveCart();
   renderCart();
@@ -1340,25 +1384,48 @@ function renderCart(){
   const totalEl = document.getElementById('cartTotal');
   const statItems = document.getElementById('statItems');
 
-  let itemsTotal = 0;
-  let coresTotal = 0;
-  let count = 0;
+  let itemsTotal = 0, coresTotal = 0, count = 0, maxWeight = 0;
 
   cart.forEach(c => {
     const price = Number(c.price) || 0;
     const coreCharge = Number(c.core_charge) || 0;
+    // weight_lbs missing/null/0 -> normal weight (assumed not oversize).
+    // Stale localStorage carts predate weight tracking; re-adding picks up real value.
+    const w = Number(c.weight_lbs) || 0;
     itemsTotal += price * c.qty;
     if(c.has_core && coreCharge > 0){
       coresTotal += coreCharge * c.qty;
     }
+    if(w > maxWeight) maxWeight = w;
     count += c.qty;
   });
 
-  const grandTotal = itemsTotal + coresTotal;
+  // Single source of truth: shared/shipping.js (window.BSDShipping)
+  const ship = window.BSDShipping.calculateShipping({ itemsSubtotal: itemsTotal, maxWeight: maxWeight });
+  const grandTotal = itemsTotal + coresTotal + ship.amount;
+
+  // Three-state checkout button: paused | quote-required | OK.
+  // CHECKOUT_ENABLED takes precedence (system-wide pause overrides cart state).
+  const ckBtn = document.getElementById('checkoutBtn');
+  if(ckBtn){
+    if(!CHECKOUT_ENABLED){
+      ckBtn.textContent = 'Checkout Paused — See Cart';
+      ckBtn.classList.add('btn-disabled');
+      ckBtn.disabled = false;
+    } else if(ship.requiresQuote){
+      ckBtn.textContent = 'Cannot Proceed — Quote Required';
+      ckBtn.classList.add('btn-disabled');
+      ckBtn.disabled = true;
+    } else {
+      ckBtn.textContent = 'Checkout';
+      ckBtn.classList.remove('btn-disabled');
+      ckBtn.disabled = false;
+    }
+  }
 
   if(badge) badge.textContent = count;
   if(statItems) statItems.textContent = count;
-  if(totalEl) totalEl.textContent = '$' + grandTotal.toLocaleString();
+  if(totalEl) totalEl.textContent = '$' + grandTotal.toFixed(2);
 
   if(!itemsEl) return;
 
@@ -1380,20 +1447,38 @@ function renderCart(){
       '<div class="cart-copy">' +
         '<h4>' + escapeHtml(c.name) + '</h4>' +
         '<p>' + escapeHtml(c.brand || '') + (c.qty > 1 ? ' × ' + c.qty : '') + '</p>' +
-        (hasCore ? '<p class="cart-core-note">+ $' + (coreCharge * c.qty).toLocaleString() + ' refundable core</p>' : '') +
+        (hasCore ? '<p class="cart-core-note">+ $' + (coreCharge * c.qty).toFixed(2) + ' refundable core</p>' : '') +
       '</div>' +
       '<div class="cart-right">' +
-        '<div class="cart-price">$' + lineTotal.toLocaleString() + '</div>' +
+        '<div class="cart-price">$' + lineTotal.toFixed(2) + '</div>' +
         '<button class="cart-remove" onclick="removeFromCart(\'' + c.id + '\')">Remove</button>' +
       '</div>' +
     '</div>';
   }).join('');
 
+  // Subtotals block — always renders when cart non-empty.
   let subtotalsHtml = '<div class="cart-subtotals">';
+  subtotalsHtml += '<div class="cart-subtotal-row"><span>Items subtotal</span><span>$' + itemsTotal.toFixed(2) + '</span></div>';
   if(coresTotal > 0){
-    subtotalsHtml += '<div class="cart-subtotal-row"><span>Items subtotal</span><span>$' + itemsTotal.toLocaleString() + '</span></div>';
-    subtotalsHtml += '<div class="cart-subtotal-row"><span>Core deposits (refundable)</span><span>$' + coresTotal.toLocaleString() + '</span></div>';
-    subtotalsHtml += '<div class="cart-subtotal-row cart-subtotal-grand"><span>Total</span><span>$' + grandTotal.toLocaleString() + '</span></div>';
+    subtotalsHtml += '<div class="cart-subtotal-row"><span>Core deposits (refundable)</span><span>$' + coresTotal.toFixed(2) + '</span></div>';
+  }
+  let shipDisplay;
+  if(ship.requiresQuote) shipDisplay = 'Quote Required';
+  else if(ship.amount === 0) shipDisplay = 'FREE';
+  else shipDisplay = '$' + ship.amount.toFixed(2);
+  subtotalsHtml += '<div class="cart-subtotal-row"><span>Shipping</span><span>' + shipDisplay + '</span></div>';
+  if(ship.requiresQuote){
+    subtotalsHtml += '<div class="cart-ship-quote-banner">⚠️ One or more items in your cart require a freight quote. Remove these items or request a quote to proceed to checkout.</div>';
+  } else if(ship.tier === 'heavy_ground' || ship.tier === 'ltl_light' || ship.tier === 'ltl_mid'){
+    subtotalsHtml += '<div class="cart-ship-oversize-note">Includes oversize freight surcharge.</div>';
+  } else if(ship.tier === 'small_order' && itemsTotal > 0){
+    const need = window.BSDShipping.amountToFreeShipping({ itemsSubtotal: itemsTotal, maxWeight: maxWeight });
+    if(need !== null && need > 0){
+      subtotalsHtml += '<div class="cart-ship-nudge">Add $' + need.toFixed(2) + ' for free shipping</div>';
+    }
+  }
+  subtotalsHtml += '<div class="cart-subtotal-row cart-subtotal-grand"><span>Total</span><span>$' + grandTotal.toFixed(2) + '</span></div>';
+  if(coresTotal > 0){
     subtotalsHtml += '<div class="cart-core-disclosure">ⓘ Core deposits are refunded when you return the old part within 30 days</div>';
   }
   subtotalsHtml += '</div>';
@@ -1868,12 +1953,16 @@ function appendProductCards(products){
       '<div class="pc-bd">' +
         '<div class="pc-br">' + escapeHtml(p.brand || '') + '</div>' +
         '<h4>' + escapeHtml(p.product_name || 'Product') + '</h4>' +
-        '<div class="pc-bt">' +
-          '<div class="pc-pr mono">$' + price.toLocaleString() + '</div>' +
-          '<button class="ab" onclick="event.stopPropagation();addToCart(\'' + escapeHtml(String(p.id)) + '\',\'' + String(p.product_name || '').replace(/'/g,"\\'") + '\',\'' + String(p.brand || '').replace(/'/g,"\\'") + '\',' + price + ',\'' + emoji + '\',' + (Number(p.core_charge) || 0) + ',' + (p.has_core ? 'true' : 'false') + ')">' +
-            '<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
-          '</button>' +
-        '</div>' +
+        (Number(p.weight_lbs) > 1000
+          ? '<div class="pc-pr mono" style="margin-bottom:6px">$' + price.toLocaleString() + '</div>' +
+            '<div class="pc-quote-badge">⚠️ Freight Quote Required</div>' +
+            '<button class="pc-quote-btn" onclick="event.stopPropagation();openFreightQuoteModal(\'' + escapeHtml(String(p.id)) + '\',\'' + String(p.sku || '').replace(/'/g,"\\'") + '\',\'' + String(p.product_name || '').replace(/'/g,"\\'") + '\')">Request Freight Quote</button>'
+          : '<div class="pc-bt">' +
+              '<div class="pc-pr mono">$' + price.toLocaleString() + '</div>' +
+              '<button class="ab" onclick="event.stopPropagation();addToCart(\'' + escapeHtml(String(p.id)) + '\',\'' + String(p.product_name || '').replace(/'/g,"\\'") + '\',\'' + String(p.brand || '').replace(/'/g,"\\'") + '\',' + price + ',\'' + emoji + '\',' + (Number(p.core_charge) || 0) + ',' + (p.has_core ? 'true' : 'false') + ',' + (Number(p.weight_lbs) || 0) + ')">' +
+                '<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
+              '</button>' +
+            '</div>') +
         (p.has_core && p.core_charge > 0 ? '<div class="pc-core">+$' + Number(p.core_charge).toLocaleString() + ' core</div>' : '') +
       '</div>' +
     '</div>';
@@ -2206,14 +2295,17 @@ function renderProductDetail(p){
     specsHtml +
     fitmentHtml +
     descHtml +
-    '<div class="pdm-cta-row">' +
-      '<div class="pdm-qty">' +
-        '<button onclick="pdmQty(-1)">\u2212</button>' +
-        '<span id="pdmQtyVal">1</span>' +
-        '<button onclick="pdmQty(1)">+</button>' +
-      '</div>' +
-      '<button class="btn-g pdm-add" onclick="pdmAddToCart(\'' + escapeHtml(String(p.id)) + '\')">Add to Cart</button>' +
-    '</div>' +
+    (Number(p.weight_lbs) > 1000
+      ? '<div class="pdm-quote-notice">This item requires LTL freight shipping. Request a quote and we\'ll get back to you within 48 business hours.</div>' +
+        '<button class="pdm-quote-btn" onclick="openFreightQuoteModal(\'' + escapeHtml(String(p.id)) + '\',\'' + String(p.sku || '').replace(/'/g,"\\'") + '\',\'' + String(p.product_name || '').replace(/'/g,"\\'") + '\')">Request Freight Quote</button>'
+      : '<div class="pdm-cta-row">' +
+          '<div class="pdm-qty">' +
+            '<button onclick="pdmQty(-1)">\u2212</button>' +
+            '<span id="pdmQtyVal">1</span>' +
+            '<button onclick="pdmQty(1)">+</button>' +
+          '</div>' +
+          '<button class="btn-g pdm-add" onclick="pdmAddToCart(\'' + escapeHtml(String(p.id)) + '\')">Add to Cart</button>' +
+        '</div>') +
     '<div style="text-align:center;margin-top:16px"><button type="button" onclick="openFeedbackModal(\'' + escapeHtml(String(p.sku || p.id)) + '\')" style="background:none;border:none;color:var(--t3);font-size:10px;text-decoration:underline;cursor:pointer;padding:4px 8px">Report issue with this product</button></div>';
 }
 
@@ -2326,6 +2418,73 @@ async function submitFeedback(){
   setTimeout(closeFeedbackModal, 1500);
 }
 
+function openFreightQuoteModal(productId, productSku, productName){
+  document.getElementById('fqProductId').value = productId || '';
+  document.getElementById('fqProductSku').value = productSku || '';
+  document.getElementById('fqProductName').value = productName || '';
+  document.getElementById('freightQuoteProductInfo').innerHTML =
+    '<strong>' + escapeHtml(productName || 'Product') + '</strong><br>SKU: ' + escapeHtml(productSku || '');
+  document.getElementById('fqName').value = '';
+  document.getElementById('fqEmail').value = (typeof ACTIVE_USER !== 'undefined' && ACTIVE_USER) ? (ACTIVE_USER.email || '') : '';
+  document.getElementById('fqPhone').value = '';
+  document.getElementById('fqNotes').value = '';
+  document.getElementById('fqStatus').textContent = '';
+  document.getElementById('freightQuoteForm').style.display = '';
+  document.getElementById('freightQuoteSuccess').style.display = 'none';
+  document.getElementById('fqSubmit').disabled = false;
+  document.getElementById('fqSubmit').textContent = 'Request Quote';
+  document.getElementById('freightQuoteOverlay').classList.add('on');
+}
+
+function closeFreightQuoteModal(){
+  document.getElementById('freightQuoteOverlay').classList.remove('on');
+}
+
+async function submitFreightQuote(){
+  const name = document.getElementById('fqName').value.trim();
+  const email = document.getElementById('fqEmail').value.trim();
+  const phone = document.getElementById('fqPhone').value.trim();
+  const notes = document.getElementById('fqNotes').value.trim();
+  const productSku = document.getElementById('fqProductSku').value;
+  const productName = document.getElementById('fqProductName').value;
+  const statusEl = document.getElementById('fqStatus');
+  const submitBtn = document.getElementById('fqSubmit');
+
+  if(!name || !email || !productSku){
+    statusEl.textContent = 'Please provide name, email, and ensure a product is selected.';
+    statusEl.style.color = 'var(--red)';
+    return;
+  }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    statusEl.textContent = 'Please enter a valid email address.';
+    statusEl.style.color = 'var(--red)';
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Sending...';
+  statusEl.textContent = '';
+
+  try{
+    const resp = await fetch('/api/freight-quote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, phone, notes, productSku, productName })
+    });
+    const data = await resp.json();
+    if(!resp.ok) throw new Error(data.error || 'Server error');
+    document.getElementById('fqReference').textContent = data.reference || '(pending)';
+    document.getElementById('fqEmailEcho').textContent = email;
+    document.getElementById('freightQuoteForm').style.display = 'none';
+    document.getElementById('freightQuoteSuccess').style.display = '';
+  }catch(err){
+    statusEl.textContent = err.message || 'Could not submit quote. Please try again.';
+    statusEl.style.color = 'var(--red)';
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Request Quote';
+  }
+}
+
 function pdmAddToCart(productId){
   var p = PDM_PRODUCT_CACHE[productId];
   if(!p) return;
@@ -2333,8 +2492,9 @@ function pdmAddToCart(productId){
   var price = parseFloat(p.price) || 0;
   var coreCharge = parseFloat(p.core_charge) || 0;
   var hasCore = Boolean(p.has_core && coreCharge > 0);
+  var weightLbs = Number(p.weight_lbs) || 0;
   for(var i = 0; i < PDM_QTY; i++){
-    addToCart(String(p.id), p.product_name || '', p.brand || '', price, emoji, coreCharge, hasCore);
+    addToCart(String(p.id), p.product_name || '', p.brand || '', price, emoji, coreCharge, hasCore, weightLbs);
   }
   closeProductDetail();
 }

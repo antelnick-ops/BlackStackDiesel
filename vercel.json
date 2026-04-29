@@ -2,6 +2,12 @@
   "functions": {
     "api/webhook.js": {
       "maxDuration": 30
+    },
+    "api/create-checkout.js": {
+      "includeFiles": ["shared/shipping.js"]
+    },
+    "api/freight-quote.js": {
+      "includeFiles": ["shared/shipping.js"]
     }
   },
   "routes": [

@@ -1,5 +1,6 @@
 const Stripe = require('stripe');
 const { createClient } = require('@supabase/supabase-js');
+const { calculateShipping } = require('../shared/shipping.js');
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -27,7 +28,7 @@ module.exports = async (req, res) => {
   );
 
   try {
-    const { items, customer_email, customer_id, vehicle, shipping_method } = req.body;
+    const { items, customer_email, customer_id, vehicle } = req.body;
 
     if (!items || !Array.isArray(items) || !items.length) {
       return res.status(400).json({ error: 'No items in cart' });
@@ -50,7 +51,7 @@ module.exports = async (req, res) => {
         price,
         cost,
         image_url,
-        shipping_cost,
+        weight_lbs,
         status,
         stock_qty,
         core_charge,
@@ -88,7 +89,7 @@ module.exports = async (req, res) => {
         price: unitPrice,
         cost: Number(db.cost || 0),
         image_url: db.image_url || null,
-        shipping_cost: Number(db.shipping_cost || 0),
+        weight_lbs: Number(db.weight_lbs) || 0,
         core_charge: Number(db.core_charge || 0),
         has_core: Boolean(db.has_core),
         qty
@@ -147,30 +148,30 @@ module.exports = async (req, res) => {
       return sum + (item.has_core && item.core_charge > 0 ? item.core_charge * item.qty : 0);
     }, 0);
 
-    const shippingOptions = [
-      {
-        shipping_rate_data: {
-          type: 'fixed_amount',
-          fixed_amount: { amount: 0, currency: 'usd' },
-          display_name: 'Standard Shipping',
-          delivery_estimate: {
-            minimum: { unit: 'business_day', value: 5 },
-            maximum: { unit: 'business_day', value: 10 }
-          }
-        }
-      },
-      {
-        shipping_rate_data: {
-          type: 'fixed_amount',
-          fixed_amount: { amount: 1999, currency: 'usd' },
-          display_name: 'Express Shipping',
-          delivery_estimate: {
-            minimum: { unit: 'business_day', value: 2 },
-            maximum: { unit: 'business_day', value: 4 }
-          }
+    // Shipping calc — same source of truth as the cart drawer (shared/shipping.js).
+    // Computed from DATABASE prices/weights, not client values, to prevent tampering.
+    const itemsSubtotal = normalizedItems.reduce((sum, it) => sum + it.price * it.qty, 0);
+    const maxWeight = normalizedItems.reduce((m, it) => Math.max(m, it.weight_lbs || 0), 0);
+    const shipping = calculateShipping({ itemsSubtotal: itemsSubtotal, maxWeight: maxWeight });
+
+    // Defense in depth: refuse to create a Stripe session for quote-required carts.
+    if (shipping.requiresQuote) {
+      return res.status(400).json({
+        error: 'Cart contains items requiring a freight quote. Please request a quote instead of checking out.'
+      });
+    }
+
+    const shippingOptions = [{
+      shipping_rate_data: {
+        type: 'fixed_amount',
+        fixed_amount: { amount: Math.round(shipping.amount * 100), currency: 'usd' },
+        display_name: shipping.displayName,
+        delivery_estimate: {
+          minimum: { unit: 'business_day', value: 5 },
+          maximum: { unit: 'business_day', value: 10 }
         }
       }
-    ];
+    }];
 
     const origin =
       req.headers.origin ||
@@ -192,7 +193,6 @@ module.exports = async (req, res) => {
         customer_email: customer_email || '',
         vehicle: vehicle || '',
         source: 'bsd_app',
-        shipping_method: shipping_method || '',
         core_total: coreTotal.toFixed(2),
         has_cores: coreTotal > 0 ? 'true' : 'false'
       },
