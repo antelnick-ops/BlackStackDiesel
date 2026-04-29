@@ -11,7 +11,14 @@
 <link rel="manifest" href="/app/manifest.json">
 <link rel="apple-touch-icon" href="/app/icon-192.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<title>BlackStack Diesel</title>
+<title>Black Stack Diesel — Cummins, Duramax, Power Stroke Parts</title>
+<meta name="description" content="Diesel parts marketplace for Cummins, Duramax, and Power Stroke trucks. Real fitment by year, make, model, and engine.">
+<meta property="og:title" content="Black Stack Diesel — Cummins, Duramax, Power Stroke Parts">
+<meta property="og:description" content="Diesel parts marketplace for Cummins, Duramax, and Power Stroke trucks. Real fitment by year, make, model, and engine.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://black-stack-diesel.com/app/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://black-stack-diesel.com/app/">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -295,8 +302,33 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 .pdm-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:var(--gl);border:1px solid var(--glb);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10}
 .pdm-close svg{width:16px;height:16px;stroke:var(--t1);fill:none;stroke-width:2}
 .pdm-img{width:100%;height:280px;background:var(--c2);position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.pdm-img img{width:100%;height:100%;object-fit:cover}
+.pdm-img img{width:100%;height:100%;object-fit:cover;display:block}
 .pdm-img .emoji-lg{font-size:80px;opacity:.3}
+/* Multi-image carousel for ASAP-enriched products */
+.pdm-carousel{width:100%;height:100%;position:relative}
+.pdm-carousel-track{display:flex;height:100%;transition:transform .35s var(--ease)}
+.pdm-carousel-slide{min-width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--c2)}
+.pdm-carousel-slide img{width:100%;height:100%;object-fit:cover}
+.pdm-carousel-nav{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.1);color:var(--t1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;font-weight:600;z-index:2;backdrop-filter:blur(8px)}
+.pdm-carousel-nav:hover{background:rgba(0,0,0,.75)}
+.pdm-carousel-nav.prev{left:10px}
+.pdm-carousel-nav.next{right:10px}
+.pdm-carousel-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:2}
+.pdm-carousel-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.35);cursor:pointer;transition:background .2s}
+.pdm-carousel-dot.on{background:var(--gold)}
+/* Universal-fit badge styles (card + detail) */
+.pc-fit.pc-universal{background:rgba(96,165,250,.12);color:var(--blu);border:1px solid rgba(96,165,250,.25)}
+.pdm-fit-badge.pdm-fit-universal{background:rgba(96,165,250,.12);color:var(--blu);border:1px solid rgba(96,165,250,.25)}
+/* MAP price disclosure */
+.pdm-map-note{font-size:11px;color:var(--t3);margin-top:4px;letter-spacing:.3px}
+/* Structured fitment table */
+.pdm-fitment-rows{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.pdm-fitment-row{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--c2);border-radius:8px;font-size:11px;color:var(--t2);font-family:'DM Mono',monospace}
+.pdm-fitment-year{color:var(--gold);font-weight:600;min-width:84px}
+.pdm-fitment-vehicle{color:var(--t1);flex:1}
+.pdm-fitment-engine{color:var(--t3)}
+/* Screen reader only — used by SEO meta-content for crawlers and accessibility */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .pdm-body{padding:24px 24px 40px}
 .pdm-brand{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
 .pdm-name{font-size:22px;font-weight:800;letter-spacing:-.4px;line-height:1.25;margin-bottom:6px}
@@ -1173,6 +1205,30 @@ function cleanImageUrl(v){
   return s;
 }
 
+// Pick the best primary image for a product:
+// 1. ASAP image_urls[0] if populated (preferred — higher quality, more reliable)
+// 2. legacy image_url field
+// 3. legacy image / images aliases
+function getPrimaryImage(p){
+  if(Array.isArray(p.image_urls) && p.image_urls.length > 0){
+    return cleanImageUrl(p.image_urls[0]);
+  }
+  return cleanImageUrl(p.image_url || p.image || p.images || '');
+}
+
+// Get the full image array for a product (carousel use). Always returns an array.
+function getAllImages(p){
+  let imgs = [];
+  if(Array.isArray(p.image_urls)){
+    imgs = p.image_urls.map(cleanImageUrl).filter(Boolean);
+  }
+  if(imgs.length === 0){
+    const single = cleanImageUrl(p.image_url || p.image || p.images || '');
+    if(single) imgs = [single];
+  }
+  return imgs;
+}
+
 function getVehicleAliases(){
   if(!V.year || !V.make || !V.model || !V.engine) return [];
   let aliases = [String(V.year), V.make, V.model, V.engine];
@@ -1188,6 +1244,9 @@ function getVehicleAliases(){
 
 function scoreProductForVehicle(p){
   if(!V.year || !V.make || !V.model || !V.engine) return 0;
+
+  // Universal-fit products (from ASAP) fit any truck regardless of year/make/engine
+  if(p.is_universal === true) return 18;
 
   const userYear = parseInt(V.year, 10);
   const engineLower = V.engine.toLowerCase();
@@ -1760,9 +1819,10 @@ function appendProductCards(products){
   }
 
   products.forEach(function(p){
-    p.__img = cleanImageUrl(p.image_url || p.image || p.images || '');
+    p.__img = getPrimaryImage(p);
     p.__score = scoreProductForVehicle(p);
     p.__fit = p.__score >= 12;
+    p.__universal = p.is_universal === true;
     p.__unknown = p.__score === -1;
     p.__wrongFit = p.__score === -999;
   });
@@ -1786,7 +1846,9 @@ function appendProductCards(products){
     var price = parseFloat(p.price) || 0;
     var stg = (p.stage !== null && p.stage !== undefined) ? p.stage : '';
     var fit = '';
-    if(p.__fit){
+    if(p.__universal){
+      fit = '<div class="pc-fit pc-universal">\u2713 Universal Fit</div>';
+    } else if(p.__fit){
       fit = '<div class="pc-fit">\u2713 Fits</div>';
     } else if(p.__unknown){
       fit = '<div class="pc-fit pc-unknown">? Fit Unknown</div>';
@@ -1859,25 +1921,193 @@ async function openProductDetail(productId){
 
 function closeProductDetail(){
   document.getElementById('pdmOverlay').classList.remove('on');
+  // Reset SEO tags to default storefront state
+  document.title = 'Black Stack Diesel — Cummins, Duramax, Power Stroke Parts';
+  setMetaTag('description', 'Diesel parts marketplace for Cummins, Duramax, and Power Stroke trucks. Real fitment by year, make, model, and engine.');
+  var canon = document.querySelector('link[rel="canonical"]');
+  if(canon) canon.setAttribute('href', window.location.origin + '/app/');
+  // Remove product JSON-LD when modal closes (no longer relevant)
+  var jsonLd = document.getElementById('product-jsonld');
+  if(jsonLd) jsonLd.remove();
+}
+
+// Carousel state for product detail modal
+var PDM_CAROUSEL_IDX = 0;
+var PDM_CAROUSEL_LEN = 0;
+
+function pdmCarouselStep(delta){
+  if(PDM_CAROUSEL_LEN <= 1) return;
+  PDM_CAROUSEL_IDX = (PDM_CAROUSEL_IDX + delta + PDM_CAROUSEL_LEN) % PDM_CAROUSEL_LEN;
+  pdmRenderCarousel();
+}
+function pdmGotoSlide(i){
+  if(PDM_CAROUSEL_LEN <= 1 || i < 0 || i >= PDM_CAROUSEL_LEN) return;
+  PDM_CAROUSEL_IDX = i;
+  pdmRenderCarousel();
+}
+function pdmRenderCarousel(){
+  var track = document.getElementById('pdmCarouselTrack');
+  if(track) track.style.transform = 'translateX(-' + (PDM_CAROUSEL_IDX * 100) + '%)';
+  document.querySelectorAll('.pdm-carousel-dot').forEach(function(d, i){
+    if(i === PDM_CAROUSEL_IDX) d.classList.add('on'); else d.classList.remove('on');
+  });
+}
+
+// Update document <head> meta tags so each product has its own SEO surface.
+// Browsers + crawlers + social-share scrapers read these — when a product modal
+// is open, this gives that product distinct title/description/canonical/og tags
+// and injects a Product JSON-LD block that Google uses for rich snippets.
+function updateProductSeoTags(p, price){
+  try {
+    var brand = p.brand || 'Black Stack Diesel';
+    var name = p.product_name || 'Diesel part';
+    var fitYears = '';
+    if(Array.isArray(p.fitment_rows) && p.fitment_rows.length > 0){
+      var allYears = [];
+      var allVeh = new Set();
+      p.fitment_rows.forEach(function(r){
+        if(r.year_start) allYears.push(parseInt(r.year_start, 10));
+        if(r.year_end) allYears.push(parseInt(r.year_end, 10));
+        if(r.make && r.model) allVeh.add(r.make + ' ' + r.model);
+      });
+      allYears = allYears.filter(function(y){ return !isNaN(y); });
+      if(allYears.length > 0){
+        var minY = Math.min.apply(null, allYears);
+        var maxY = Math.max.apply(null, allYears);
+        fitYears = (minY === maxY ? minY : (minY + '-' + maxY));
+      }
+      var vehList = Array.from(allVeh).slice(0, 3).join(', ');
+      if(vehList) fitYears = fitYears ? (fitYears + ' ' + vehList) : vehList;
+    } else if(Array.isArray(p.fitment_engines) && p.fitment_engines.length > 0){
+      fitYears = p.fitment_engines.slice(0, 2).join(', ');
+    }
+
+    var titleParts = [name, brand];
+    if(fitYears) titleParts.splice(1, 0, fitYears);
+    titleParts.push('Black Stack Diesel');
+    var newTitle = titleParts.filter(Boolean).join(' | ').slice(0, 160);
+
+    var descBase = (p.short_description || p.description || '').slice(0, 120);
+    var descFit = fitYears ? ' Fits ' + fitYears + '.' : '';
+    var newDesc = (brand + ' ' + name + '. ' + descBase + descFit + ' Available at Black Stack Diesel.').slice(0, 300).trim();
+
+    document.title = newTitle;
+    setMetaTag('description', newDesc);
+    setMetaTag('og:title', newTitle, 'property');
+    setMetaTag('og:description', newDesc, 'property');
+    setMetaTag('og:type', 'product', 'property');
+    var primaryImg = getPrimaryImage(p);
+    if(primaryImg) setMetaTag('og:image', primaryImg, 'property');
+    setMetaTag('twitter:card', 'summary_large_image');
+    setMetaTag('twitter:title', newTitle);
+    setMetaTag('twitter:description', newDesc);
+    if(primaryImg) setMetaTag('twitter:image', primaryImg);
+
+    // Canonical URL — uses the deep-link query param so each product has a unique URL
+    var canonicalUrl = window.location.origin + '/app/?product=' + encodeURIComponent(p.id);
+    setLinkTag('canonical', canonicalUrl);
+
+    // JSON-LD Product schema for Google rich snippets
+    var jsonLd = {
+      '@context': 'https://schema.org/',
+      '@type': 'Product',
+      'name': name,
+      'sku': p.sku || p.id,
+      'brand': { '@type': 'Brand', 'name': brand },
+      'description': descBase || (brand + ' ' + name)
+    };
+    if(p.mfg_sku) jsonLd.mpn = p.mfg_sku;
+    if(p.upc) jsonLd.gtin12 = p.upc;
+    if(primaryImg) jsonLd.image = primaryImg;
+    if(price > 0){
+      jsonLd.offers = {
+        '@type': 'Offer',
+        'url': canonicalUrl,
+        'priceCurrency': 'USD',
+        'price': price.toFixed(2),
+        'availability': (p.stock_qty && p.stock_qty > 0) ? 'https://schema.org/InStock' : 'https://schema.org/InStock',
+        'itemCondition': 'https://schema.org/NewCondition'
+      };
+    }
+    setJsonLd('product-jsonld', jsonLd);
+  } catch(err){
+    console.warn('[BSD] SEO tag update failed:', err);
+  }
+}
+function setMetaTag(name, content, attr){
+  var key = attr || 'name';
+  var el = document.querySelector('meta[' + key + '="' + name + '"]');
+  if(!el){
+    el = document.createElement('meta');
+    el.setAttribute(key, name);
+    document.head.appendChild(el);
+  }
+  el.setAttribute('content', content);
+}
+function setLinkTag(rel, href){
+  var el = document.querySelector('link[rel="' + rel + '"]');
+  if(!el){
+    el = document.createElement('link');
+    el.setAttribute('rel', rel);
+    document.head.appendChild(el);
+  }
+  el.setAttribute('href', href);
+}
+function setJsonLd(id, data){
+  var el = document.getElementById(id);
+  if(!el){
+    el = document.createElement('script');
+    el.id = id;
+    el.type = 'application/ld+json';
+    document.head.appendChild(el);
+  }
+  el.textContent = JSON.stringify(data);
 }
 
 function renderProductDetail(p){
   var imgEl = document.getElementById('pdmImg');
   var bodyEl = document.getElementById('pdmBody');
-  var img = cleanImageUrl(p.image_url || p.image || p.images || '');
+  var imgs = getAllImages(p);
   var emoji = getCatEmoji(p.category);
   var price = parseFloat(p.price) || 0;
   var compareAt = parseFloat(p.compare_at_price) || 0;
+  var mapPrice = parseFloat(p.map_price) || 0;
+  var isUniversal = p.is_universal === true;
   var score = scoreProductForVehicle(p);
   var fits = score >= 12;
   var hasVehicle = V.make && V.engine;
 
-  imgEl.innerHTML = img
-    ? '<img src="' + escapeHtml(img) + '" alt="' + escapeHtml(p.product_name || '') + '" onerror="this.style.display=\'none\';this.parentNode.innerHTML=\'<span class=emoji-lg>' + emoji + '</span>\'">'
-    : '<span class="emoji-lg">' + emoji + '</span>';
+  // Render image area: carousel if multi-image, single image if one, emoji fallback if none
+  if(imgs.length > 1){
+    var slidesHtml = imgs.map(function(u, i){
+      return '<div class="pdm-carousel-slide" data-idx="' + i + '">' +
+             '<img src="' + escapeHtml(u) + '" alt="' + escapeHtml(p.product_name || '') + ' image ' + (i+1) + '" onerror="this.style.display=\'none\'">' +
+             '</div>';
+    }).join('');
+    var dotsHtml = imgs.map(function(_, i){
+      return '<span class="pdm-carousel-dot' + (i === 0 ? ' on' : '') + '" data-idx="' + i + '" onclick="pdmGotoSlide(' + i + ')"></span>';
+    }).join('');
+    imgEl.innerHTML =
+      '<div class="pdm-carousel" id="pdmCarousel">' +
+        '<div class="pdm-carousel-track" id="pdmCarouselTrack">' + slidesHtml + '</div>' +
+        '<button class="pdm-carousel-nav prev" onclick="pdmCarouselStep(-1)" aria-label="Previous image">\u2039</button>' +
+        '<button class="pdm-carousel-nav next" onclick="pdmCarouselStep(1)" aria-label="Next image">\u203a</button>' +
+        '<div class="pdm-carousel-dots">' + dotsHtml + '</div>' +
+      '</div>';
+    PDM_CAROUSEL_IDX = 0;
+    PDM_CAROUSEL_LEN = imgs.length;
+  } else if(imgs.length === 1){
+    imgEl.innerHTML = '<img src="' + escapeHtml(imgs[0]) + '" alt="' + escapeHtml(p.product_name || '') + '" onerror="this.style.display=\'none\';this.parentNode.innerHTML=\'<span class=emoji-lg>' + emoji + '</span>\'">';
+    PDM_CAROUSEL_LEN = 0;
+  } else {
+    imgEl.innerHTML = '<span class="emoji-lg">' + emoji + '</span>';
+    PDM_CAROUSEL_LEN = 0;
+  }
 
   var fitBadge = '';
-  if(hasVehicle){
+  if(isUniversal){
+    fitBadge = '<div class="pdm-fit-badge pdm-fit-universal">\u2713 Universal Fit (any truck)</div>';
+  } else if(hasVehicle){
     if(score === -999){
       fitBadge = '<div class="pdm-fit-badge pdm-fit-no">\u00d7 Does NOT fit your truck</div>';
     } else if(score === -1){
@@ -1917,7 +2147,24 @@ function renderProductDetail(p){
   }
 
   var fitmentHtml = '';
-  if(p.fitment_text){
+  // Prefer structured ASAP fitment_rows (year_start/year_end/make/model/sub_model)
+  var fRows = Array.isArray(p.fitment_rows) ? p.fitment_rows : [];
+  if(fRows.length > 0){
+    var rowsHtml = fRows.slice(0, 30).map(function(r){
+      var yr = r.year_start && r.year_end
+        ? (r.year_start === r.year_end ? r.year_start : (r.year_start + '-' + r.year_end))
+        : (r.year_start || r.year_end || '');
+      var veh = [r.make, r.model, r.sub_model].filter(Boolean).join(' ');
+      var eng = r.engine || '';
+      return '<div class="pdm-fitment-row">' +
+        '<span class="pdm-fitment-year">' + escapeHtml(String(yr)) + '</span>' +
+        '<span class="pdm-fitment-vehicle">' + escapeHtml(veh) + '</span>' +
+        (eng ? '<span class="pdm-fitment-engine">' + escapeHtml(eng) + '</span>' : '') +
+        '</div>';
+    }).join('');
+    var moreNote = fRows.length > 30 ? '<div style="font-size:10px;color:var(--t3);margin-top:8px">+ ' + (fRows.length - 30) + ' more vehicles</div>' : '';
+    fitmentHtml = '<div class="pdm-section"><h3>Vehicle Fitment (' + fRows.length + ')</h3><div class="pdm-fitment-rows">' + rowsHtml + '</div>' + moreNote + '</div>';
+  } else if(p.fitment_text){
     fitmentHtml = '<div class="pdm-section"><h3>Fitment</h3><div class="pdm-fitment">' +
       escapeHtml(p.fitment_text) + '</div></div>';
   }
@@ -1933,6 +2180,12 @@ function renderProductDetail(p){
     priceHtml = '<div><span class="pdm-price">$' + price.toLocaleString() +
       '</span><span class="pdm-compare">$' + compareAt.toLocaleString() + '</span></div>';
   }
+  // Append MAP price note when ASAP set MAP and our price is at or below it
+  if(mapPrice > 0 && price <= mapPrice){
+    priceHtml += '<div class="pdm-map-note">MAP-compliant pricing</div>';
+  }
+  // Update document head meta tags for this product (SEO + social sharing)
+  updateProductSeoTags(p, price);
 
   var coreHtml = '';
   if(p.has_core && p.core_charge > 0){
