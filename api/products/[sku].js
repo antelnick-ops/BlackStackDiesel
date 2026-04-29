@@ -26,6 +26,27 @@ function escapeJsonInScript(json) {
   return json.replace(/</g, '\\u003c');
 }
 
+// Strip the structured metadata block that BSD's `description` field
+// often appends after the free-text portion (Brand:/MFG/UPC/Category/
+// Subcategory/Type). Cuts at the first newline OR the first metadata
+// label, whichever comes earlier. Collapses whitespace.
+function cleanDescription(rawDesc) {
+  if (!rawDesc) return '';
+  const cutoff = rawDesc.search(/\n|\bBrand:|\bMFG\b|\bUPC:|\bCategory:|\bSubcategory:|\bType:/i);
+  return (cutoff > 0 ? rawDesc.slice(0, cutoff) : rawDesc)
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Hard char limit but cut at the previous space when one is within the
+// last 50 chars. Avoids "Available at Black Stac" mid-word truncation.
+function truncateAtWordBoundary(text, maxLen) {
+  if (!text || text.length <= maxLen) return text || '';
+  const window = text.slice(0, maxLen);
+  const lastSpace = window.lastIndexOf(' ');
+  return (lastSpace > maxLen - 50 ? window.slice(0, lastSpace) : window).trim() + '…';
+}
+
 export default async function handler(req) {
   const url = new URL(req.url);
   const parts = url.pathname.split('/').filter(Boolean);
@@ -75,7 +96,7 @@ function productShell(p) {
   const brand = String(p.brand || '').slice(0, 60);
   const sku = String(p.sku);
   const price = parseFloat(p.price) || 0;
-  const desc = String(p.short_description || p.description || '').slice(0, 200);
+  const cleanedDesc = cleanDescription(p.short_description || p.description);
   const image = (p.image_url && /^https:\/\/images\.black-stack-diesel\.com\//.test(p.image_url))
     ? p.image_url
     : DEFAULT_OG_IMAGE;
@@ -87,8 +108,10 @@ function productShell(p) {
   titleParts.push('Black Stack Diesel');
   const title = titleParts.join(' | ').slice(0, 160);
 
-  const description = ((brand ? brand + ' ' : '') + name + '. ' +
-    (desc ? desc + ' ' : '') + 'Available at Black Stack Diesel.').slice(0, 300).trim();
+  const baseDescription = (brand ? brand + ' ' : '') + name + '.' +
+    (cleanedDesc ? ' ' + cleanedDesc : '') +
+    ' Available at Black Stack Diesel.';
+  const description = truncateAtWordBoundary(baseDescription, 300);
 
   const jsonLd = {
     '@context': 'https://schema.org/',
@@ -96,7 +119,7 @@ function productShell(p) {
     name: name,
     sku: sku,
     brand: { '@type': 'Brand', name: brand || 'Black Stack Diesel' },
-    description: desc || (brand + ' ' + name),
+    description: truncateAtWordBoundary(cleanedDesc || (brand + ' ' + name), 500),
     image: image
   };
   if (p.mfg_sku) jsonLd.mpn = p.mfg_sku;
