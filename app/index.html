@@ -1754,10 +1754,14 @@ async function rebuildProductCategoryDropdowns(){
   try{
     const [catRes, brandRes] = await Promise.all([
       sb.rpc('get_distinct_product_categories'),
-      sb.rpc('get_distinct_product_brands')
+      sb.rpc('get_distinct_product_brands_filtered', { p_category: null })
     ]);
     CACHED_CATEGORIES = (catRes.data || []).filter(Boolean);
-    CACHED_BRANDS = (brandRes.data || []).filter(Boolean);
+    // New RPC returns rows shaped as { brand: '...' }; old RPC returned plain strings.
+    // Defensive map handles both shapes in case of mid-deploy state.
+    CACHED_BRANDS = (brandRes.data || [])
+      .map(function(r){ return typeof r === 'string' ? r : r && r.brand; })
+      .filter(Boolean);
   }catch(e){
     console.error('[BSD] Failed to load categories/brands:', e);
     CACHED_CATEGORIES = CACHED_CATEGORIES || [];
@@ -1773,6 +1777,9 @@ async function rebuildProductCategoryDropdowns(){
       c.onclick = function(){
         document.querySelectorAll('.ct').forEach(function(x){ x.classList.remove('on'); });
         c.classList.add('on');
+        // Rebuild brand dropdown for the new category context.
+        // Fire-and-forget — onFilterChange shouldn't wait for it.
+        rebuildBrandDropdown(c.textContent.trim());
         onFilterChange();
       };
     });
@@ -1789,6 +1796,58 @@ async function rebuildProductCategoryDropdowns(){
     var bhtml = '<option>Brand: All</option>';
     CACHED_BRANDS.forEach(function(b){ bhtml += '<option>' + escapeHtml(b) + '</option>'; });
     brandDd.innerHTML = bhtml;
+  }
+}
+
+// Rebuild the brand dropdown to reflect the brands available within a
+// given category. Called whenever the category chip selection changes.
+// Fire-and-forget — does NOT block onFilterChange. On RPC error, keeps
+// the existing dropdown intact so transient failures don't blank the UI.
+async function rebuildBrandDropdown(category){
+  const brandDd = document.getElementById('brandDd');
+  if(!brandDd) return;
+
+  // Normalize: 'All' (chip text) / 'all' / falsy -> null (unfiltered).
+  const p_category = (!category || category === 'All' || category === 'all')
+    ? null
+    : category;
+  const prevValue = brandDd.value;
+
+  let brands;
+  try {
+    const { data, error } = await sb.rpc(
+      'get_distinct_product_brands_filtered',
+      { p_category: p_category }
+    );
+    if(error) throw error;
+    brands = (data || [])
+      .map(function(r){ return typeof r === 'string' ? r : r && r.brand; })
+      .filter(Boolean);
+  } catch(err) {
+    console.warn('[BSD] Filtered brand rebuild failed; keeping existing dropdown:', err && err.message);
+    return;
+  }
+
+  let html = '<option>Brand: All</option>';
+  brands.forEach(function(b){ html += '<option>' + escapeHtml(b) + '</option>'; });
+  brandDd.innerHTML = html;
+
+  // Preserve previous selection if still present in the new list.
+  let brandWasReset = false;
+  if(prevValue && prevValue !== 'Brand: All' && brands.indexOf(prevValue) !== -1){
+    brandDd.value = prevValue;
+  } else {
+    brandDd.value = 'Brand: All';
+    if(prevValue && prevValue !== 'Brand: All'){
+      // The user's brand selection was dropped because it's not in
+      // the new category. Re-fire onFilterChange to clear the brand
+      // filter from the active query so the grid matches the dropdown.
+      brandWasReset = true;
+    }
+  }
+
+  if(brandWasReset && typeof onFilterChange === 'function'){
+    onFilterChange();
   }
 }
 
