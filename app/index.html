@@ -2040,18 +2040,26 @@ function closeProductDetail(){
   // Remove product JSON-LD when modal closes (no longer relevant)
   var jsonLd = document.getElementById('product-jsonld');
   if(jsonLd) jsonLd.remove();
-  // Clear deep-link param while preserving any other params (fbclid, UTM, etc.)
+  // Navigate back to /app/ from either /products/<sku> or /app/?p=<sku>.
+  // Preserves fbclid, UTM, and any other query params.
   var params = new URLSearchParams(location.search);
-  if(params.has('p')){
-    params.delete('p');
+  var hadLegacyParam = params.has('p');
+  if(hadLegacyParam) params.delete('p');
+  var onProductPath = /^\/products\//.test(location.pathname);
+  if(onProductPath || hadLegacyParam){
     var qs = params.toString();
-    history.replaceState(null, '', location.pathname + (qs ? '?' + qs : ''));
+    history.replaceState(null, '', '/app/' + (qs ? '?' + qs : ''));
   }
 }
 
 async function pdmShare(sku, productName, brand){
   if(!sku){ showShareToast('Cannot share — SKU missing'); return; }
-  var shareUrl = location.origin + '/app/?p=' + encodeURIComponent(sku);
+  // Use canonical /products/<sku> path when SKU is URL-safe; fall back to
+  // legacy ?p= for the 0.17% of SKUs containing /, +, etc.
+  var safe = !/[/?#&%+\s]/.test(sku);
+  var shareUrl = safe
+    ? location.origin + '/products/' + encodeURIComponent(sku)
+    : location.origin + '/app/?p=' + encodeURIComponent(sku);
   var shareTitle = productName || 'Black Stack Diesel';
   var shareText = brand
     ? productName + ' — ' + brand + ' | Black Stack Diesel'
@@ -2103,8 +2111,14 @@ function showShareToast(message){
 // Deep-link handler — opens the matching product when ?p=<sku> is present.
 // Runs once on initial page load. Silent failure on unknown SKU (per spec).
 async function handleDeepLink(){
-  var params = new URLSearchParams(location.search);
-  var sku = params.get('p');
+  // Path-based first: /products/<sku>
+  var pathMatch = location.pathname.match(/^\/products\/([^\/]+)\/?$/);
+  var sku = pathMatch ? decodeURIComponent(pathMatch[1]) : null;
+  // Legacy fallback: /app/?p=<sku>
+  if(!sku){
+    var params = new URLSearchParams(location.search);
+    sku = params.get('p');
+  }
   if(!sku) return;
   try {
     var result = await sb.from('products')
@@ -2191,10 +2205,18 @@ function updateProductSeoTags(p, price){
 
     document.title = newTitle;
     if(p.sku){
-      // Preserve existing query params (fbclid, UTM, etc.) — never overwrite the search string.
+      // Preserve existing query params (fbclid, UTM, etc.) on path change.
       var params = new URLSearchParams(location.search);
-      params.set('p', p.sku);
-      history.replaceState({ productSku: p.sku }, document.title, '?' + params.toString());
+      params.delete('p'); // remove legacy param if present
+      var qs = params.toString();
+      if(!/[/?#&%+\s]/.test(p.sku)){
+        // Safe SKU — write canonical /products/<sku> path.
+        history.replaceState({ productSku: p.sku }, document.title, '/products/' + encodeURIComponent(p.sku) + (qs ? '?' + qs : ''));
+      } else {
+        // Unsafe SKU — keep on /app/ with legacy ?p= format.
+        params.set('p', p.sku);
+        history.replaceState({ productSku: p.sku }, document.title, '/app/?' + params.toString());
+      }
     }
     setMetaTag('description', newDesc);
     setMetaTag('og:title', newTitle, 'property');
@@ -2207,8 +2229,12 @@ function updateProductSeoTags(p, price){
     setMetaTag('twitter:description', newDesc);
     if(primaryImg) setMetaTag('twitter:image', primaryImg);
 
-    // Canonical URL — uses the deep-link query param so each product has a unique URL
-    var canonicalUrl = window.location.origin + '/app/?product=' + encodeURIComponent(p.id);
+    // Canonical URL — points at the server-rendered SEO page when SKU is safe,
+    // legacy /app/?p= otherwise. Matches the share button + replaceState behavior.
+    var canonicalSku = (p.sku && !/[/?#&%+\s]/.test(p.sku)) ? p.sku : null;
+    var canonicalUrl = canonicalSku
+      ? window.location.origin + '/products/' + encodeURIComponent(canonicalSku)
+      : window.location.origin + '/app/?p=' + encodeURIComponent(p.sku || p.id);
     setLinkTag('canonical', canonicalUrl);
 
     // JSON-LD Product schema for Google rich snippets
