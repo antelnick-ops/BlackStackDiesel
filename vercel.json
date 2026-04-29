@@ -4,10 +4,10 @@
       "maxDuration": 30
     },
     "api/create-checkout.js": {
-      "includeFiles": ["shared/shipping.js"]
+      "includeFiles": "shared/**"
     },
     "api/freight-quote.js": {
-      "includeFiles": ["shared/shipping.js"]
+      "includeFiles": "shared/**"
     }
   },
   "routes": [
