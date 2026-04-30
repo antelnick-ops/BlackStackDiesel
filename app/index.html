@@ -861,6 +861,19 @@ async function saveVehicleToAccount(){
     if(updated && updated.data && updated.data.user){
       ACTIVE_USER = updated.data.user;
     }
+    try{
+      const { error: profErr } = await sb.from('profiles').upsert({
+        id: ACTIVE_USER.id,
+        vehicle_year: V.year ? String(V.year) : null,
+        vehicle_make: V.make || null,
+        vehicle_model: V.model || null,
+        vehicle_engine: V.engine || null,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'id' });
+      if(profErr) console.warn('[BSD] profiles vehicle upsert failed:', profErr.message);
+    }catch(profErr){
+      console.warn('[BSD] profiles vehicle upsert exception:', profErr);
+    }
   }catch(e){
     console.error('Vehicle save failed', e);
   }
@@ -875,6 +888,19 @@ async function clearVehicleFromAccount(){
     const updated = await sb.auth.updateUser({ data: md });
     if(updated && updated.data && updated.data.user){
       ACTIVE_USER = updated.data.user;
+    }
+    try{
+      const { error: profErr } = await sb.from('profiles').upsert({
+        id: ACTIVE_USER.id,
+        vehicle_year: null,
+        vehicle_make: null,
+        vehicle_model: null,
+        vehicle_engine: null,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'id' });
+      if(profErr) console.warn('[BSD] profiles vehicle clear failed:', profErr.message);
+    }catch(profErr){
+      console.warn('[BSD] profiles vehicle clear exception:', profErr);
     }
   }catch(e){
     console.error('Vehicle clear failed', e);
