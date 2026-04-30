@@ -1252,6 +1252,8 @@ function vehBack(){
 
 async function confirmV(){
   await saveVehicleToAccount();
+  // Vehicle changed — rebuild brand dropdown to reflect new fitment context.
+  if(typeof rebuildBrandDropdown === 'function') rebuildBrandDropdown();
   applyVehicle();
   go('mkt');
   showNav();
@@ -1261,6 +1263,8 @@ async function confirmV(){
 async function resetVeh(){
   V.year = V.make = V.model = V.engine = null;
   await clearVehicleFromAccount();
+  // Vehicle cleared — rebuild brand dropdown without vehicle filter.
+  if(typeof rebuildBrandDropdown === 'function') rebuildBrandDropdown();
   uProg(1);
   initYrs();
   hG('make'); hG('model'); hG('engine'); hPrev();
@@ -1806,6 +1810,8 @@ async function rebuildProductCategoryDropdowns(){
         // Rebuild brand dropdown for the new category context.
         // Fire-and-forget — onFilterChange shouldn't wait for it.
         rebuildBrandDropdown(c.textContent.trim());
+        // Skip the redundant rebuild that onFilterChange would otherwise do.
+        PRODUCT_STATE.skipBrandRebuild = true;
         onFilterChange();
       };
     });
@@ -1825,25 +1831,57 @@ async function rebuildProductCategoryDropdowns(){
   }
 }
 
-// Rebuild the brand dropdown to reflect the brands available within a
-// given category. Called whenever the category chip selection changes.
-// Fire-and-forget — does NOT block onFilterChange. On RPC error, keeps
-// the existing dropdown intact so transient failures don't blank the UI.
-async function rebuildBrandDropdown(category){
+// Rebuild the brand dropdown to reflect brands actually available given
+// ALL current filter dimensions (category + search + stages + vehicle).
+// Called whenever any of those filters change. Fire-and-forget —
+// does NOT block onFilterChange. On RPC error, keeps the existing
+// dropdown intact so transient failures don't blank the UI.
+//
+// Optionally accepts categoryOverride for the category-chip-click case
+// where the .ct.on class hasn't updated yet at call time.
+async function rebuildBrandDropdown(categoryOverride){
   const brandDd = document.getElementById('brandDd');
   if(!brandDd) return;
 
-  // Normalize: 'All' (chip text) / 'all' / falsy -> null (unfiltered).
-  const p_category = (!category || category === 'All' || category === 'all')
-    ? null
-    : category;
+  // Snapshot current filter state — read fresh from DOM, not cached.
+  const filters = (typeof buildQueryFilters === 'function')
+    ? buildQueryFilters()
+    : { category: 'all', stages: [], search: '' };
+
+  // Category: use override if provided, else from the filters snapshot.
+  let cat = (categoryOverride !== undefined) ? categoryOverride : filters.category;
+  if(cat === 'All' || cat === 'all' || !cat) cat = null;
+
+  // Search: only meaningful searches (>=2 chars) — match the grid query.
+  const search = (filters.search && filters.search.length >= 2) ? filters.search : null;
+
+  // Stages: empty array -> null.
+  const stages = (Array.isArray(filters.stages) && filters.stages.length > 0)
+    ? filters.stages.map(function(s){ return parseInt(s, 10); }).filter(function(n){ return !isNaN(n); })
+    : null;
+
+  // Vehicle: only pass if user has set a complete truck profile.
+  const hasVehicle = !!(V.year && V.make && V.model && V.engine);
+  const p_vehicle_year   = hasVehicle ? parseInt(V.year, 10) : null;
+  const p_vehicle_make   = hasVehicle ? V.make : null;
+  const p_vehicle_model  = hasVehicle ? V.model : null;
+  const p_vehicle_engine = hasVehicle ? V.engine : null;
+
   const prevValue = brandDd.value;
 
   let brands;
   try {
     const { data, error } = await sb.rpc(
-      'get_distinct_product_brands_filtered',
-      { p_category: p_category }
+      'get_distinct_product_brands_filtered_v2',
+      {
+        p_category: cat,
+        p_search: search,
+        p_stages: stages,
+        p_vehicle_year: p_vehicle_year,
+        p_vehicle_make: p_vehicle_make,
+        p_vehicle_model: p_vehicle_model,
+        p_vehicle_engine: p_vehicle_engine
+      }
     );
     if(error) throw error;
     brands = (data || [])
@@ -1865,14 +1903,15 @@ async function rebuildBrandDropdown(category){
   } else {
     brandDd.value = 'Brand: All';
     if(prevValue && prevValue !== 'Brand: All'){
-      // The user's brand selection was dropped because it's not in
-      // the new category. Re-fire onFilterChange to clear the brand
-      // filter from the active query so the grid matches the dropdown.
+      // The previous brand is no longer available with current filters.
+      // Re-fire onFilterChange to clear the brand filter from the active
+      // query so grid stays consistent with dropdown.
       brandWasReset = true;
     }
   }
 
   if(brandWasReset && typeof onFilterChange === 'function'){
+    PRODUCT_STATE.skipBrandRebuild = true;  // avoid loop
     onFilterChange();
   }
 }
@@ -2863,6 +2902,16 @@ async function onFilterChange(){
   PRODUCT_STATE.page = 1;
   PRODUCT_STATE.displayedProducts = [];
   PRODUCT_STATE.hasMore = true;
+
+  // Fire-and-forget: rebuild the brand dropdown to reflect brands
+  // actually available given current filters. Does NOT await — the
+  // product grid query runs in parallel. The skipBrandRebuild flag is
+  // set by callers (category chip click, brand-was-reset reload) to
+  // avoid redundant or recursive rebuilds.
+  if(typeof rebuildBrandDropdown === 'function' && !PRODUCT_STATE.skipBrandRebuild){
+    rebuildBrandDropdown();
+  }
+  PRODUCT_STATE.skipBrandRebuild = false;
 
   var grid = document.getElementById('pgrid');
   if(grid) grid.innerHTML = '<div class="feed-empty" style="color:var(--t3)">Loading\u2026</div>';
