@@ -40,6 +40,13 @@ const PREFIX_RULES = {
   '72434':  { brand_pattern: 'Diamond Eye MFG',                 prefix: 'DEM', strip_length: 3 },
   '83748':  { brand_pattern: 'Icon Suspension (Randys)',        prefix: 'IVD', strip_length: 3 },
   '115148': { brand_pattern: 'Choate Performance Engineering',  prefix: 'CHT', strip_length: 3 },
+  // NOTE: ASAP returns Zone SKUs WITH the ZON prefix already (e.g.,
+  // ZONF111F-FQMS). After backfill ran, mfg_sku was reverted to equal
+  // sku via SQL UPDATE so matching works. Until we refactor the
+  // normalizer to handle per-brand APG-prefix-included SKUs, running
+  // --backfill-only on this brand is a no-op (will re-strip and break
+  // matching again).
+  '130082': { brand_pattern: 'Zone Offroad (Fox)',              prefix: 'ZON', strip_length: 3 },
   '130085': { brand_pattern: 'BDS Suspension (Fox)',            prefix: 'BDS', strip_length: 3 },
   '130108': { brand_pattern: 'FOX',                             prefix: 'FOX', strip_length: 3 },
   '175491': { brand_pattern: 'BD Diesel',                       prefix: 'BDD', strip_length: 3 },
