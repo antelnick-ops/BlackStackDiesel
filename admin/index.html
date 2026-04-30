@@ -1713,19 +1713,35 @@ async function loadProducts() {
   const kpisEl = document.getElementById('productsKpis');
   const tableEl = document.getElementById('productTable');
   try {
-    const [all, stocking, withWholesale] = await Promise.all([
+    const [all, stocking, withWholesale, marginRpc] = await Promise.all([
       sb.from('products').select('id', { count: 'exact', head: true }).eq('vendor_id', APG_VENDOR_ID).eq('status', 'active'),
       sb.from('products').select('id', { count: 'exact', head: true }).eq('vendor_id', APG_VENDOR_ID).eq('status', 'active').eq('is_stocking_item', true),
-      sb.from('products').select('id', { count: 'exact', head: true }).eq('vendor_id', APG_VENDOR_ID).eq('status', 'active').not('wholesale_price', 'is', null)
+      sb.from('products').select('id', { count: 'exact', head: true }).eq('vendor_id', APG_VENDOR_ID).eq('status', 'active').not('wholesale_price', 'is', null),
+      sb.rpc('get_admin_margin_stats')
     ]);
 
     const pct = all.count > 0 ? (withWholesale.count / all.count) * 100 : 0;
+    // RPC returns a single-row result-set when SELECT...
+    const margin = (marginRpc.data && marginRpc.data[0]) || {};
+    const avgMarginPct = margin.avg_margin_pct;
+    const avgMarginDollars = margin.avg_margin_dollars;
+    const totalMarginPotential = margin.total_margin_potential;
 
     kpisEl.innerHTML = `
       <div class="kpi accent">
         <div class="label">Active Products</div>
         <div class="value">${fmt.int(all.count)}</div>
         <div class="meta">APG catalog</div>
+      </div>
+      <div class="kpi net">
+        <div class="label">Avg Margin %</div>
+        <div class="value">${avgMarginPct != null ? fmt.pct(avgMarginPct) : '—'}</div>
+        <div class="meta">Across products with wholesale data</div>
+      </div>
+      <div class="kpi net">
+        <div class="label">Avg Margin $</div>
+        <div class="value">${avgMarginDollars != null ? fmt.usd(avgMarginDollars) : '—'}</div>
+        <div class="meta">Per-product margin in dollars</div>
       </div>
       <div class="kpi">
         <div class="label">Stocking Items</div>
