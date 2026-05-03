@@ -1,10 +1,20 @@
 import "@supabase/functions-js/edge-runtime.d.ts"
 import Anthropic from "npm:@anthropic-ai/sdk@0.32.1"
+import { createClient } from "npm:@supabase/supabase-js@2"
 
 const anthropic = new Anthropic({
   apiKey: Deno.env.get("ANTHROPIC_API_KEY")
 
 })
+
+const supabase = createClient(
+  Deno.env.get("SUPABASE_URL") ?? "",
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+)
+
+const MODEL = "claude-sonnet-4-6"
+const MAX_MESSAGES = 50
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 const SYSTEM_PROMPT = `You are the BlackStackDiesel (BSD) parts counter assistant.
 
@@ -53,6 +63,18 @@ You're a parts counter, not a mechanic on the phone. For deep diagnostic stuff, 
 # Closing the response
 End naturally. No forced sign-offs, no "let me know if you have other questions" boilerplate, no emojis.`
 
+const CORS_HEADERS = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*",
+}
+
+function badRequest(message: string): Response {
+  return new Response(
+    JSON.stringify({ error: message }),
+    { status: 400, headers: CORS_HEADERS },
+  )
+}
+
 Deno.serve(async (req) => {
   // CORS preflight
   if (req.method === "OPTIONS") {
@@ -66,48 +88,83 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { message } = await req.json()
+    const { messages, session_id } = await req.json()
 
-    if (!message || typeof message !== "string") {
-      return new Response(
-        JSON.stringify({ error: "Missing or invalid 'message' field" }),
-        { status: 400, headers: { "Content-Type": "application/json" } },
-      )
+    if (!session_id || typeof session_id !== "string" || !UUID_REGEX.test(session_id)) {
+      return badRequest("Missing or invalid 'session_id' (must be a UUID)")
     }
 
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return badRequest("'messages' must be a non-empty array")
+    }
+
+    for (let i = 0; i < messages.length; i++) {
+      const m = messages[i]
+      if (!m || typeof m !== "object") {
+        return badRequest(`messages[${i}] must be an object`)
+      }
+      if (m.role !== "user" && m.role !== "assistant") {
+        return badRequest(`messages[${i}].role must be "user" or "assistant"`)
+      }
+      if (typeof m.content !== "string" || m.content.length === 0) {
+        return badRequest(`messages[${i}].content must be a non-empty string`)
+      }
+    }
+
+    if (messages[messages.length - 1].role !== "user") {
+      return badRequest("Last message must have role 'user'")
+    }
+
+    let trimmedMessages = messages
+    if (messages.length > MAX_MESSAGES) {
+      console.warn(`Trimming ${messages.length} messages to last ${MAX_MESSAGES}`)
+      trimmedMessages = messages.slice(-MAX_MESSAGES)
+    }
+
+    const startTime = Date.now()
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
+      model: MODEL,
       max_tokens: 1024,
       system: SYSTEM_PROMPT,
-      messages: [{ role: "user", content: message }],
+      messages: trimmedMessages,
     })
+    const latencyMs = Date.now() - startTime
 
-    // Extract the text from Claude's response
     const reply = response.content
       .filter((block) => block.type === "text")
       .map((block) => block.text)
       .join("\n")
 
+    const lastUserMessage = trimmedMessages[trimmedMessages.length - 1].content
+    const logPromise = supabase
+      .from("chat_logs")
+      .insert({
+        session_id,
+        user_message: lastUserMessage,
+        assistant_response: reply,
+        model: MODEL,
+        latency_ms: latencyMs,
+      })
+      .then(({ error }) => {
+        if (error) console.error("Failed to write chat_log:", error)
+      })
+
+    // Keep the worker alive long enough to flush the log without blocking the response.
+    // @ts-ignore - EdgeRuntime is provided by Supabase Edge Runtime, not in standard Deno types
+    if (typeof EdgeRuntime !== "undefined" && typeof EdgeRuntime.waitUntil === "function") {
+      // @ts-ignore
+      EdgeRuntime.waitUntil(logPromise)
+    }
+
     return new Response(
       JSON.stringify({ reply }),
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
-      },
+      { headers: CORS_HEADERS },
     )
   } catch (err) {
     console.error("Chat function error:", err)
     return new Response(
       JSON.stringify({ error: err.message }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
-      },
+      { status: 500, headers: CORS_HEADERS },
     )
   }
 })
