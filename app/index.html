@@ -144,6 +144,12 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 .fpw-msg{padding:10px 14px;border-radius:10px;font-size:12px;font-weight:500;margin-bottom:12px;text-align:center;line-height:1.5}
 .fpw-msg.ok{background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:var(--grn)}
 .fpw-msg.err{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.15);color:var(--red)}
+.terms-check{display:flex;align-items:flex-start;gap:8px;margin:12px 0;font-size:12px;color:var(--t2);line-height:1.45;cursor:pointer}
+.terms-check input[type="checkbox"]{flex-shrink:0;margin-top:2px;accent-color:var(--gold);cursor:pointer;width:16px;height:16px}
+.terms-check span{flex:1}
+.terms-check a{color:var(--gold);text-decoration:underline;text-decoration-color:rgba(237,174,10,.3)}
+.terms-check a:hover{text-decoration-color:var(--gold)}
+.btn-g:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
 
 #s-veh{padding:0}
 .v-top{display:flex;align-items:center;padding:10px 24px 0}
@@ -172,6 +178,11 @@ body{font-family:'Manrope',sans-serif;background:#000;color:var(--t1);display:fl
 .vprev .ve{font-size:12px;color:var(--t2);margin-top:4px;font-weight:500}
 .vprev .vt{display:flex;gap:6px;margin-top:12px}
 .vprev .tag{padding:4px 12px;border-radius:8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t2)}
+
+#s-terms{padding:20px 24px}
+.terms-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:calc(100% - 40px);max-width:340px;margin:0 auto;gap:18px}
+.terms-screen .ai-d{margin-bottom:8px}
+.terms-screen .terms-check{margin:8px 0;font-size:13px}
 
 #s-ai{padding:20px 24px 100px;display:flex;flex-direction:column;height:100%}
 .sec-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
@@ -538,6 +549,11 @@ src="https://www.facebook.com/tr?id=2798529717175247&ev=PageView&noscript=1"
           <input class="fi" id="authConfirm" type="password" placeholder="••••••••">
         </div>
 
+        <label class="terms-check" id="termsCheckWrap" style="display:none">
+          <input type="checkbox" id="termsAccept" />
+          <span>I agree to the <a href="/terms" target="_blank" rel="noopener">Terms and Conditions</a> and <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a>.</span>
+        </label>
+
         <div class="fpw-link"><a href="#" onclick="showForgot(event)">Forgot password?</a></div>
 
         <button class="btn-g" id="authBtn" onclick="handleAuth()">Sign In</button>
@@ -601,6 +617,21 @@ src="https://www.facebook.com/tr?id=2798529717175247&ev=PageView&noscript=1"
         </div>
 
         <button class="btn-g hid" id="vBtn" style="margin-top:16px" onclick="confirmV()">Continue</button>
+      </div>
+    </div>
+
+    <div class="scr" id="s-terms">
+      <div class="terms-screen">
+        <div class="orb"><span>📋</span></div>
+        <div class="ai-t">Quick Update</div>
+        <div class="ai-d">We've updated our Terms and Privacy Policy. Take a look and accept to continue.</div>
+
+        <label class="terms-check">
+          <input type="checkbox" id="termsAcceptGate" />
+          <span>I agree to the <a href="/terms" target="_blank" rel="noopener">Terms and Conditions</a> and <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a>.</span>
+        </label>
+
+        <button id="termsAcceptBtn" class="btn-g" style="width:100%;max-width:300px" disabled>Continue</button>
       </div>
     </div>
 
@@ -890,6 +921,10 @@ src="https://www.facebook.com/tr?id=2798529717175247&ev=PageView&noscript=1"
 // /api/create-checkout. Pair flips with a sw.js cache bump.
 const CHECKOUT_ENABLED = true;
 
+// Bump this date when /terms or /privacy is updated meaningfully.
+// Users with profiles.terms_version older than this get re-prompted on sign-in.
+const TERMS_VERSION = '2026-05-04';
+
 const SUPABASE_URL = 'https://jfjbilfsiebifzddveof.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamJpbGZzaWViaWZ6ZGR2ZW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2OTg4ODUsImV4cCI6MjA4NzI3NDg4NX0.bbTQ0l4HsHoKUzoKACBvbXJ0TbnUM5tltK4YLKyuMr8';
 
@@ -1062,9 +1097,23 @@ function toggleAuthMode(e){
   hideErr();
   document.getElementById('authBtn').textContent = isSignUp ? 'Create Account' : 'Sign In';
   document.getElementById('confirmWrap').style.display = isSignUp ? 'block' : 'none';
+  document.getElementById('termsCheckWrap').style.display = isSignUp ? 'flex' : 'none';
+  document.getElementById('termsAccept').checked = false;
   document.getElementById('authToggle').innerHTML = isSignUp
     ? 'Already have an account? <a href="#" onclick="toggleAuthMode(event)">Sign In</a>'
     : 'No account? <a href="#" onclick="toggleAuthMode(event)">Sign Up</a>';
+  syncSignupButtonState();
+}
+
+function syncSignupButtonState(){
+  const btn = document.getElementById('authBtn');
+  if(!btn) return;
+  if(isSignUp){
+    const cb = document.getElementById('termsAccept');
+    btn.disabled = !(cb && cb.checked);
+  }else{
+    btn.disabled = false;
+  }
 }
 
 async function handleAuth(){
@@ -1108,7 +1157,24 @@ async function handleAuth(){
     }
 
     const user = res.data && res.data.session ? res.data.session.user : (res.data ? res.data.user : null);
-    if(user) await onAuth(user);
+    if(user){
+      if(isSignUp){
+        // Write the consent record so the sign-in gate sees it. Profiles row may
+        // not exist yet (no auth.users trigger creates it), so upsert on id.
+        try{
+          const { error: termsErr } = await sb.from('profiles').upsert({
+            id: user.id,
+            terms_accepted_at: new Date().toISOString(),
+            terms_version: TERMS_VERSION,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'id' });
+          if(termsErr) console.warn('[BSD] terms acceptance write failed:', termsErr.message);
+        }catch(termsErr){
+          console.warn('[BSD] terms acceptance write exception:', termsErr);
+        }
+      }
+      await onAuth(user);
+    }
   }catch(err){
     showErr(err.message || 'Authentication failed');
     btn.textContent = isSignUp ? 'Create Account' : 'Sign In';
@@ -1258,6 +1324,28 @@ async function onAuth(user){
   ACTIVE_USER = user || null;
   updateProfileBasics(user);
 
+  // Gate 1: terms acceptance. Re-prompt if profiles.terms_version doesn't match
+  // the current TERMS_VERSION (or no profiles row exists yet).
+  let termsOk = false;
+  try{
+    const { data } = await sb.from('profiles')
+      .select('terms_version')
+      .eq('id', user.id)
+      .maybeSingle();
+    termsOk = data?.terms_version === TERMS_VERSION;
+  }catch(err){
+    console.warn('[BSD] terms check failed, prompting acceptance:', err);
+  }
+  if(!termsOk){
+    showTermsAcceptScreen();
+    return;
+  }
+
+  // Gate 2: vehicle setup.
+  await proceedToVehicleOrApp(user);
+}
+
+async function proceedToVehicleOrApp(user){
   const acctVehicle = (user.user_metadata && user.user_metadata.vehicle) ? user.user_metadata.vehicle : null;
   const saved = vehicleObjIsComplete(acctVehicle) ? acctVehicle : getStoredVehicle();
 
@@ -1315,6 +1403,43 @@ function nav(el){
 }
 function showNav(){ document.getElementById('bnav').classList.remove('hid'); updateMkVehiclePill(); }
 function hideNav(){ document.getElementById('bnav').classList.add('hid'); }
+
+function showTermsAcceptScreen(){
+  hideNav();
+  document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
+  document.getElementById('s-terms').classList.add('on');
+  // Reset the screen's checkbox/button state in case the user got here via a re-prompt
+  const cb = document.getElementById('termsAcceptGate');
+  const btn = document.getElementById('termsAcceptBtn');
+  if(cb) cb.checked = false;
+  if(btn){ btn.disabled = true; btn.textContent = 'Continue'; }
+}
+
+async function acceptTermsAndContinue(){
+  if(!ACTIVE_USER) return;
+  const btn = document.getElementById('termsAcceptBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  try{
+    const { error } = await sb.from('profiles').upsert({
+      id: ACTIVE_USER.id,
+      terms_accepted_at: new Date().toISOString(),
+      terms_version: TERMS_VERSION,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'id' });
+    if(error){
+      console.error('[BSD] Terms accept write failed:', error);
+      btn.textContent = 'Try again';
+      btn.disabled = false;
+      return;
+    }
+    await proceedToVehicleOrApp(ACTIVE_USER);
+  }catch(err){
+    console.error('[BSD] Terms accept exception:', err);
+    btn.textContent = 'Try again';
+    btn.disabled = false;
+  }
+}
 function toggleCart(){ document.getElementById('cD').classList.toggle('op'); }
 
 function uProg(s){
@@ -3182,6 +3307,15 @@ initCheckoutBanner();
 document.getElementById('authPass').addEventListener('keydown', e => {
   if(e.key === 'Enter') handleAuth();
 });
+
+// Sign-up terms checkbox: drives the Sign Up button's enabled state.
+document.getElementById('termsAccept').addEventListener('change', syncSignupButtonState);
+
+// Terms-acceptance gate screen (re-prompt for existing users on version bump).
+document.getElementById('termsAcceptGate').addEventListener('change', function(){
+  document.getElementById('termsAcceptBtn').disabled = !this.checked;
+});
+document.getElementById('termsAcceptBtn').addEventListener('click', acceptTermsAndContinue);
 
 document.querySelectorAll('.stg').forEach(b => {
   b.onclick = () => {
