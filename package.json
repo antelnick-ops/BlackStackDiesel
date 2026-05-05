@@ -8,7 +8,10 @@
     "apg:test-auth": "node scripts/diagnostics/apg-test-auth.js",
     "apg:download-feed": "node scripts/importers/apg-download-feed.js",
     "apg:test-api": "node scripts/diagnostics/apg-test-api.js",
-    "apg:import-feed": "node scripts/importers/import-apg-feed.js"
+    "apg:import-feed": "node scripts/importers/import-apg-feed.js",
+    "asap:bulk-import": "node scripts/importers/asap-bulk-import.js",
+    "asap:coverage": "node scripts/ops/asap-coverage-analysis.js",
+    "asap:discover-prefixes": "node scripts/ops/asap-discover-prefixes.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
@@ -16,6 +19,7 @@
     "basic-ftp": "^5.3.0",
     "csv-parse": "^5.5.6",
     "dotenv": "^16.6.1",
+    "resend": "^6.12.2",
     "stripe": "^14.0.0"
   },
   "author": "Dynamic Innovative Solutions LLC",

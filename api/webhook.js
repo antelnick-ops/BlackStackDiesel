@@ -250,6 +250,51 @@ async function handleCheckoutCompleted(session, stripe, supabase) {
   }
 
   console.log(`Order ${insertedOrder.order_number} created from session ${session.id}`);
+
+  // Send operator notification email.
+  // Failure to email must NEVER fail the webhook — the order is already written
+  // and the customer has paid. Worst case: we lost a notification, the order
+  // sits in supplier_status='queued' until someone notices.
+  try {
+    const { Resend } = require('resend');
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    const orderShortId = String(insertedOrder.id).substring(0, 8);
+    const itemSummary = orderItemsPayload
+      .map((it) => `- ${it.quantity}x ${it.sku || '(no sku)'} | ${it.product_name} ($${it.unit_price})`)
+      .join('\n');
+
+    await resend.emails.send({
+      from: 'BlackStackDiesel <noreply@black-stack-diesel.com>',
+      to: 'antelnick@gmail.com', // TODO: move to env var BSD_OPERATOR_EMAIL
+      subject: `New BSD order #${orderShortId} - $${total}`,
+      text: [
+        'New order received on BlackStackDiesel.',
+        '',
+        `Order ID: ${insertedOrder.id}`,
+        `Order #: ${insertedOrder.order_number || '(none)'}`,
+        `Total: $${total}`,
+        `Customer email: ${customerEmail}`,
+        '',
+        'Shipping to:',
+        `  ${shipName || '(no name)'}`,
+        `  ${joinAddressLines(shippingAddress.line1, shippingAddress.line2) || '(no street address)'}`,
+        `  ${shippingAddress.city || '?'}, ${shippingAddress.state || '?'} ${shippingAddress.postal_code || '?'}`,
+        '',
+        'Items:',
+        itemSummary,
+        '',
+        "Payment captured. Order is queued in Supabase with supplier_status='queued'.",
+        '',
+        'ACTION REQUIRED: log into APG and place this order for drop-ship to the shipping address above.',
+        '',
+        `Stripe payment intent: ${session.payment_intent || '(none)'}`,
+      ].join('\n'),
+    });
+  } catch (emailErr) {
+    console.error('[webhook] Operator notification email failed:', emailErr);
+    // Do not throw — webhook still returns 200.
+  }
 }
 
 async function handleCheckoutFailed(session, supabase) {
