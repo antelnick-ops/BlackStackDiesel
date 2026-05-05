@@ -144,3 +144,17 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 - Zod for all API input validation
 - Prices stored as cents in DB, displayed as dollars in UI
 - Error boundaries on every route segment
+
+---
+
+## Gotchas
+
+### PostgREST schema cache
+
+After any DDL change to the `public` schema (`ALTER TABLE`, `CREATE TABLE`, `ADD COLUMN`, etc.), the PostgREST API layer caches the old schema and will return `PGRST204` errors on writes referencing new columns. Always run the following in the Supabase SQL editor immediately after any DDL change:
+
+```sql
+NOTIFY pgrst, 'reload schema';
+```
+
+This applies whether the change is via Supabase migrations, the dashboard SQL editor, or `psql`.
