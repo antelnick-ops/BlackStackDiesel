@@ -10,7 +10,7 @@ const { createClient } = require('@supabase/supabase-js');
 // =====================================================================
 const BRANDS_FILE = path.join(process.cwd(), 'tmp', 'asap_approved_brands.json');
 const LOG_DIR = path.join(process.cwd(), 'tmp', 'asap-bulk-import-runs');
-const IMPORT_SCRIPT = path.join('scripts', 'asap-import.js');
+const IMPORT_SCRIPT = path.join('scripts', 'importers', 'asap-import.js');
 
 // Per-brand mfg_sku backfill rules. Each rule strips a known APG prefix from
 // `sku` to populate `mfg_sku` so the asap-import.js mfg_sku-match path can
@@ -96,7 +96,7 @@ const args = parseArgs(process.argv);
 
 if (args.help) {
   console.error([
-    'Usage: node scripts/asap-bulk-import.js [options]',
+    'Usage: node scripts/importers/asap-bulk-import.js [options]',
     '',
     '  --dry-run                Default. Each brand runs in dry-run; backfill counts only.',
     '  --commit                 Commit both backfill UPDATEs and import UPDATEs.',
@@ -106,10 +106,10 @@ if (args.help) {
     '  --only-brands "id1,id2"  Comma-separated brand IDs to include.',
     '',
     'Examples:',
-    '  node scripts/asap-bulk-import.js --only-brands "196448,197827,83748,877"',
-    '  node scripts/asap-bulk-import.js --backfill-only            # dry-run, all rules',
-    '  node scripts/asap-bulk-import.js --backfill-only --commit   # apply backfill UPDATEs',
-    '  node scripts/asap-bulk-import.js --commit  # full run, all approved brands'
+    '  node scripts/importers/asap-bulk-import.js --only-brands "196448,197827,83748,877"',
+    '  node scripts/importers/asap-bulk-import.js --backfill-only            # dry-run, all rules',
+    '  node scripts/importers/asap-bulk-import.js --backfill-only --commit   # apply backfill UPDATEs',
+    '  node scripts/importers/asap-bulk-import.js --commit  # full run, all approved brands'
   ].join('\n'));
   process.exit(0);
 }
@@ -135,7 +135,7 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
 function loadBrands() {
   if (!fs.existsSync(BRANDS_FILE)) {
     throw new Error(
-      `Brand list not found at ${BRANDS_FILE}. Run scripts/probe-asap.js first to populate it.`
+      `Brand list not found at ${BRANDS_FILE}. Run scripts/diagnostics/probe-asap.js first to populate it.`
     );
   }
   const raw = JSON.parse(fs.readFileSync(BRANDS_FILE, 'utf8'));
