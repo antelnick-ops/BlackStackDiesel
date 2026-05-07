@@ -1,3 +1,16 @@
+/**
+ * APG ItemExport importer — PRICE-ONLY refresh.
+ *
+ * ItemExport.csv is APG's slim daily/weekly feed (11 cols vs master's 44).
+ * It lacks the manufacturer drop-ship inventory column ("MFG Invt") that
+ * the master feed exposes. If we wrote stock_qty from ItemExport alone,
+ * we'd silently strip the MFG drop-ship pool from every drop-ship product
+ * on each run. Same logic for in_stock.
+ *
+ * So: this importer is intentionally limited to pricing fields. Stock
+ * (stock_qty, in_stock) is owned by import-apg-feed.js. Run master weekly
+ * for stock + descriptions + fitment; run ItemExport between for price.
+ */
 require('dotenv').config({ path: '.env.local' });
 
 const fs = require('fs');
@@ -10,17 +23,6 @@ const FEED_PATH = path.join(process.cwd(), 'tmp', 'StandardExport.csv');
 const DRY_RUN = true;
 const CHUNK_SIZE = 500;
 const CONCURRENCY = 50;
-
-// Warehouses counted toward stock_qty. Matches import-apg-feed.js
-// (NV + KY + WA + MFG). Texas and Shock Surplus are deliberately excluded
-// so stock_qty doesn't drift based on which importer ran last; if we ever
-// decide to include them, change both importers together.
-const COUNTED_WAREHOUSES = [
-  /^Nevada\b/i,
-  /^Kentucky\b/i,
-  /^Washington\b/i,
-  /^(Manufacturer|MFG|Mfg)\b/i
-];
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -64,24 +66,6 @@ function pickPrice(row) {
   if (yourPrice && yourPrice > 0) return roundMoney(yourPrice);
   if (jobber && jobber > 0) return roundMoney(jobber * 1.3);
   return 0;
-}
-
-// "Nevada Warehouse :0;Kentucky Warehouse :5;Texas Warehouse :2;..." → only
-// counts segments matching COUNTED_WAREHOUSES (NV + KY + WA + MFG).
-function parseStockQty(availability) {
-  if (!availability || typeof availability !== 'string') return 0;
-  let total = 0;
-  for (const seg of availability.split(';')) {
-    const trimmed = seg.trim();
-    if (!trimmed) continue;
-    const colonIdx = trimmed.lastIndexOf(':');
-    if (colonIdx < 0) continue;
-    const name = trimmed.slice(0, colonIdx).trim();
-    if (!COUNTED_WAREHOUSES.some((re) => re.test(name))) continue;
-    const n = parseInt(trimmed.slice(colonIdx + 1).trim(), 10);
-    if (Number.isFinite(n) && n > 0) total += n;
-  }
-  return total;
 }
 
 async function fetchExistingApgSkus() {
@@ -157,7 +141,6 @@ async function main() {
 
     stats.matched++;
 
-    const stockQty = parseStockQty(row['Warehouse Availability']);
     const wholesale = toNumber(row['Your Price']);
     const map = toNumber(row['Map']);
 
@@ -165,9 +148,7 @@ async function main() {
       sku,
       price,
       wholesale_price: wholesale && wholesale > 0 ? roundMoney(wholesale) : null,
-      map_price: map && map > 0 ? roundMoney(map) : null,
-      stock_qty: stockQty,
-      in_stock: stockQty > 0
+      map_price: map && map > 0 ? roundMoney(map) : null
     });
   }
 
@@ -186,12 +167,10 @@ async function main() {
       const u = shuffled[i];
       console.log(
         `${(i + 1).toString().padStart(2)}. ${u.sku.padEnd(20)} | price=$${u.price} ` +
-        `| wholesale=$${u.wholesale_price ?? '—'} | map=$${u.map_price ?? '—'} | stock=${u.stock_qty}`
+        `| wholesale=$${u.wholesale_price ?? '—'} | map=$${u.map_price ?? '—'}`
       );
     }
-    const inStockCount = updates.filter((u) => u.in_stock).length;
-    console.log(`\nIn stock: ${inStockCount.toLocaleString()} / ${updates.length.toLocaleString()}`);
-    console.log(`\nWould update ${updates.length.toLocaleString()} products. Set DRY_RUN=false to write.`);
+    console.log(`\nWould refresh prices on ${updates.length.toLocaleString()} products. Set DRY_RUN=false to write.`);
     return;
   }
 
@@ -214,8 +193,6 @@ async function main() {
               price: u.price,
               wholesale_price: u.wholesale_price,
               map_price: u.map_price,
-              stock_qty: u.stock_qty,
-              in_stock: u.in_stock,
               updated_at: updatedAt
             })
             .eq('sku', u.sku)
@@ -234,7 +211,7 @@ async function main() {
     );
   }
 
-  console.log('\n=== APG ItemExport import complete ===');
+  console.log('\n=== APG ItemExport price refresh complete ===');
   console.log(`  total rows:    ${stats.total.toLocaleString()}`);
   console.log(`  matched:       ${stats.matched.toLocaleString()}`);
   console.log(`  updated:       ${stats.updated.toLocaleString()}`);
