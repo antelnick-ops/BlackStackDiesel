@@ -140,8 +140,13 @@ APG_FALLBACK_PHONE=
 APG_AUTO_ORDER_ENABLED=false
 APG_TRACKING_POLL_ENABLED=false
 RESEND_API_KEY=
+BSD_OPERATOR_EMAIL=
 CRON_SECRET=
 ```
+
+`BSD_OPERATOR_EMAIL`: Optional. Recipient for new-order notification emails
+sent from the Stripe webhook. Falls back to `nick@black-stack-diesel.com` if
+unset.
 
 `APG_AUTO_ORDER_ENABLED`: Feature flag. Set to `'true'` to enable automatic
 APG order forwarding from the Stripe webhook. Defaults to false (manual

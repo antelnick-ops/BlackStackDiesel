@@ -6,13 +6,15 @@ module.exports = async (req, res) => {
     return res.status(405).end();
   }
 
-  if (
-    !process.env.STRIPE_SECRET_KEY ||
-    !process.env.STRIPE_WEBHOOK_SECRET ||
-    !process.env.SUPABASE_URL ||
-    !process.env.SUPABASE_SERVICE_KEY
-  ) {
-    console.error('Missing required environment variables');
+  const missingEnv = [
+    'STRIPE_SECRET_KEY',
+    'STRIPE_WEBHOOK_SECRET',
+    'SUPABASE_URL',
+    'SUPABASE_SERVICE_KEY',
+    'RESEND_API_KEY',
+  ].filter((k) => !process.env[k]);
+  if (missingEnv.length) {
+    console.error('Missing required environment variables:', missingEnv.join(', '));
     return res.status(500).json({ error: 'Server misconfiguration' });
   }
 
@@ -266,7 +268,7 @@ async function handleCheckoutCompleted(session, stripe, supabase) {
 
     await resend.emails.send({
       from: 'BlackStackDiesel <noreply@black-stack-diesel.com>',
-      to: 'nick@black-stack-diesel.com', // TODO: move to env var BSD_OPERATOR_EMAIL
+      to: process.env.BSD_OPERATOR_EMAIL || 'nick@black-stack-diesel.com',
       subject: `New BSD order #${orderShortId} - $${total}`,
       text: [
         'New order received on BlackStackDiesel.',
