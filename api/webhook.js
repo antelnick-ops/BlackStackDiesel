@@ -1,5 +1,6 @@
 const Stripe = require('stripe');
 const { createClient } = require('@supabase/supabase-js');
+const { buildOperatorEmail, buildCustomerEmail } = require('../lib/emails');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -253,48 +254,43 @@ async function handleCheckoutCompleted(session, stripe, supabase) {
 
   console.log(`Order ${insertedOrder.order_number} created from session ${session.id}`);
 
-  // Send operator notification email.
-  // Failure to email must NEVER fail the webhook — the order is already written
-  // and the customer has paid. Worst case: we lost a notification, the order
-  // sits in supplier_status='queued' until someone notices.
+  // Email notifications (operator + customer). Failures must NEVER fail the
+  // webhook — the order is already written and the customer has paid. Worst
+  // case: a notification is lost; the order sits in supplier_status='queued'
+  // until someone notices. The two sends are independent — one failing must
+  // not block the other.
+  const { Resend } = require('resend');
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
+  const emailOrder = {
+    id: insertedOrder.id,
+    order_number: insertedOrder.order_number,
+    customer_email: customerEmail,
+    ship_name: shipName,
+    ship_address: joinAddressLines(shippingAddress.line1, shippingAddress.line2),
+    ship_city: shippingAddress.city,
+    ship_state: shippingAddress.state,
+    ship_zip: shippingAddress.postal_code,
+    subtotal,
+    shipping_total: shippingTotal,
+    tax,
+    total,
+    stripe_payment_intent_id: session.payment_intent,
+  };
+
   try {
-    const { Resend } = require('resend');
-    const resend = new Resend(process.env.RESEND_API_KEY);
-
-    const orderShortId = String(insertedOrder.id).substring(0, 8);
-    const itemSummary = orderItemsPayload
-      .map((it) => `- ${it.quantity}x ${it.sku || '(no sku)'} | ${it.product_name} ($${it.unit_price})`)
-      .join('\n');
-
-    await resend.emails.send({
-      from: 'BlackStackDiesel <noreply@black-stack-diesel.com>',
-      to: process.env.BSD_OPERATOR_EMAIL || 'nick@black-stack-diesel.com',
-      subject: `New BSD order #${orderShortId} - $${total}`,
-      text: [
-        'New order received on BlackStackDiesel.',
-        '',
-        `Order ID: ${insertedOrder.id}`,
-        `Order #: ${insertedOrder.order_number || '(none)'}`,
-        `Total: $${total}`,
-        `Customer email: ${customerEmail}`,
-        '',
-        'Shipping to:',
-        `  ${shipName || '(no name)'}`,
-        `  ${joinAddressLines(shippingAddress.line1, shippingAddress.line2) || '(no street address)'}`,
-        `  ${shippingAddress.city || '?'}, ${shippingAddress.state || '?'} ${shippingAddress.postal_code || '?'}`,
-        '',
-        'Items:',
-        itemSummary,
-        '',
-        "Payment captured. Order is queued in Supabase with supplier_status='queued'.",
-        '',
-        'ACTION REQUIRED: log into APG and place this order for drop-ship to the shipping address above.',
-        '',
-        `Stripe payment intent: ${session.payment_intent || '(none)'}`,
-      ].join('\n'),
-    });
+    await resend.emails.send(buildOperatorEmail(emailOrder, orderItemsPayload));
+    console.log('[webhook] Operator email sent');
   } catch (emailErr) {
-    console.error('[webhook] Operator notification email failed:', emailErr);
+    console.error('[webhook] Operator email failed:', emailErr);
+    // Do not throw — webhook still returns 200.
+  }
+
+  try {
+    await resend.emails.send(buildCustomerEmail(emailOrder, orderItemsPayload));
+    console.log('[webhook] Customer email sent');
+  } catch (emailErr) {
+    console.error('[webhook] Customer email failed:', emailErr);
     // Do not throw — webhook still returns 200.
   }
 
