@@ -1163,7 +1163,7 @@ async function loadRecentOrders() {
               <td class="mono" style="font-size:12px;">${(o.customer_email || '—').substring(0, 24)}</td>
               <td style="font-size:12px; color:var(--text-dim);">${[o.vehicle_year, o.vehicle_make, o.vehicle_model].filter(Boolean).join(' ') || '—'}</td>
               <td class="num">${fmt.usd(o.total)}</td>
-              <td><span class="badge ${o.status === 'paid' ? 'active' : o.status === 'shipped' ? 'active' : 'pending'}">${o.status || 'pending'}</span></td>
+              <td><span class="badge ${o.status === 'confirmed' ? 'active' : o.status === 'shipped' ? 'active' : 'pending'}">${o.status || 'pending'}</span></td>
             </tr>
           `).join('')}
         </tbody>
@@ -1232,14 +1232,14 @@ async function loadSales() {
       sb.from('orders')
         .select('id, total, status, created_at, stripe_fee, shipping_cost_paid, customer_email')
         .gte('created_at', startDate)
-        .eq('status', 'paid'),
+        .eq('status', 'confirmed'),
       sb.from('orders')
         .select('id, total, status')
         .gte('created_at', prevStart)
         .lt('created_at', prevEnd)
-        .eq('status', 'paid'),
+        .eq('status', 'confirmed'),
       sb.from('order_items')
-        .select('order_id, product_sku, product_name, brand, quantity, unit_price, wholesale_price, shipping_cost, stage')
+        .select('order_id, sku, product_name, brand, quantity, unit_price, unit_cost, shipping_cost')
         .gte('created_at', startDate)
     ]);
 
@@ -1254,7 +1254,7 @@ async function loadSales() {
     const grossDelta = prevGross > 0 ? ((gross - prevGross) / prevGross) * 100 : null;
 
     const stripeFees = orders.reduce((s, o) => s + Number(o.stripe_fee || estimateStripeFee(o.total || 0)), 0);
-    const cogs = items.reduce((s, i) => s + (Number(i.wholesale_price || 0) * Number(i.quantity || 1)), 0);
+    const cogs = items.reduce((s, i) => s + (Number(i.unit_cost || 0) * Number(i.quantity || 1)), 0);
     const shipping = items.reduce((s, i) => s + Number(i.shipping_cost || 0), 0);
     const net = gross - stripeFees - cogs - shipping;
     const netMargin = gross > 0 ? (net / gross) * 100 : 0;
@@ -1277,7 +1277,7 @@ async function loadSales() {
     const unshippedOrderIds = orders.filter(o => o.status !== 'shipped').map(o => o.id);
     const apgPayable = items
       .filter(i => unshippedOrderIds.includes(i.order_id))
-      .reduce((s, i) => s + (Number(i.wholesale_price || 0) * Number(i.quantity || 1)) + Number(i.shipping_cost || 0), 0);
+      .reduce((s, i) => s + (Number(i.unit_cost || 0) * Number(i.quantity || 1)) + Number(i.shipping_cost || 0), 0);
 
     // Stripe balance — ideally pulled from a stripe_balance cache table. For now, approximate.
     // We'll show "In Transit" as orders paid in last 2 days, "Available" as net - in transit.
@@ -1328,18 +1328,18 @@ function renderHeroProducts(items) {
   // Group by SKU
   const skuMap = new Map();
   items.forEach(i => {
-    const key = i.product_sku || 'unknown';
+    const key = i.sku || 'unknown';
     if (!skuMap.has(key)) {
       skuMap.set(key, {
         sku: key, name: i.product_name || '—', brand: i.brand || '—',
-        stage: i.stage, units: 0, gross: 0, cogs: 0, shipping: 0
+        units: 0, gross: 0, cogs: 0, shipping: 0
       });
     }
     const row = skuMap.get(key);
     const qty = Number(i.quantity || 1);
     row.units += qty;
     row.gross += Number(i.unit_price || 0) * qty;
-    row.cogs += Number(i.wholesale_price || 0) * qty;
+    row.cogs += Number(i.unit_cost || 0) * qty;
     row.shipping += Number(i.shipping_cost || 0);
   });
 
@@ -1358,7 +1358,6 @@ function renderHeroProducts(items) {
       <thead><tr>
         <th>Product</th>
         <th>Brand</th>
-        <th>Stage</th>
         <th class="num sortable" data-sort="units">Units</th>
         <th class="num sortable" data-sort="gross">Gross</th>
         <th class="num sortable" data-sort="cogs">COGS</th>
@@ -1373,7 +1372,6 @@ function renderHeroProducts(items) {
               <div class="mono" style="font-size:10px; color:var(--text-faint);">${escapeHtml(r.sku)}</div>
             </td>
             <td style="font-size:12px;">${escapeHtml(r.brand)}</td>
-            <td><span class="badge stage-${r.stage == null ? 'null' : r.stage}">${r.stage == null ? 'UNI' : r.stage === 0 ? 'OEM' : 'S' + r.stage}</span></td>
             <td class="num">${fmt.int(r.units)}</td>
             <td class="num">${fmt.usd(r.gross)}</td>
             <td class="num" style="color:var(--red);">−${fmt.usd(r.cogs)}</td>
@@ -1407,7 +1405,7 @@ function renderBrandPerf(items) {
     const qty = Number(i.quantity || 1);
     r.units += qty;
     r.gross += Number(i.unit_price || 0) * qty;
-    r.cogs += Number(i.wholesale_price || 0) * qty;
+    r.cogs += Number(i.unit_cost || 0) * qty;
   });
   const rows = Array.from(map.values()).map(r => {
     r.net = r.gross - r.cogs - estimateStripeFee(r.gross);
@@ -1442,7 +1440,7 @@ function renderEnginePerf(items) {
   items.forEach(i => {
     const name = ((i.product_name || '') + ' ' + (i.brand || '')).toLowerCase();
     const qty = Number(i.quantity || 1);
-    const itemNet = (Number(i.unit_price || 0) - Number(i.wholesale_price || 0)) * qty;
+    const itemNet = (Number(i.unit_price || 0) - Number(i.unit_cost || 0)) * qty;
     let bucket = 'Universal / Other';
     if (/6\.?7l?.*cummins|cummins.*6\.?7/.test(name)) bucket = '6.7 Cummins';
     else if (/5\.?9l?.*cummins|cummins.*5\.?9/.test(name)) bucket = '5.9 Cummins';
@@ -1496,7 +1494,7 @@ async function loadTraffic() {
   try {
     const [events, orders, gaps] = await Promise.all([
       sb.from('page_events').select('event_type, category, vehicle_year, vehicle_engine, product_sku').gte('created_at', startDate),
-      sb.from('orders').select('id, created_at').eq('status', 'paid').gte('created_at', startDate),
+      sb.from('orders').select('id, created_at').eq('status', 'confirmed').gte('created_at', startDate),
       sb.from('search_no_results_log').select('query, created_at').gte('created_at', startDate).order('created_at', { ascending: false })
     ]);
 
