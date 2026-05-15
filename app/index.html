@@ -2048,8 +2048,10 @@ async function queryProducts(filters, page, pageSize){
     console.log('[BSD] Search-first filter (vehicle via badge only)');
     query = query.or(searchClauses.join(','));
   } else if(vehicleClauses){
-    console.log('[BSD] Vehicle-only filter (hard year-contains)');
-    query = query.contains('fitment_years', [Number(V.year)]);
+    console.log('[BSD] Vehicle filter (year + vehicleClauses OR)');
+    query = query
+      .contains('fitment_years', [Number(V.year)])
+      .or(vehicleClauses.join(','));
   } else if(searchClauses){
     console.log('[BSD] Search-only filter');
     query = query.or(searchClauses.join(','));
@@ -2127,8 +2129,10 @@ async function queryTotalCount(filters){
     console.log('[BSD] Search-first filter (vehicle via badge only)');
     query = query.or(searchClauses.join(','));
   } else if(vehicleClauses){
-    console.log('[BSD] Vehicle-only filter (hard year-contains)');
-    query = query.contains('fitment_years', [Number(V.year)]);
+    console.log('[BSD] Vehicle filter (year + vehicleClauses OR)');
+    query = query
+      .contains('fitment_years', [Number(V.year)])
+      .or(vehicleClauses.join(','));
   } else if(searchClauses){
     console.log('[BSD] Search-only filter');
     query = query.or(searchClauses.join(','));
