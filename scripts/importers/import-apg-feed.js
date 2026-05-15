@@ -13,7 +13,10 @@ const supabase = createClient(
 const APG_VENDOR_ID = '013cd9a7-171e-45fe-9421-0320319dce33';
 const FEED_PATH = path.join(process.cwd(), 'tmp', 'premier_data_feed_master.csv');
 const IMPORT_LIMIT = 0;   // 0 = no limit
-const DRY_RUN = true;     // set false to actually write to Supabase
+
+// CLI flags: default is dry-run. Pass --commit to actually write.
+// --dry-run is accepted but redundant with the default.
+const DRY_RUN = !process.argv.includes('--commit');
 
 // SKUs with known-bad images in Premier's feed (force null).
 // When you find more, add the SKU here.
@@ -238,6 +241,30 @@ function rewriteImageUrl(url, sku) {
 }
 
 // =====================================================================
+// LIFECYCLE PARSER — APG flags discontinuation by prepending the marker
+// to External/Long Description, sometimes with a replacement SKU. The
+// `Inventory Status` column alone misses these; productStatus() still runs
+// as a defensive first signal but this is the source of truth.
+// =====================================================================
+
+const RE_DISCONTINUED = /\*{3}\s*Discontinued\s*\*{3}/i;
+const RE_SUPERSEDED = /\*{3}\s*Superseded\s*to\s+([A-Z0-9][A-Z0-9\-_]*)\s*\*{3}/i;
+const RE_USE = /\*\s*USE:\s*([A-Z0-9][A-Z0-9\-_]*)\s*\*/i;
+
+function parseProductLifecycle(text) {
+  if (!text) return { discontinued: false, replacementSku: null };
+  const discontinued = RE_DISCONTINUED.test(text);
+  let replacementSku = null;
+  const sup = text.match(RE_SUPERSEDED);
+  if (sup) replacementSku = sup[1].toUpperCase();
+  if (!replacementSku) {
+    const use = text.match(RE_USE);
+    if (use) replacementSku = use[1].toUpperCase();
+  }
+  return { discontinued, replacementSku };
+}
+
+// =====================================================================
 // FITMENT PARSER
 // =====================================================================
 
@@ -380,8 +407,23 @@ function mapRow(row) {
   const coreCharge = parseCoreCharge(row['Core Charge']);
   const hasCore = coreCharge > 0 || clean(row['ItemWithCores'])?.toLowerCase() === 'yes';
   const price = pickPrice(row);
-  const status = productStatus(row);
+  let status = productStatus(row);
+  let isVisible = true;
   const description = buildDescription(row);
+
+  // Description-based discontinuation override. APG's primary discontinued
+  // signal lives in External/Long Description, not Inventory Status. Run
+  // against the *raw* description fields (not the assembled `description`)
+  // so a future change to buildDescription() can't introduce false positives.
+  const rawDescText = [
+    clean(row['External Long Description']),
+    clean(row['Long Description'])
+  ].filter(Boolean).join('\n');
+  const lifecycle = parseProductLifecycle(rawDescText);
+  if (lifecycle.discontinued) {
+    status = 'archived';
+    isVisible = false;
+  }
 
   const fitment = parseFitment(productName, description);
 
@@ -413,7 +455,11 @@ function mapRow(row) {
     source: 'distributor',
     source_ref: sku,
     status,
-    is_visible: true
+    // TODO: is_visible is unconditional and overrides manual admin hides.
+    // Fix: only set on INSERT, preserve on UPDATE. Tracked separately.
+    is_visible: isVisible,
+    replacement_sku: lifecycle.replacementSku,
+    _lifecycle_discontinued: lifecycle.discontinued
   };
 }
 
@@ -454,6 +500,65 @@ async function main() {
   const withYears = mapped.filter(m => m.fitment_years.length > 0).length;
   console.log(`Fitment parsed: ${withMakes} with makes, ${withEngines} with engines, ${withYears} with years`);
 
+  // Lifecycle reporting — strip the in-memory-only flag before upsert,
+  // count discontinued rows, and find active→archived transitions.
+  const reportFlags = mapped.map((m) => m._lifecycle_discontinued);
+  for (const m of mapped) delete m._lifecycle_discontinued;
+
+  const wouldArchive = mapped.filter((_, i) => reportFlags[i]);
+  const withReplacement = wouldArchive.filter((m) => m.replacement_sku);
+
+  console.log(`\nDiscontinued detection:`);
+  console.log(`  rows flagged by description marker: ${wouldArchive.length}`);
+  console.log(`  └─ of those, with replacement SKU:  ${withReplacement.length}`);
+
+  let transitions = [];
+  if (wouldArchive.length > 0) {
+    console.log('\nChecking which discontinued SKUs are currently active in DB...');
+    const skuList = wouldArchive.map((m) => m.sku);
+    const SELECT_CHUNK = 500;
+    for (let i = 0; i < skuList.length; i += SELECT_CHUNK) {
+      const chunk = skuList.slice(i, i + SELECT_CHUNK);
+      const { data, error } = await supabase
+        .from('products')
+        .select('sku, status, is_visible')
+        .eq('vendor_id', APG_VENDOR_ID)
+        .in('sku', chunk);
+      if (error) throw error;
+      for (const row of data || []) {
+        if (row.status === 'active' || row.is_visible === true) {
+          transitions.push(row.sku);
+        }
+      }
+    }
+    console.log(`  active→archived transitions on this run: ${transitions.length}`);
+    if (transitions.length > 0) {
+      console.log(`  first 10: ${transitions.slice(0, 10).join(', ')}`);
+    }
+  }
+
+  // Novel-pattern detector — flag rows with *** sequences that don't match
+  // any known pattern so new APG conventions surface in run output.
+  const novel = [];
+  for (let i = 0; i < limited.length && novel.length < 10; i++) {
+    const raw = [
+      clean(limited[i]['External Long Description']),
+      clean(limited[i]['Long Description'])
+    ].filter(Boolean).join('\n');
+    if (!raw || !/\*\*\*/.test(raw)) continue;
+    if (RE_DISCONTINUED.test(raw)) continue;
+    if (RE_SUPERSEDED.test(raw)) continue;
+    if (RE_USE.test(raw)) continue;
+    novel.push({
+      sku: clean(limited[i]['Premier Part Number']),
+      excerpt: raw.slice(0, 200).replace(/\s+/g, ' ')
+    });
+  }
+  if (novel.length > 0) {
+    console.log(`\nNovel *** patterns (not matching Discontinued/Superseded/USE): ${novel.length} samples`);
+    for (const n of novel) console.log(`  ${n.sku}: ${n.excerpt}`);
+  }
+
   if (DRY_RUN) {
     console.log('\nDRY RUN — no writes to Supabase.');
     console.log('\n=== 15 random samples ===');
@@ -468,11 +573,17 @@ async function main() {
     const withCoreData = mapped.filter(m => m.has_core).length;
     const coreChargeTotal = mapped.reduce((sum, m) => sum + (m.core_charge || 0), 0);
     console.log(`Core charge products: ${withCoreData} (avg $${(coreChargeTotal / Math.max(withCoreData, 1)).toFixed(2)})`);
-    console.log(`\nWould import ${mapped.length} products. Set DRY_RUN=false to actually write.`);
+    console.log(`\nWould import ${mapped.length} products. Re-run with --commit to actually write.`);
     return;
   }
 
   console.log(`Prepared ${mapped.length} rows for import`);
+  if (transitions.length > 0) {
+    console.log(`\nArchiving ${transitions.length} active SKUs newly flagged as discontinued:`);
+    for (const sku of transitions) {
+      console.log(`  ARCHIVE: ${sku} (description marker present)`);
+    }
+  }
   const chunkSize = 500;
 
   for (let i = 0; i < mapped.length; i += chunkSize) {
