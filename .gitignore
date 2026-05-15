@@ -49,3 +49,10 @@ tmp/
 tmp/ 
 *.csv 
 
+# Secrets - NEVER COMMIT
+.local-secrets.txt
+
+# Android signing & build artifacts
+*.keystore
+*.jks
+twa/

@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.black_stack_diesel.twa",
+    "sha256_cert_fingerprints": [
+      "5B:6C:27:7B:4F:5D:F3:A3:61:A5:D7:AE:8E:FF:03:7E:88:39:6D:AF:88:D3:97:70:A3:75:AD:D7:85:8D:D5:1F"
+    ]
+  }
+}]
