@@ -2,11 +2,13 @@
 
 _Generated 2026-04-28. Source: 3 CSVs from initial ACCEL + BAK exports landed in `tmp/asap-data/`. Plus an end-to-end probe of the `/brands`, `/products`, `/product` API endpoints._
 
+> **Update 2026-05-15:** ASAP dashboard now shows **28 approved brands**, up from 25 on 2026-04-28. Newly approved: **Pacific Performance Engineering (PPE)**, **Choate Performance**, **Crown Automotive**. Awaiting data delivery for the new three. The list at the top of `scripts/diagnostics/bsd-vs-asap-linecard.js` (`APPROVED_BRANDS_SET`) is the live source of truth; this doc is a point-in-time inspection. See `docs/BSD_VS_ASAP_LINECARD.md` for the full BSD-catalog-vs-ASAP-line-card breakdown (62 brands / 9,776 BSD SKUs still in the authorization gap as of 2026-05-15).
+
 ## Executive summary
 
 ASAP delivers two parallel data paths: a **bulk CSV export** (manually generated per-brand, what just landed in `tmp/asap-data/`) and a **REST API** (`api.asapnetwork.org/webapi/`, working and probed today). Both paths return the same conceptual schema — SKU + manufacturer SKU, structured packaging dimensions, MAP pricing separate from list, AAIA-coded category and brand IDs, ACES-style fitment rows, and authentic CDN-hosted images. The product detail payload from the API is the richest representation; the CSV product files are very close, with each SKU as one row and fitment encoded as a single pipe-delimited cell. This is a clear quality upgrade over the APG keyword-parsing pipeline: structured fitment, real MAP/list pricing, official brand imagery, and UPCs all become first-class fields.
 
-There are two data-quality issues worth knowing before any import work starts. **First**, the `_fitment` companion CSV is **headerless** and its SKU set does not overlap with the products CSV at all (71 fitment SKUs vs 216 product SKUs, zero intersection for ACCEL). The embedded `fitment` column in the products CSV is the actual usable fitment source — the companion file appears to cover a different/stale SKU universe and shouldn't drive ingest decisions until ASAP clarifies its scope. **Second**, the `/brands` endpoint reports **25 approved brands**, not the 27 you mentioned — flagging in case two are still mid-approval on ASAP's side. Recommendation below is to ingest from the embedded fitment column, treat the companion CSV as supplementary cross-reference data, and reorganize `tmp/asap-data/` into a per-brand subfolder layout to keep multi-snapshot history clean.
+There are two data-quality issues worth knowing before any import work starts. **First**, the `_fitment` companion CSV is **headerless** and its SKU set does not overlap with the products CSV at all (71 fitment SKUs vs 216 product SKUs, zero intersection for ACCEL). The embedded `fitment` column in the products CSV is the actual usable fitment source — the companion file appears to cover a different/stale SKU universe and shouldn't drive ingest decisions until ASAP clarifies its scope. **Second**, the `/brands` endpoint reports **25 approved brands** at the time of this probe (since grown to 28 as of 2026-05-15 — see top-of-doc update). Recommendation below is to ingest from the embedded fitment column, treat the companion CSV as supplementary cross-reference data, and reorganize `tmp/asap-data/` into a per-brand subfolder layout to keep multi-snapshot history clean.
 
 ---
 
@@ -20,9 +22,11 @@ There are two data-quality issues worth knowing before any import work starts. *
 
 Saved: `tmp/asap_approved_brands.json` (full /brands response).
 
-**Approved brands (25):** DiabloSport, Holley Performance, Rock Krawler, USA Standard Gear, Yukon Gear and Axle, RIGID, Skyjacker, EZ Lynk, Icon Vehicle Dynamics, BDS Suspension, Fox Factory, BD Diesel, Bilstein, Edge Products, ACCEL, BAK, Go Rhino, Superlift, NFab, Extang, Lund, Carli Suspension, Rugged Ridge, Retrax, UnderCover.
+**Approved brands as of 2026-04-28 probe (25):** DiabloSport, Holley Performance, Rock Krawler, USA Standard Gear, Yukon Gear and Axle, RIGID, Skyjacker, EZ Lynk, Icon Vehicle Dynamics, BDS Suspension, Fox Factory, BD Diesel, Bilstein, Edge Products, ACCEL, BAK, Go Rhino, Superlift, NFab, Extang, Lund, Carli Suspension, Rugged Ridge, Retrax, UnderCover.
 
-**Note:** You said 27 brands approved, API returned 25. Likely two are still mid-approval — worth checking the ASAP dashboard for any in `requested` state.
+**Added 2026-05-15 (3):** Pacific Performance Engineering, Choate Performance, Crown Automotive.
+
+**Current total: 28 approved.** Source of truth for downstream scripts is `APPROVED_BRANDS_SET` in `scripts/diagnostics/bsd-vs-asap-linecard.js` — update both that constant AND this list whenever a new approval lands.
 
 ### Product detail payload — top-level keys
 

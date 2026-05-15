@@ -20,7 +20,10 @@ const { createClient } = require('@supabase/supabase-js');
 
 const APG_VENDOR_ID = '013cd9a7-171e-45fe-9421-0320319dce33';
 const FEED_PATH = path.join(process.cwd(), 'tmp', 'StandardExport.csv');
-const DRY_RUN = true;
+
+// CLI flags: default is dry-run. Pass --commit to actually write.
+const DRY_RUN = !process.argv.includes('--commit');
+
 const CHUNK_SIZE = 500;
 const CONCURRENCY = 50;
 
@@ -170,7 +173,7 @@ async function main() {
         `| wholesale=$${u.wholesale_price ?? '—'} | map=$${u.map_price ?? '—'}`
       );
     }
-    console.log(`\nWould refresh prices on ${updates.length.toLocaleString()} products. Set DRY_RUN=false to write.`);
+    console.log(`\nWould refresh prices on ${updates.length.toLocaleString()} products. Re-run with --commit to write.`);
     return;
   }
 
