@@ -10,51 +10,87 @@ Black Stack Diesel (BSD) is a mobile-first web application for diesel truck owne
 
 ---
 
+## Design Source of Truth
+
+`app/_legacy/bsd-app.jsx` is the read-only React mockup that defines every color, spacing, layout, and component pattern in the mobile app. **Do not modify it.** Treat it as a frozen design reference — all changes happen in the ported components under `app/src/components/**` and `app/src/screens/**`. The Design System section below extracts its color tokens into `app/src/lib/constants/colors.ts`.
+
+---
+
 ## Tech Stack
 
-- **Framework:** Next.js 14 (App Router)
+**Client (mobile-first PWA):**
+- **Build:** Vite 5 + React 18
 - **Language:** TypeScript (strict mode)
-- **Styling:** Tailwind CSS v4 + CSS custom properties
+- **Styling:** Tailwind CSS v3.4 (layout/spacing) + inline style tokens from `src/lib/constants/colors.ts` (color/surface)
+- **State:** React Context + custom hooks
+- **Persistence:** `localStorage` (namespaced `bsd:*` keys)
+- **Icons:** lucide-react
+- **PWA:** vite-plugin-pwa (Workbox-generated service worker)
+
+**Server / data:**
 - **Database:** PostgreSQL via Supabase
 - **Auth:** Supabase Auth (email/password + Google + Apple OAuth)
-- **ORM:** Drizzle ORM
-- **State Management:** Zustand
-- **AI:** Anthropic Claude API (claude-sonnet-4-20250514) for diagnostics chat
+- **AI:** Anthropic Claude API for diagnostics chat (model selection deferred)
 - **Payments:** Stripe (checkout sessions + webhooks)
 - **File Storage:** Supabase Storage (diagnostic photos)
+- **Email:** Resend, routed through Cloudflare Email Routing
+- **Backend functions:** Vercel serverless functions at `/api/*.js`
+
+**Infra:**
 - **Deployment:** Vercel
 - **Domain/DNS:** Cloudflare
-- **Email:** Cloudflare Email Routing
 
 ---
 
 ## Project Structure
 
+This file documents the full `C:\dev\BlackStackDiesel\` repo. The active mobile app build lives in `app/` — other directories (`admin/`, `api/`, `scripts/`, `supabase/`) are pre-existing and out of scope for the current 6-phase build plan.
+
 ```
 BlackStackDiesel/
-├── index.html                           # Early access landing page (LIVE)
-├── app/
-│   └── index.html                       # Full BSD app prototype
-├── src/                                 # (Future Next.js app)
-│   ├── app/
-│   │   ├── (auth)/login/page.tsx
-│   │   ├── (auth)/register/page.tsx
-│   │   ├── (app)/vehicle-setup/page.tsx
-│   │   ├── (app)/ai/page.tsx
-│   │   ├── (app)/marketplace/page.tsx
-│   │   ├── (app)/orders/page.tsx
-│   │   ├── (app)/profile/page.tsx
-│   │   └── api/
-│   ├── components/
-│   ├── lib/
-│   ├── stores/
-│   └── types/
-├── ARCHITECTURE.md
-├── CLAUDE.md
-├── README.md
-├── LICENSE
-├── package.json
-└── .gitignore
+├── index.html                            # Early access landing page (live)
+├── delete-account.html, privacy.html     # Required for OAuth providers
+├── favicon.ico, logo.png
+├── package.json                          # Root: data-import scripts only (no React deps)
+├── vercel.json
+├── ARCHITECTURE.md, CLAUDE.md, README.md, LICENSE
+├── admin/                                # Admin dashboard (static HTML)
+├── api/                                  # Vercel serverless functions
+│   ├── create-checkout.js                # Stripe checkout session
+│   ├── webhook.js                        # Stripe webhook handler
+│   ├── place-apg-order.js                # APG fulfillment
+│   ├── poll-apg-tracking.js              # APG tracking poller
+│   ├── freight-quote.js, sitemap.xml.js
+│   └── products/
+├── app/                                  # Vite + React + TS PWA — THE mobile app
+│   ├── _legacy/                          # archived: static prototype + bsd-app.jsx mockup
+│   ├── public/icons/                     # PWA icons (192/512, maskable)
+│   ├── src/
+│   │   ├── main.tsx, App.tsx, index.css
+│   │   ├── components/   shared / home / parts / product / diagnose /
+│   │   │                 account / onboarding / cart / checkout
+│   │   ├── screens/      one file per top-level screen
+│   │   ├── lib/
+│   │   │   ├── constants/    colors.ts (every hex token)
+│   │   │   ├── context/      Vehicle, Cart, Conversation, Preferences
+│   │   │   ├── hooks/        useDiagnose, useConversations, useGarage, useCart
+│   │   │   ├── storage/      localStorage wrapper (bsd:* namespace)
+│   │   │   ├── analytics/    diagnostic-chain.ts (anonymized export)
+│   │   │   ├── mock-data/    garage, parts, fitment, orders, diagnoses, symptomTags
+│   │   │   └── utils/        tagExtraction, idGen, dateFormat, anonymize
+│   │   └── types/            Conversation/Message/Resolution/PartReference carry schemaVersion: 1
+│   ├── index.html, vite.config.ts, tailwind.config.ts, postcss.config.cjs
+│   ├── tsconfig.json, tsconfig.node.json
+│   ├── package.json                      # App-scoped deps (React, Vite, Tailwind, etc.)
+│   └── TODO.md                           # deferred-fix list
+├── data/, docs/, tmp/, vendors/
+├── lib/                                  # Root-shared helpers (e.g. emails.js)
+├── shared/                               # Shared between api/ and admin/
+├── scripts/
+│   ├── diagnostics/                      # apg-test-auth, apg-test-api
+│   ├── importers/                        # apg/asap feed importers
+│   └── ops/                              # asap-coverage-analysis, etc.
+└── supabase/                             # SQL migrations, RLS policies
 ```
 
 ---
@@ -85,17 +121,35 @@ Year → Make (only makes with models for that year)
 
 ### Aesthetic: Industrial / Dark / Tough
 
+**Source of truth:** `app/_legacy/bsd-app.jsx` — the React mockup that defines every color, spacing, and component pattern. Color tokens are exported from `app/src/lib/constants/colors.ts`. No component file should contain a hardcoded hex value — always import from `@/lib/constants/colors`.
+
 Colors:
-```css
---bg: #08090B; --bg2: #0E1014; --bg3: #151820; --bg4: #1C2029;
---ember: #FF6B2C; --ember2: #E85A1E;
---amber: #F5A623;
---text-primary: #F2EDE6; --text-secondary: #A0A4B0; --text-muted: #5E6270;
+```ts
+// Primary brand
+AMBER         = '#f59e0b'   // CTA / accent
+AMBER_DEEP    = '#d97706'   // CTA gradient end
+// Surfaces
+BG            = '#16161a'   // page background
+SURFACE       = '#1f1f24'   // cards
+SURFACE_2     = '#2a2a30'   // nested cards / inputs
+BORDER        = '#2e2e35'
+// Text
+TEXT          = '#e8e6e3'
+TEXT_MUTED    = '#8b8a87'
+TEXT_DIM      = '#5c5b58'
+// Status
+GREEN         = '#6ee7b7'   // fits / resolved / success
+GREEN_BG      = '#0d3221'
+GREEN_BORDER  = '#1d5238'
+DANGER        = '#f87171'   // destructive
+// Overlays
+AMBER_ON_BG   = '#1a1207'   // text/icon color on amber buttons
+PRODUCT_BG    = '#f5f4f1'   // light placeholder behind product imagery
 ```
 
-Typography: Rajdhani (display/headings), Archivo (body)
+Typography: **Inter** (weights 400/500/600/700/800), loaded from Google Fonts.
 
-Mobile-first: 393×852 viewport, bottom nav (AI / Shop / Profile), 44px minimum touch targets.
+Mobile-first: 393×852 reference viewport, bottom nav (Home / Parts / Diagnose / Account), 44px minimum touch targets, `rounded-2xl` cards, `rounded-xl` inner elements, `px-4` page padding.
 
 ---
 
@@ -107,18 +161,18 @@ Mobile-first: 393×852 viewport, bottom nav (AI / Shop / Profile), 44px minimum 
 
 ---
 
-## Implementation Order
+## Build Plan (mobile app)
 
-1. Project scaffold (Next.js, TypeScript, Tailwind, Supabase)
-2. Auth (login/register, Supabase Auth, protected routes)
-3. Database (Drizzle schema, migrations, seed vehicles + products)
-4. Vehicle Setup (cascading selector, Zustand store, save to DB)
-5. Layout Shell (mobile shell, bottom nav)
-6. AI Chat (Anthropic API, engine-specific prompts, photo upload)
-7. Marketplace (filtered product grid, categories, search)
-8. Cart + Checkout (Zustand cart, Stripe checkout)
-9. Orders (Stripe webhooks, order list, tracking)
-10. Profile (vehicle display, stats, settings)
+The mobile app is being built out from `app/_legacy/bsd-app.jsx` in 6 phases. Stop and review after each.
+
+1. **Scaffold** — Vite + React + TS + Tailwind set up at `app/`, folder structure + stub files + `colors.ts` populated. ✅
+2. **Refactor existing screens** — Port Home/Parts/Product/Diagnose/Account out of the monolith into their own files. Replace local state with VehicleContext, CartContext, PreferencesContext, ConversationContext (stub). Persist garage/cart/preferences to localStorage. No design changes.
+3. **Onboarding + Cart + Checkout** — 6-step vehicle picker, data-sharing disclosure, cart screen, 3-step checkout, order confirmation.
+4. **Ongoing chat + image upload + diagnostic data chain** — Multi-conversation per vehicle, image attachments, symptom tag extraction, resolution flow, cross-diagnosis suggestions, PartReference data model.
+5. **Analytics + anonymization** — `lib/analytics/diagnostic-chain.ts` + `lib/utils/anonymize.ts`. The sellable anonymized dataset layer.
+6. **Polish + Account wiring** — Loading/empty states, error boundaries, settings detail screens, dev-only "reset onboarding" hatch.
+
+Backend integration (real Anthropic API, real product queries) is deliberately out of scope through Phase 6 — the build plan calls all data sources mocked, with hooks structured so the real API call is a one-file change later.
 
 ---
 
@@ -165,15 +219,18 @@ requires `Authorization: Bearer <CRON_SECRET>` header. Vercel cron provides
 this automatically. Without it, anyone with the URL can trigger the function
 (not destructive but consumes API quota).
 
+Note: `NEXT_PUBLIC_*` prefix is legacy from the original Next.js plan. The serverless functions in `/api/*.js` still read these via `process.env` regardless of prefix. Any new client-side env var consumed by the Vite app must use the `VITE_*` prefix instead.
+
 ---
 
 ## Code Style
 
 - Functional components only
-- Server Components by default, `"use client"` only when needed
-- Zod for all API input validation
+- Inline `style={{ background: SURFACE }}` for color/surface tokens (per mockup convention); Tailwind for layout/spacing only
+- Zod for input validation at every API boundary (Vercel functions, future AI proxy)
 - Prices stored as cents in DB, displayed as dollars in UI
-- Error boundaries on every route segment
+- Error boundaries on every top-level screen — one bad screen shouldn't kill navigation
+- Every persisted data structure (`Conversation`, `Message`, `Resolution`, `PartReference`, `AnalyticsEvent`) carries a `schemaVersion: 1` field for future migrations
 
 ---
 
