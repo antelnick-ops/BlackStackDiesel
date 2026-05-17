@@ -34,10 +34,18 @@
   --ease:cubic-bezier(.22,1,.36,1);
 }
 
-/* Color semantics (BSD restyle Pass 4-5):
-   AMBER (--gold / --goldg) = persistent selection, commitment, primary action.
-   ORANGE (#FF6B2C, hardcoded) = transient action needed, clearable state, warning.
-   See .pill.sel / .ct.on / .stg.on (amber) vs .afc-chip / .banner-paused (orange).
+/* BSD Color Semantics — established Passes 1-7
+   AMBER (--gold/--goldg): primary CTAs, selected/active state, identity markers, grand totals.
+     Used by: .btn-g, .pill.sel, .ct.on, .stg.on, .mk-vp border, .cd-tot strong, .cart-core-disclosure.
+   ORANGE (#FF6B2C, hardcoded): transient warnings, clearable states.
+     Used by: .afc-chip, .banner-paused, .cart-ship-nudge, .pdm-share-toast, freight-quote inline overrides.
+   DEEPER RED (#dc2626, hardcoded): blocking warnings (freight quote required to checkout).
+     Used by: .cart-ship-quote-banner.
+   --red (#f87171): error text, sign-out, destructive actions.
+     Used by: .so-btn, .cart-remove, .fpw-msg.err, #authErr.
+   --grn (#6ee7b7) / GREEN_BG (#0d3221): success/fits/delivered/resolved.
+     Used by: .pc-fit, .fpw-msg.ok.
+   --t1 (cream #e8e6e3): per-item prices, normal text, product/vehicle names.
    Intentionally separate roles — do not unify into one accent. */
 html,body{height:100%;overflow:hidden}
 body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);display:flex;justify-content:center;align-items:center}
@@ -310,35 +318,35 @@ body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);di
 .feed-empty{grid-column:1/-1;padding:24px 12px;text-align:center;color:var(--t3);font-size:12px}
 
 .cd{position:absolute;inset:0;z-index:300;pointer-events:none}.cd.op{pointer-events:auto}
-.cd-bg{position:absolute;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);opacity:0;transition:.4s}.cd.op .cd-bg{opacity:1}
-.cd-sh{position:absolute;bottom:0;left:0;right:0;background:rgba(13,13,18,.96);backdrop-filter:blur(40px);border-radius:24px 24px 0 0;padding:20px 24px 36px;transform:translateY(100%);transition:.5s var(--ease);max-height:70%;overflow-y:auto;border:1px solid var(--glb);border-bottom:none}.cd.op .cd-sh{transform:translateY(0)}
+.cd-bg{position:absolute;inset:0;background:rgba(0,0,0,.7);opacity:0;transition:.4s}.cd.op .cd-bg{opacity:1}
+.cd-sh{position:absolute;bottom:0;left:0;right:0;background:var(--c1);border-radius:var(--r3) var(--r3) 0 0;padding:20px 24px 36px;transform:translateY(100%);transition:.5s var(--ease);max-height:70%;overflow-y:auto;border:1px solid var(--c4);border-bottom:none}.cd.op .cd-sh{transform:translateY(0)}
 .cd-h{width:32px;height:3px;background:var(--t4);border-radius:2px;margin:0 auto 18px}
 .cd-t{font-size:15px;font-weight:800;margin-bottom:14px;letter-spacing:-.2px}
 .cd-e{text-align:center;padding:32px 0;color:var(--t3);font-size:12px;font-weight:500}
 .cart-list{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
-.cart-item{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--gl);border:1px solid var(--glb)}
+.cart-item{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:var(--r);background:var(--c2);border:1px solid var(--c4)}
 .cart-emoji{font-size:22px;flex-shrink:0}
 .cart-copy{flex:1}
 .cart-copy h4{font-size:12px;font-weight:700;margin-bottom:3px}
 .cart-copy p{font-size:10px;color:var(--t3)}
 .cart-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
-.cart-price{font-size:12px;font-weight:800;color:var(--gold)}
+.cart-price{font-size:12px;font-weight:700;color:var(--t1)}
 .cart-remove{background:transparent;border:none;color:var(--red);font-size:10px;font-weight:700;cursor:pointer}
 .cart-core-note{font-size:9px;color:var(--gold);margin-top:2px}
-.cart-subtotals{margin-top:14px;padding-top:12px;border-top:1px solid var(--glb)}
+.cart-subtotals{margin-top:14px;padding-top:12px;border-top:1px solid var(--c4)}
 .cart-subtotal-row{display:flex;justify-content:space-between;padding:6px 0;font-size:11px;color:var(--t2)}
-.cart-subtotal-row.cart-subtotal-grand{padding-top:8px;margin-top:4px;border-top:1px solid var(--glb);font-size:13px;font-weight:600;color:var(--t1)}
+.cart-subtotal-row.cart-subtotal-grand{padding-top:8px;margin-top:4px;border-top:1px solid var(--c4);font-size:13px;font-weight:600;color:var(--t1)}
 .cart-ship-nudge{padding:6px 0;font-size:11px;color:#FF6B2C;font-weight:600}
 .cart-ship-oversize-note{padding:4px 0 6px;font-size:10px;color:var(--t2);font-style:italic;line-height:1.4}
-.cart-ship-quote-banner{margin-top:8px;padding:10px 12px;background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.3);border-radius:6px;color:#dc2626;font-size:11px;line-height:1.4;font-weight:500}
+.cart-ship-quote-banner{margin-top:8px;padding:10px 12px;background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.3);border-radius:var(--r);color:#dc2626;font-size:11px;line-height:1.4;font-weight:500}
 .pc-quote-badge{display:inline-block;padding:3px 8px;background:rgba(255,107,44,.12);color:#FF6B2C;border:1px solid rgba(255,107,44,.3);border-radius:6px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:6px 0}
 .pc-quote-btn{width:100%;padding:8px;background:rgba(255,107,44,.1);color:#FF6B2C;border:1px solid #FF6B2C;border-radius:8px;font-weight:600;font-size:11px;cursor:pointer;font-family:inherit}
 .pc-quote-btn:hover{background:rgba(255,107,44,.2)}
 .pdm-quote-notice{padding:10px 12px;margin:12px 0;background:rgba(255,107,44,.08);border:1px solid rgba(255,107,44,.3);border-radius:8px;color:var(--t1);font-size:12px;line-height:1.5}
 .pdm-quote-btn{width:100%;padding:12px;background:#FF6B2C;color:#fff;border:none;border-radius:10px;font-weight:600;font-size:13px;cursor:pointer;font-family:inherit}
 .pdm-quote-btn:hover{background:#e55a1f}
-.cart-core-disclosure{margin-top:10px;padding:8px 10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);border-radius:6px;font-size:9px;line-height:1.4;color:var(--gold)}
-.cd-tot{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-top:1px solid var(--glb);margin:14px 0}
+.cart-core-disclosure{margin-top:10px;padding:8px 10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);border-radius:var(--r);font-size:9px;line-height:1.4;color:var(--gold)}
+.cd-tot{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-top:1px solid var(--c4);margin:14px 0}
 .cd-tot span{font-size:12px;color:var(--t2);font-weight:500}
 .cd-tot strong{font-size:20px;font-weight:800;color:var(--gold)}
 
