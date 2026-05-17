@@ -123,24 +123,24 @@ body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);di
 .ni:active{transform:scale(.92)}
 
 /* Center tab: elevated and gold-glowing — the AI Assistant differentiator */
-.ni.center{position:relative;flex:0 0 64px;height:64px;margin-top:-22px;border-radius:50%;background:linear-gradient(140deg,#FBBF24,#F59E0B,#D97706);box-shadow:0 4px 20px rgba(237,174,10,.45),0 0 30px rgba(237,174,10,.25),inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(0,0,0,.2);border:2px solid rgba(7,7,10,.85);color:#0a0a0a;justify-content:center;gap:0}
-.ni.center svg{width:24px;height:24px;stroke:#0a0a0a;stroke-width:2.4}
+.ni.center{position:relative;flex:0 0 64px;height:64px;margin-top:-22px;border-radius:50%;background:linear-gradient(140deg,#FBBF24,var(--gold),var(--gold2));box-shadow:0 4px 20px rgba(245,158,11,.45),0 0 30px rgba(245,158,11,.25),inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(0,0,0,.2);border:2px solid rgba(22,22,26,.85);color:#1a1207;justify-content:center;gap:0}
+.ni.center svg{width:24px;height:24px;stroke:#1a1207;stroke-width:2.4}
 .ni.center span{display:none}
-.ni.center.on svg{stroke:#0a0a0a}
-.ni.center::after{content:'';position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:8px;font-weight:900;letter-spacing:1px;color:var(--gold);text-transform:uppercase;text-shadow:0 1px 1px rgba(0,0,0,.6)}
+.ni.center.on svg{stroke:#1a1207}
+.ni.center::after{content:'';position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:8px;font-weight:900;letter-spacing:1px;color:var(--gold);text-transform:uppercase}
 .ni.center.on::after,.ni.center::after{content:'AI'}
 
 /* Tighten the bnav container so the elevated center tab has breathing room */
 .bnav{padding:0 24px 14px}
 .bnav-in{height:62px;padding:0 4px;align-items:center}
 .bnav{position:absolute;bottom:0;left:0;right:0;z-index:100;padding:0 24px 14px}
-.bnav-in{display:flex;align-items:center;justify-content:space-around;height:56px;background:rgba(7,7,10,.75);backdrop-filter:blur(40px) saturate(1.8);-webkit-backdrop-filter:blur(40px) saturate(1.8);border:1px solid rgba(255,255,255,.04);border-radius:100px;padding:0 8px}
+.bnav-in{display:flex;align-items:center;justify-content:space-around;height:56px;background:rgba(22,22,26,.75);backdrop-filter:blur(40px) saturate(1.8);-webkit-backdrop-filter:blur(40px) saturate(1.8);border:1px solid rgba(255,255,255,.04);border-radius:100px;padding:0 8px}
 .ni{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 24px;border-radius:100px;position:relative;transition:.3s var(--ease)}
 .ni svg{width:20px;height:20px;stroke:var(--t4);fill:none;stroke-width:1.7;transition:.35s var(--ease)}
 .ni span{font-size:9px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:1.8px;transition:.35s var(--ease)}
 .ni.on svg{stroke:var(--gold)}
 .ni.on span{color:var(--gold)}
-.ni.on::before{content:'';position:absolute;inset:0;border-radius:100px;background:rgba(237,174,10,.05);border:1px solid rgba(237,174,10,.08)}
+.ni.on::before{content:'';position:absolute;inset:0;border-radius:100px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.08)}
 .hid{display:none!important}
 
 .g{background:var(--c1);border:1px solid var(--c4);border-radius:var(--r2)}
@@ -269,7 +269,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);di
 .cbtn{position:relative;width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .cbtn:active{transform:scale(.88)}
 .cbtn svg{width:19px;height:19px;stroke:var(--t2);fill:none;stroke-width:1.7}
-.cbdg{position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;background:var(--goldg);border-radius:100px;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);padding:0 4px;color:#0a0a0a}
+.cbdg{position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;background:var(--goldg);border-radius:100px;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);padding:0 4px;color:#1a1207}
 .vstrip{padding:10px 14px;border-radius:var(--r);display:flex;align-items:center;gap:9px;margin-bottom:14px;font-size:11px;font-weight:600;color:var(--gold)}
 .vstrip svg{width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:2;flex-shrink:0}
 .cats-wrap{position:relative;margin-bottom:12px}
