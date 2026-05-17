@@ -34,28 +34,33 @@
   --ease:cubic-bezier(.22,1,.36,1);
 }
 
-/* BSD Design System — established Passes 1-8
+/* BSD Design System — established Passes 1-9
 
    COLOR SEMANTICS
-   AMBER (--gold/--goldg): primary CTAs, selected/active state, identity markers, grand totals/commitment.
-     Used by: .btn-g, .pill.sel, .ct.on, .stg.on, .mk-vp border, .cd-tot strong, .cart-core-disclosure, .pdm-stg-pill.
+   AMBER (--gold/--goldg): primary CTAs, selected/active state, identity markers,
+     grand totals/commitment, stat values / display metrics.
+     Used by: .btn-g, .pill.sel, .ct.on, .stg.on, .mk-vp border, .cd-tot strong,
+              .cart-core-disclosure, .pdm-stg-pill, .p-stv, order status "pending".
    ORANGE (#FF6B2C, hardcoded): transient warnings, clearable states.
-     Used by: .afc-chip, .banner-paused, .cart-ship-nudge, .pdm-share-toast, freight-quote inline overrides.
+     Used by: .afc-chip, .banner-paused, .cart-ship-nudge, .pdm-share-toast,
+              freight-quote inline overrides, order status "confirmed".
    DEEPER RED (#dc2626, hardcoded): blocking warnings (freight quote required to checkout).
      Used by: .cart-ship-quote-banner.
-   --red (#f87171): informational/destructive — errors, sign-out, does-not-fit.
-     Used by: .so-btn, .cart-remove, .fpw-msg.err, .pdm-fit-no, #authErr.
-   --grn (#6ee7b7): success/fits/delivered/resolved.
-     Used by: .pc-fit, .pdm-fit-yes, .fpw-msg.ok.
+   --red (#f87171): informational/destructive — errors, sign-out, does-not-fit, cancelled.
+     Used by: .so-btn, .cart-remove, .fpw-msg.err, .pdm-fit-no, #authErr, order status "cancelled".
+   --grn (#6ee7b7): success/fits/delivered/resolved/shipped.
+     Used by: .pc-fit, .pdm-fit-yes, .fpw-msg.ok, order tracking section, order status "shipped"/"delivered".
    --t1 (cream #e8e6e3): per-line/per-spec prices, normal text, product/vehicle names.
      .pdm-price uses TEXT (displayed price, not commitment — commitment happens at Add to Cart).
-     Grand totals + commitment prices: AMBER.
+     Distinction: "transactional accounting" (per-line prices, subtotals) = TEXT;
+                  "metric display" (stat tiles, grand totals) = AMBER.
    Intentionally separate roles — do not unify into one accent.
 
    COMPONENT PATTERNS
    Product imagery: aspect-square + #f5f4f1 cream bg (.pc-img, .pdm-img, .pdm-carousel-slide).
    Bottom-sheet hinge: var(--r3) (24px) top corners for slide-up-from-bottom sheets (.cd-sh, .pdm).
-   Qty stepper: 40x48 buttons inside rounded-2xl (var(--r2)) container, var(--c1) bg + var(--c4) border (.pdm-qty). */
+   Qty stepper: 40x48 buttons inside rounded-2xl (var(--r2)) container, var(--c1) bg + var(--c4) border (.pdm-qty).
+   Modal text colors: paragraph body var(--t2), helper/hint text var(--t3). */
 html,body{height:100%;overflow:hidden}
 body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);display:flex;justify-content:center;align-items:center}
 
@@ -361,23 +366,22 @@ body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);di
 
 #s-pro{padding:20px 24px 120px}
 .p-head{text-align:center;padding:20px 0 8px}
-.p-av{width:76px;height:76px;border-radius:24px;background:var(--goldg);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#0a0a0a;box-shadow:0 8px 36px rgba(237,174,10,.12);position:relative}
-.p-av::after{content:'';position:absolute;inset:-4px;border-radius:28px;border:1px solid rgba(237,174,10,.08)}
-.p-name{font-size:18px;font-weight:800;letter-spacing:-.3px}
+.p-av{width:76px;height:76px;border-radius:var(--r3);background:var(--c2);border:1px solid var(--c4);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:var(--t1)}
+.p-name{font-size:18px;font-weight:700;letter-spacing:-.3px}
 .p-email{font-size:11px;color:var(--t3);margin-top:3px;font-weight:500}
 .p-truck{border-radius:var(--r2);padding:16px;margin:22px 0 18px;display:flex;align-items:center;gap:12px}
-.p-trk-i{width:46px;height:46px;background:var(--goldgl);border:1px solid var(--goldb);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.p-trk-t h4{font-size:13px;font-weight:700;background:var(--goldg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.p-trk-i{width:46px;height:46px;background:var(--c2);border:1px solid var(--c4);border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.p-trk-t h4{font-size:13px;font-weight:700;color:var(--t1)}
 .p-trk-t p{font-size:10px;color:var(--t3);margin-top:2px;font-weight:500}
-.p-edit{margin-left:auto;padding:7px 16px;border-radius:10px;font-size:9px;font-weight:700;color:var(--t2);cursor:pointer;letter-spacing:.5px;text-transform:uppercase}
+.p-edit{margin-left:auto;padding:7px 16px;border-radius:var(--r);font-size:9px;font-weight:700;color:var(--t2);cursor:pointer;letter-spacing:.5px;text-transform:uppercase}
 .p-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:22px}
 .p-st{border-radius:var(--r);padding:14px 6px;text-align:center}
 .p-stv{font-size:18px;font-weight:800;color:var(--gold)}
 .p-stl{font-size:8px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1.4px;margin-top:4px}
 .p-list{display:flex;flex-direction:column;gap:1px;border-radius:var(--r2);overflow:hidden}
-.p-row{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--gl);cursor:pointer;transition:.15s}
-.p-row:active{background:var(--glh)}
-.p-ri{width:36px;height:36px;border-radius:11px;background:rgba(255,255,255,.025);border:1px solid var(--glb);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.p-row{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--c2);cursor:pointer;transition:.15s}
+.p-row:active{background:var(--c1)}
+.p-ri{width:36px;height:36px;border-radius:var(--r);background:var(--c1);border:1px solid var(--c4);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .p-ri svg{width:16px;height:16px;stroke:var(--t2);fill:none;stroke-width:1.7}
 .p-row span{flex:1;font-size:13px;font-weight:500}.p-row .ch{color:var(--t4);font-size:15px}
 .so-btn{width:100%;height:48px;background:transparent;border:1px solid rgba(248,113,113,.1);border-radius:var(--r);margin-top:20px;font-size:12px;font-weight:700;color:var(--red);cursor:pointer;transition:.2s;letter-spacing:.3px}
@@ -1927,9 +1931,9 @@ function escapeHtml(v){
 function showCheckoutPausedModal(){
   showModal('Checkout Temporarily Unavailable', ''
     + '<div style="padding:8px 0;">'
-    + '<p style="color:#ccc;line-height:1.6;margin-bottom:14px;">We\'re updating our pricing and inventory systems with our distributor and have temporarily paused new orders.</p>'
-    + '<p style="color:#ccc;line-height:1.6;margin-bottom:14px;">Your cart will be saved — please check back soon. Expected to reopen within the next few days.</p>'
-    + '<p style="color:#ccc;line-height:1.6;margin-bottom:18px;">Questions? Email <a href="mailto:help@black-stack-diesel.com" style="color:#FF6B2C;">help@black-stack-diesel.com</a></p>'
+    + '<p style="color:var(--t2);line-height:1.6;margin-bottom:14px;">We\'re updating our pricing and inventory systems with our distributor and have temporarily paused new orders.</p>'
+    + '<p style="color:var(--t2);line-height:1.6;margin-bottom:14px;">Your cart will be saved — please check back soon. Expected to reopen within the next few days.</p>'
+    + '<p style="color:var(--t2);line-height:1.6;margin-bottom:18px;">Questions? Email <a href="mailto:help@black-stack-diesel.com" style="color:#FF6B2C;">help@black-stack-diesel.com</a></p>'
     + '<button onclick="closeAppModal()" class="btn-g" style="width:100%">Got it</button>'
     + '</div>');
 }
@@ -3393,8 +3397,8 @@ function closeAppModal(){
 
 function orderStatusBadge(status){
   const s = (status || 'pending').toLowerCase();
-  const colors = { confirmed:'#FF6B2C', shipped:'#22c55e', delivered:'#22c55e', cancelled:'#ef4444', pending:'#F5A623' };
-  const bg = colors[s] || '#666';
+  const colors = { confirmed:'#FF6B2C', shipped:'#6ee7b7', delivered:'#6ee7b7', cancelled:'#f87171', pending:'#f59e0b' };
+  const bg = colors[s] || '#666666';
   return '<span style="display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;'
     + 'padding:3px 8px;border-radius:4px;background:' + bg + '22;color:' + bg + ';">' + escapeHtml(s) + '</span>';
 }
@@ -3412,7 +3416,7 @@ async function showOrderHistory(){
   if(error){ console.error(error); alert('Could not load orders'); return; }
 
   if(!orders || orders.length === 0){
-    showModal('Order History', '<div style="text-align:center;padding:40px 20px;"><div style="font-size:48px;margin-bottom:16px;">📦</div><div style="color:#999;">No orders yet.</div><div style="color:#666;font-size:14px;margin-top:8px;">When you make a purchase, it will appear here.</div></div>');
+    showModal('Order History', '<div style="text-align:center;padding:40px 20px;"><div style="font-size:48px;margin-bottom:16px;">📦</div><div style="color:var(--t3);">No orders yet.</div><div style="color:var(--t3);font-size:14px;margin-top:8px;">When you make a purchase, it will appear here.</div></div>');
     return;
   }
 
@@ -3421,12 +3425,12 @@ async function showOrderHistory(){
     const label = o.order_number ? ('#' + o.order_number) : ('#' + String(o.id || '').substring(0,8));
     const date = o.created_at ? new Date(o.created_at).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }) : '';
     const total = (parseFloat(o.total) || 0).toFixed(2);
-    return '<div onclick="showOrderDetail(' + i + ')" style="padding:14px 16px;border-bottom:1px solid #1a1a1a;cursor:pointer;transition:background .15s;" onmouseenter="this.style.background=\'rgba(255,255,255,.03)\'" onmouseleave="this.style.background=\'none\'">'
+    return '<div onclick="showOrderDetail(' + i + ')" style="padding:14px 16px;border-bottom:1px solid var(--c4);cursor:pointer;transition:background .15s;" onmouseenter="this.style.background=\'rgba(255,255,255,.03)\'" onmouseleave="this.style.background=\'none\'">'
       + '<div style="display:flex;justify-content:space-between;align-items:center;">'
       + '<div><div style="font-weight:600;font-size:14px;">Order ' + escapeHtml(label) + '</div>'
       + '<div style="color:var(--t3);font-size:12px;margin-top:2px;">' + escapeHtml(date) + '</div></div>'
       + '<div style="display:flex;align-items:center;gap:10px;">'
-      + '<div style="text-align:right;"><div style="font-weight:700;font-family:\'DM Mono\',monospace;font-size:14px;">$' + total + '</div>'
+      + '<div style="text-align:right;"><div style="font-weight:700;font-size:14px;">$' + total + '</div>'
       + orderStatusBadge(o.status) + '</div>'
       + '<span style="color:var(--t3);font-size:18px;">›</span>'
       + '</div></div></div>';
@@ -3456,16 +3460,16 @@ async function showOrderDetail(idx){
     itemsHtml = items.map(li => {
       const price = (parseFloat(li.unit_price) || 0).toFixed(2);
       const lineTotal = (parseFloat(li.line_total) || 0).toFixed(2);
-      return '<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #1a1a1a;">'
+      return '<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--c4);">'
         + (li.image_url
-          ? '<img src="' + escapeHtml(li.image_url) + '" style="width:52px;height:52px;object-fit:contain;border-radius:6px;background:#111;flex-shrink:0;" onerror="this.style.display=\'none\'">'
-          : '<div style="width:52px;height:52px;border-radius:6px;background:#111;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;">📦</div>')
+          ? '<img src="' + escapeHtml(li.image_url) + '" style="width:52px;height:52px;object-fit:contain;border-radius:6px;background:var(--c2);flex-shrink:0;" onerror="this.style.display=\'none\'">'
+          : '<div style="width:52px;height:52px;border-radius:6px;background:var(--c2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;">📦</div>')
         + '<div style="flex:1;min-width:0;">'
         + '<div style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHtml(li.product_name) + '</div>'
         + (li.brand ? '<div style="color:var(--t3);font-size:11px;">' + escapeHtml(li.brand) + (li.sku ? ' · ' + escapeHtml(li.sku) : '') + '</div>' : '')
         + '<div style="color:var(--t3);font-size:12px;margin-top:2px;">Qty ' + (li.quantity || 1) + ' × $' + price + '</div>'
         + '</div>'
-        + '<div style="font-weight:700;font-family:\'DM Mono\',monospace;font-size:13px;white-space:nowrap;">$' + lineTotal + '</div>'
+        + '<div style="font-weight:700;font-size:13px;white-space:nowrap;">$' + lineTotal + '</div>'
         + '</div>';
     }).join('');
   } else if(!error && (!items || items.length === 0)){
@@ -3478,9 +3482,9 @@ async function showOrderDetail(idx){
     const carrier = escapeHtml(o.tracking_carrier || 'Carrier');
     const trackNum = escapeHtml(o.tracking_number);
     const shippedDate = o.shipped_at ? new Date(o.shipped_at).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }) : '';
-    trackingHtml = '<div style="margin-top:16px;padding:12px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15);border-radius:8px;">'
-      + '<div style="font-weight:700;font-size:12px;color:#22c55e;margin-bottom:6px;">TRACKING</div>'
-      + '<div style="font-size:13px;">' + carrier + ': <span style="font-family:\'DM Mono\',monospace;">' + trackNum + '</span></div>'
+    trackingHtml = '<div style="margin-top:16px;padding:12px;background:rgba(110,231,183,.08);border:1px solid rgba(110,231,183,.25);border-radius:var(--r);">'
+      + '<div style="font-weight:700;font-size:12px;color:var(--grn);margin-bottom:6px;">TRACKING</div>'
+      + '<div style="font-size:13px;">' + carrier + ': <span style="">' + trackNum + '</span></div>'
       + (shippedDate ? '<div style="color:var(--t3);font-size:11px;margin-top:2px;">Shipped ' + shippedDate + '</div>' : '')
       + '</div>';
   }
@@ -3499,7 +3503,7 @@ async function showOrderDetail(idx){
 
   const html = '<div>'
     // Back link
-    + '<div onclick="showOrderHistory()" style="color:#FF6B2C;font-size:13px;cursor:pointer;margin-bottom:14px;font-weight:600;">← All Orders</div>'
+    + '<div onclick="showOrderHistory()" style="color:var(--gold);font-size:13px;cursor:pointer;margin-bottom:14px;font-weight:600;">← All Orders</div>'
     // Header
     + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">'
     + '<div><div style="font-size:16px;font-weight:800;">Order ' + escapeHtml(label) + '</div>'
@@ -3510,11 +3514,11 @@ async function showOrderDetail(idx){
     + '<div style="font-weight:700;font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Items</div>'
     + itemsHtml
     // Totals
-    + '<div style="margin-top:14px;padding-top:10px;border-top:1px solid #222;">'
-    + '<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--t2);margin-bottom:4px;"><span>Subtotal</span><span style="font-family:\'DM Mono\',monospace;">$' + subtotal + '</span></div>'
-    + '<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--t2);margin-bottom:4px;"><span>Shipping</span><span style="font-family:\'DM Mono\',monospace;">$' + shipping + '</span></div>'
-    + '<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--t2);margin-bottom:8px;"><span>Tax</span><span style="font-family:\'DM Mono\',monospace;">$' + tax + '</span></div>'
-    + '<div style="display:flex;justify-content:space-between;font-size:15px;font-weight:800;padding-top:8px;border-top:1px solid #333;"><span>Total</span><span style="font-family:\'DM Mono\',monospace;color:#FF6B2C;">$' + total + '</span></div>'
+    + '<div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--c4);">'
+    + '<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--t2);margin-bottom:4px;"><span>Subtotal</span><span style="">$' + subtotal + '</span></div>'
+    + '<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--t2);margin-bottom:4px;"><span>Shipping</span><span style="">$' + shipping + '</span></div>'
+    + '<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--t2);margin-bottom:8px;"><span>Tax</span><span style="">$' + tax + '</span></div>'
+    + '<div style="display:flex;justify-content:space-between;font-size:15px;font-weight:800;padding-top:8px;border-top:1px solid var(--c4);"><span>Total</span><span style="color:var(--gold);">$' + total + '</span></div>'
     + '</div>'
     // Tracking
     + trackingHtml
@@ -3529,9 +3533,9 @@ function showPaymentMethods(){
   showModal('Payment Methods', ''
     + '<div style="padding:20px 0;">'
     + '<div style="font-size:32px;margin-bottom:16px;text-align:center;">💳</div>'
-    + '<p style="color:#ccc;line-height:1.6;margin-bottom:16px;">Black Stack Diesel uses Stripe for secure checkout. Your payment details are never stored on our servers — Stripe handles all card processing with bank-grade encryption.</p>'
-    + '<p style="color:#ccc;line-height:1.6;margin-bottom:16px;">At checkout, you can save your card to Stripe for faster future purchases. Look for the "Save payment method" option on the Stripe Checkout page.</p>'
-    + '<p style="color:#999;font-size:13px;">Saved card management will be available here in a future update.</p>'
+    + '<p style="color:var(--t2);line-height:1.6;margin-bottom:16px;">Black Stack Diesel uses Stripe for secure checkout. Your payment details are never stored on our servers — Stripe handles all card processing with bank-grade encryption.</p>'
+    + '<p style="color:var(--t2);line-height:1.6;margin-bottom:16px;">At checkout, you can save your card to Stripe for faster future purchases. Look for the "Save payment method" option on the Stripe Checkout page.</p>'
+    + '<p style="color:var(--t3);font-size:13px;">Saved card management will be available here in a future update.</p>'
     + '</div>');
 }
 
@@ -3539,22 +3543,22 @@ function showSavedAddresses(){
   showModal('Saved Addresses', `
     <div style="padding:20px;">
       <div style="font-size:32px;margin-bottom:16px;text-align:center;">📍</div>
-      <p style="color:#ccc;line-height:1.6;margin-bottom:16px;">
+      <p style="color:var(--t2);line-height:1.6;margin-bottom:16px;">
         Black Stack Diesel uses Stripe for secure checkout. Your
         shipping address is entered and securely stored with Stripe
         at checkout — we never store it on our servers.
       </p>
-      <p style="color:#ccc;line-height:1.6;margin-bottom:16px;">
+      <p style="color:var(--t2);line-height:1.6;margin-bottom:16px;">
         At checkout, you can save your address with Stripe for
         faster future purchases. Your saved address will auto-fill
         the next time you check out.
       </p>
-      <p style="color:#ccc;line-height:1.6;margin-bottom:16px;">
+      <p style="color:var(--t2);line-height:1.6;margin-bottom:16px;">
         Need to change a shipping address on an order that hasn't
         shipped yet? Contact us at help@black-stack-diesel.com and
         we'll update it for you.
       </p>
-      <p style="color:#999;font-size:13px;">
+      <p style="color:var(--t3);font-size:13px;">
         Saved address management will be available here in a future
         update.
       </p>
@@ -3570,17 +3574,17 @@ function showNotifications(){
   showModal('Notifications', ''
     + '<div style="padding:12px 0;">'
     + '<div style="font-size:32px;margin-bottom:20px;text-align:center;">🔔</div>'
-    + '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 0;border-bottom:1px solid #222;">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 0;border-bottom:1px solid var(--c4);">'
     + '<div><div style="font-weight:600;color:var(--t1);">Order Updates</div>'
-    + '<div style="color:#999;font-size:13px;">Shipping, tracking, delivery</div></div>'
+    + '<div style="color:var(--t3);font-size:13px;">Shipping, tracking, delivery</div></div>'
     + '<label class="toggle"><input type="checkbox" id="notif-orders" ' + (emailOrders ? 'checked' : '') + ' onchange="saveNotifPrefs()"><span class="slider"></span></label>'
     + '</div>'
-    + '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 0;border-bottom:1px solid #222;">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 0;border-bottom:1px solid var(--c4);">'
     + '<div><div style="font-weight:600;color:var(--t1);">Deals & New Products</div>'
-    + '<div style="color:#999;font-size:13px;">Occasional updates on new parts</div></div>'
+    + '<div style="color:var(--t3);font-size:13px;">Occasional updates on new parts</div></div>'
     + '<label class="toggle"><input type="checkbox" id="notif-deals" ' + (emailDeals ? 'checked' : '') + ' onchange="saveNotifPrefs()"><span class="slider"></span></label>'
     + '</div>'
-    + '<p style="color:#999;font-size:13px;margin-top:20px;">Notifications are sent to your account email.</p>'
+    + '<p style="color:var(--t3);font-size:13px;margin-top:20px;">Notifications are sent to your account email.</p>'
     + '</div>');
 }
 
@@ -3597,30 +3601,30 @@ function showHelpSupport(){
     + '<div style="padding:12px 0;">'
     + '<div style="font-size:32px;margin-bottom:20px;text-align:center;">🛠️</div>'
     + '<div style="margin-bottom:24px;">'
-    + '<div style="font-weight:600;margin-bottom:8px;color:#FF6B2C;">Contact Us</div>'
-    + '<div style="color:#ccc;line-height:1.8;">Email: <a href="mailto:help@black-stack-diesel.com" style="color:#FF6B2C;">help@black-stack-diesel.com</a></div>'
+    + '<div style="font-weight:600;margin-bottom:8px;color:var(--gold);">Contact Us</div>'
+    + '<div style="color:var(--t2);line-height:1.8;">Email: <a href="mailto:help@black-stack-diesel.com" style="color:#FF6B2C;">help@black-stack-diesel.com</a></div>'
     + '</div>'
     + '<div style="margin-bottom:20px;">'
     + '<div style="font-weight:600;margin-bottom:12px;color:var(--t1);">Frequently Asked Questions</div>'
-    + '<details style="margin-bottom:12px;padding:12px;background:#111;border-radius:8px;">'
+    + '<details style="margin-bottom:12px;padding:12px;background:var(--c2);border-radius:8px;">'
     + '<summary style="cursor:pointer;font-weight:600;color:var(--t1);">How does shipping work?</summary>'
-    + '<p style="color:#ccc;margin-top:8px;line-height:1.6;">Orders ship directly from our distributor APG Wholesale (Premier Performance) via UPS Ground. Most orders arrive within 3-7 business days depending on your location.</p>'
+    + '<p style="color:var(--t2);margin-top:8px;line-height:1.6;">Orders ship directly from our distributor APG Wholesale (Premier Performance) via UPS Ground. Most orders arrive within 3-7 business days depending on your location.</p>'
     + '</details>'
-    + '<details style="margin-bottom:12px;padding:12px;background:#111;border-radius:8px;">'
+    + '<details style="margin-bottom:12px;padding:12px;background:var(--c2);border-radius:8px;">'
     + '<summary style="cursor:pointer;font-weight:600;color:var(--t1);">What is a core charge?</summary>'
-    + '<p style="color:#ccc;margin-top:8px;line-height:1.6;">A core charge is a refundable deposit on reman parts. When you return the old part within 30 days, you get the core charge back. Core instructions are included with every applicable order.</p>'
+    + '<p style="color:var(--t2);margin-top:8px;line-height:1.6;">A core charge is a refundable deposit on reman parts. When you return the old part within 30 days, you get the core charge back. Core instructions are included with every applicable order.</p>'
     + '</details>'
-    + '<details style="margin-bottom:12px;padding:12px;background:#111;border-radius:8px;">'
+    + '<details style="margin-bottom:12px;padding:12px;background:var(--c2);border-radius:8px;">'
     + '<summary style="cursor:pointer;font-weight:600;color:var(--t1);">Fitment guarantee?</summary>'
-    + '<p style="color:#ccc;margin-top:8px;line-height:1.6;">We do our best to ensure parts fit your vehicle, but always verify the part number matches your application before installing. If a part doesn\'t fit, contact us within 14 days for return authorization.</p>'
+    + '<p style="color:var(--t2);margin-top:8px;line-height:1.6;">We do our best to ensure parts fit your vehicle, but always verify the part number matches your application before installing. If a part doesn\'t fit, contact us within 14 days for return authorization.</p>'
     + '</details>'
-    + '<details style="margin-bottom:12px;padding:12px;background:#111;border-radius:8px;">'
+    + '<details style="margin-bottom:12px;padding:12px;background:var(--c2);border-radius:8px;">'
     + '<summary style="cursor:pointer;font-weight:600;color:var(--t1);">Returns and refunds?</summary>'
-    + '<p style="color:#ccc;margin-top:8px;line-height:1.6;">Unused parts in original packaging can be returned within 30 days. Some items are non-returnable (electronics, special orders). Contact help@black-stack-diesel.com to start a return.</p>'
+    + '<p style="color:var(--t2);margin-top:8px;line-height:1.6;">Unused parts in original packaging can be returned within 30 days. Some items are non-returnable (electronics, special orders). Contact help@black-stack-diesel.com to start a return.</p>'
     + '</details>'
-    + '<details style="padding:12px;background:#111;border-radius:8px;">'
+    + '<details style="padding:12px;background:var(--c2);border-radius:8px;">'
     + '<summary style="cursor:pointer;font-weight:600;color:var(--t1);">How do I report a bug or bad product data?</summary>'
-    + '<p style="color:#ccc;margin-top:8px;line-height:1.6;">Use the Send Feedback button on the Profile page, or the "Report issue with this product" link on any product page. We read every one.</p>'
+    + '<p style="color:var(--t2);margin-top:8px;line-height:1.6;">Use the Send Feedback button on the Profile page, or the "Report issue with this product" link on any product page. We read every one.</p>'
     + '</details>'
     + '</div>'
     + '</div>');
