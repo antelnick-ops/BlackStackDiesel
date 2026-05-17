@@ -38,3 +38,21 @@ Phase 2 mock data (`src/lib/mock-data/parts.ts`) carries some parts in multiple 
 ### Bertha's name is hardcoded in the AI canned response
 
 `hardStartDiagnosis.text` in `src/lib/mock-data/diagnoses.ts` references "Bertha's age" literally. Mockup behavior preserved. Phase 4 templatizes when the AI hook is wired up.
+
+---
+
+## Post-restyle cleanup (added 2026-05-17)
+
+After the restyle ships and runs stable in production:
+
+### Remove or archive `app/src/` Vite scaffold
+
+The parked Vite-rebuild scaffold (`app/src/`, `app/package.json`, `app/vite.config.ts`, plus the rest of the Vite-only files under `app/`) was introduced by commit `6634236` "Phase 2 complete" but never deployed. With the restyle replacing the rebuild's purpose, decide:
+
+- Delete entirely (clean cut — restyle obsoletes the rebuild)
+- Move to `app/_vite-rebuild-parked/` (preserve as reference for future use)
+- Leave in place (current state — clutter but harmless)
+
+### Salvage or delete `tmp/CLAUDE.md.proposed`
+
+`tmp/CLAUDE.md.proposed` (~18 KB, gitignored) is a pre-pivot CLAUDE.md draft from the Vite-rebuild planning session. It contains useful infrastructure docs (`api/*` surface, env-var notes, design system tokens, gotchas) that the current `CLAUDE.md` doesn't have. Salvage what still applies → `CLAUDE.md`, then delete the draft.
