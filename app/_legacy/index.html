@@ -66,7 +66,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);di
 
 .phone{width:393px;height:852px;background:var(--bg);position:relative;overflow:hidden;border-radius:52px;border:1px solid rgba(255,255,255,.06)}
 .blob{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
-.blob-1{width:260px;height:260px;background:rgba(237,174,10,.045);top:-60px;right:-40px;animation:float1 22s ease infinite alternate}
+.blob-1{width:260px;height:260px;background:rgba(245,158,11,.045);top:-60px;right:-40px;animation:float1 22s ease infinite alternate}
 .blob-2{width:200px;height:200px;background:rgba(96,165,250,.03);bottom:60px;left:-50px;animation:float2 18s ease infinite alternate}
 .blob-3{width:160px;height:160px;background:rgba(167,139,250,.025);top:40%;left:50%;animation:float3 25s ease infinite alternate}
 @keyframes float1{to{transform:translate(-30px,50px) scale(1.15)}}
@@ -412,6 +412,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);di
     right:0;
     bottom:0;
   }
+  .blob,.phone::after{display:none}
   .sbar, .notch{display:none !important;height:0 !important}
 }
 @keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
@@ -757,7 +758,7 @@ src="https://www.facebook.com/tr?id=2798529717175247&ev=PageView&noscript=1"
       <div id="resultsHeader" class="feed-msg" style="display:none;margin-bottom:10px"></div>
       <div class="pgrid" id="pgrid"></div>
       <div id="loadMoreWrap" style="text-align:center;padding:16px 0;display:none">
-        <button id="loadMoreBtn" style="padding:0 32px;height:44px;border-radius:var(--r);background:var(--gl);border:1px solid var(--glb);color:var(--t2);font-family:'Manrope',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:.2s;letter-spacing:.3px" onclick="loadMoreProducts()">Load More</button>
+        <button id="loadMoreBtn" style="padding:0 32px;height:44px;border-radius:var(--r);background:var(--c1);border:1px solid var(--c4);color:var(--t2);font-size:12px;font-weight:700;cursor:pointer;transition:.2s;letter-spacing:.3px" onclick="loadMoreProducts()">Load More</button>
       </div>
       <div id="endMsg" style="text-align:center;padding:12px 0;color:var(--t3);font-size:11px;display:none">That's all the results</div>
     </div>
