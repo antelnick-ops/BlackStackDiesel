@@ -419,26 +419,26 @@ body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);di
 .pc:nth-child(2){animation-delay:.05s}.pc:nth-child(3){animation-delay:.1s}
 .pc:nth-child(4){animation-delay:.15s}.pc:nth-child(5){animation-delay:.2s}.pc:nth-child(6){animation-delay:.25s}
 .pdm-overlay{position:absolute;inset:0;background:rgba(0,0,0,.7);z-index:500;opacity:0;pointer-events:none;transition:opacity .3s var(--ease)}
-.modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:600;opacity:0;pointer-events:none;transition:opacity .25s var(--ease);display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,.7);z-index:600;opacity:0;pointer-events:none;transition:opacity .25s var(--ease);display:flex;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.on{opacity:1;pointer-events:auto}
 .modal-panel{background:var(--c2);border:1px solid var(--c4);border-radius:var(--r2);padding:22px 20px;position:relative;max-height:80vh;overflow-y:auto;width:100%}
 .modal-close{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--t2);font-size:22px;cursor:pointer;line-height:1;padding:4px 8px}
 .modal-close:hover{color:var(--t1)}
-.banner-paused{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:8px;padding:10px 12px;margin:0 0 12px 0;background:rgba(255,107,44,.12);color:#FF6B2C;border:1px solid rgba(255,107,44,.25);border-radius:10px;font-size:11px;font-weight:600;line-height:1.35}
+.banner-paused{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:8px;padding:10px 12px;margin:0 0 12px 0;background:rgba(255,107,44,.12);color:#FF6B2C;border:1px solid rgba(255,107,44,.25);border-radius:var(--r);font-size:11px;font-weight:600;line-height:1.35}
 .banner-paused-text{flex:1}
-.banner-paused-x{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:none;border:none;color:#FF6B2C;cursor:pointer;opacity:.7;font-size:14px;line-height:1;padding:0;font-family:inherit;flex-shrink:0;transition:opacity .15s,background .15s}
+.banner-paused-x{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:var(--r);background:none;border:none;color:#FF6B2C;cursor:pointer;opacity:.7;font-size:14px;line-height:1;padding:0;font-family:inherit;flex-shrink:0;transition:opacity .15s,background .15s}
 .banner-paused-x:hover,.banner-paused-x:active{opacity:1;background:rgba(255,107,44,.1)}
 .btn-disabled{background:var(--c4)!important;color:var(--t2)!important;cursor:pointer}
 .btn-disabled:hover{background:var(--c4)!important}
 .toggle{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0}
 .toggle input{opacity:0;width:0;height:0}
 .toggle .slider{position:absolute;inset:0;background:var(--c4);border-radius:24px;cursor:pointer;transition:.2s var(--ease)}
-.toggle .slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;top:3px;background:#F1F5F9;border-radius:50%;transition:.2s var(--ease)}
-.toggle input:checked + .slider{background:#FF6B2C}
+.toggle .slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;top:3px;background:var(--t1);border-radius:50%;transition:.2s var(--ease)}
+.toggle input:checked + .slider{background:var(--gold)}
 .toggle input:checked + .slider::before{transform:translateX(20px)}
 .btn-gh{height:48px;background:var(--c1);border:1px solid var(--c4);border-radius:var(--r2);font-size:13px;font-weight:600;color:var(--gold);cursor:pointer;transition:.2s}
 .btn-gh:hover{background:var(--c2);color:var(--gold)}
-.fb-prio{flex:1;padding:8px 6px;border-radius:8px;background:var(--gl);border:1px solid var(--glb);color:var(--t2);font-size:9px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:0.3px;transition:all 0.15s}
+.fb-prio{flex:1;padding:8px 6px;border-radius:var(--r);background:var(--c1);border:1px solid var(--c4);color:var(--t2);font-size:9px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:0.3px;transition:all 0.15s}
 .fb-prio:hover{background:rgba(245,158,11,.04);border-color:rgba(245,158,11,.3)}
 .fb-prio.on{background:var(--goldgl);border-color:var(--goldb);color:var(--gold)}
 .pdm-overlay.on{opacity:1;pointer-events:auto}
@@ -557,7 +557,7 @@ src="https://www.facebook.com/tr?id=2798529717175247&ev=PageView&noscript=1"
       <div class="l-mark">Black<em>Stack</em></div>
       <div class="l-sub">Diesel parts & diagnostics</div>
 
-      <div id="authErr" style="display:none;width:100%;padding:10px 14px;border-radius:10px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.15);color:var(--red);font-size:12px;font-weight:500;margin-bottom:12px;text-align:center"></div>
+      <div id="authErr" style="display:none;width:100%;padding:10px 14px;border-radius:var(--r);background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.15);color:var(--red);font-size:12px;font-weight:500;margin-bottom:12px;text-align:center"></div>
 
       <div class="fg">
         <div class="fl">Email</div>
@@ -911,18 +911,18 @@ src="https://www.facebook.com/tr?id=2798529717175247&ev=PageView&noscript=1"
         <div id="freightQuoteForm">
           <h2 style="margin:0 0 6px;font-size:16px;padding-right:24px">Request Freight Quote</h2>
           <p style="font-size:11px;color:var(--t2);margin:0 0 14px;line-height:1.5">We'll get back to you within 48 business hours with shipping cost and lead time.</p>
-          <div id="freightQuoteProductInfo" style="font-size:11px;color:var(--t2);padding:8px 10px;background:var(--gl);border-radius:6px;margin-bottom:14px"></div>
+          <div id="freightQuoteProductInfo" style="font-size:11px;color:var(--t2);padding:8px 10px;background:var(--c2);border-radius:var(--r);margin-bottom:14px"></div>
           <input type="hidden" id="fqProductId">
           <input type="hidden" id="fqProductSku">
           <input type="hidden" id="fqProductName">
           <label style="font-size:11px;color:var(--t2);font-weight:500">Name *</label>
-          <input id="fqName" type="text" style="width:100%;padding:9px 10px;margin:4px 0 10px;border-radius:8px;background:var(--c4);border:1px solid var(--glb);color:var(--t1);font-size:13px;font-family:inherit">
+          <input id="fqName" type="text" style="width:100%;padding:9px 10px;margin:4px 0 10px;border-radius:var(--r);background:var(--c1);border:1px solid var(--c4);color:var(--t1);font-size:13px;font-family:inherit">
           <label style="font-size:11px;color:var(--t2);font-weight:500">Email *</label>
-          <input id="fqEmail" type="email" style="width:100%;padding:9px 10px;margin:4px 0 10px;border-radius:8px;background:var(--c4);border:1px solid var(--glb);color:var(--t1);font-size:13px;font-family:inherit">
+          <input id="fqEmail" type="email" style="width:100%;padding:9px 10px;margin:4px 0 10px;border-radius:var(--r);background:var(--c1);border:1px solid var(--c4);color:var(--t1);font-size:13px;font-family:inherit">
           <label style="font-size:11px;color:var(--t2);font-weight:500">Phone <span style="opacity:.6">(optional)</span></label>
-          <input id="fqPhone" type="tel" style="width:100%;padding:9px 10px;margin:4px 0 10px;border-radius:8px;background:var(--c4);border:1px solid var(--glb);color:var(--t1);font-size:13px;font-family:inherit">
+          <input id="fqPhone" type="tel" style="width:100%;padding:9px 10px;margin:4px 0 10px;border-radius:var(--r);background:var(--c1);border:1px solid var(--c4);color:var(--t1);font-size:13px;font-family:inherit">
           <label style="font-size:11px;color:var(--t2);font-weight:500">Notes <span style="opacity:.6">(optional)</span></label>
-          <textarea id="fqNotes" rows="3" placeholder="Anything we should know? Delivery address type (residential/business), liftgate needed, deadline, etc." style="width:100%;padding:9px 10px;margin:4px 0 12px;border-radius:8px;background:var(--c4);border:1px solid var(--glb);color:var(--t1);font-size:13px;font-family:inherit;resize:vertical"></textarea>
+          <textarea id="fqNotes" rows="3" placeholder="Anything we should know? Delivery address type (residential/business), liftgate needed, deadline, etc." style="width:100%;padding:9px 10px;margin:4px 0 12px;border-radius:var(--r);background:var(--c1);border:1px solid var(--c4);color:var(--t1);font-size:13px;font-family:inherit;resize:vertical"></textarea>
           <div id="fqStatus" style="font-size:11px;min-height:14px;margin-bottom:8px"></div>
           <div style="display:flex;gap:8px">
             <button onclick="closeFreightQuoteModal()" class="btn-gh" style="flex:1">Cancel</button>
