@@ -278,12 +278,12 @@ body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);di
 .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .pc{border-radius:var(--r2);overflow:hidden;cursor:pointer;transition:.25s var(--ease)}
 .pc:active{transform:scale(.965)}
-.pc-img{height:100px;background:rgba(255,255,255,.015);display:flex;align-items:center;justify-content:center;position:relative;font-size:34px;border-bottom:1px solid var(--glb);overflow:hidden}
+.pc-img{aspect-ratio:1/1;background:#f5f4f1;display:flex;align-items:center;justify-content:center;position:relative;font-size:34px;border-bottom:1px solid var(--c4);overflow:hidden}
 .pc-img img{width:100%;height:100%;object-fit:contain}
-.pc-fit{position:absolute;top:7px;left:7px;padding:4px 10px;border-radius:7px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.6px;background:linear-gradient(140deg,rgba(34,197,94,.7),rgba(21,128,61,.8));color:#fff;border:1.5px solid rgba(74,222,128,.9);text-shadow:0 1px 1px rgba(0,0,0,.5);box-shadow:0 0 8px rgba(52,211,153,.4)}
-.pc-unknown{background:rgba(75,85,99,.65);color:#fff;border:1.5px solid rgba(156,163,175,.7);font-weight:900;text-shadow:0 1px 1px rgba(0,0,0,.5)}
+.pc-fit{position:absolute;top:7px;left:7px;padding:3px 8px;border-radius:6px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;background:var(--bg);color:var(--grn);border:1px solid var(--c4);display:inline-flex;align-items:center;gap:4px}
+.pc-unknown{background:var(--c2);color:var(--t2);border:1px solid var(--c4);font-weight:700}
 .pc-stg{position:absolute;top:7px;right:7px;padding:3px 8px;border-radius:7px;font-size:7px;font-weight:800;letter-spacing:.8px;text-transform:uppercase}
-.s0{background:var(--gl);color:var(--t2);border:1px solid var(--glb)}
+.s0{background:var(--c2);color:var(--t2);border:1px solid var(--c4)}
 /* Sunlight / high-contrast safety net — triggers on prefers-contrast: more
    (iOS Increase Contrast, Android system contrast settings). Bumps every
    secondary text color and chip border to maximum legibility. */
@@ -301,12 +301,12 @@ body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);di
 .pc-br{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:3px}
 .pc-bd h4{font-size:11.5px;font-weight:600;line-height:1.4;margin-bottom:8px;color:var(--t1)}
 .pc-bt{display:flex;justify-content:space-between;align-items:center}
-.pc-pr{font-size:16px;font-weight:800;color:var(--gold);letter-spacing:-.5px}
+.pc-pr{font-size:14px;font-weight:700;color:var(--t1);letter-spacing:-.3px}
 .pc-core{font-size:9px;color:var(--gold);font-weight:500;margin-top:2px;letter-spacing:0.3px}
-.ab{width:32px;height:32px;background:var(--goldg);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;transition:.15s;box-shadow:0 2px 10px rgba(237,174,10,.1)}
+.ab{width:32px;height:32px;background:var(--goldg);border-radius:var(--r);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;transition:.15s}
 .ab:active{transform:scale(.8)}
-.ab svg{width:14px;height:14px;stroke:#0a0a0a;stroke-width:2.5;fill:none}
-.feed-msg{grid-column:1/-1;padding:14px;border-radius:12px;background:var(--goldgl);border:1px solid var(--goldb);font-size:11px;font-weight:600;color:var(--gold)}
+.ab svg{width:14px;height:14px;stroke:#1a1207;stroke-width:2.5;fill:none}
+.feed-msg{grid-column:1/-1;padding:14px;border-radius:var(--r);background:var(--goldgl);border:1px solid var(--goldb);font-size:11px;font-weight:600;color:var(--gold)}
 .feed-empty{grid-column:1/-1;padding:24px 12px;text-align:center;color:var(--t3);font-size:12px}
 
 .cd{position:absolute;inset:0;z-index:300;pointer-events:none}.cd.op{pointer-events:auto}
@@ -2298,8 +2298,8 @@ function getEmptyStateMessage(filters){
     return '<div class="empty-state" style="grid-column:1/-1;text-align:center;padding:60px 20px;">'
       + '<div style="font-size:48px;margin-bottom:16px;">&#128269;</div>'
       + '<div style="font-weight:600;margin-bottom:8px;font-size:18px;color:var(--t1);">No parts match your filters</div>'
-      + '<div style="color:#999;margin-bottom:20px;font-size:14px;">Try removing a filter or widening your search.</div>'
-      + '<button onclick="clearAllFilters()" style="background:#FF6B2C;color:#000;border:none;padding:12px 24px;border-radius:8px;font-weight:600;cursor:pointer;font-size:14px;font-family:\'Manrope\',sans-serif;">Clear all filters</button>'
+      + '<div style="color:var(--t2);margin-bottom:20px;font-size:14px;">Try removing a filter or widening your search.</div>'
+      + '<button onclick="clearAllFilters()" style="background:#FF6B2C;color:#fff;border:none;padding:12px 24px;border-radius:12px;font-weight:600;cursor:pointer;font-size:14px;">Clear all filters</button>'
       + '</div>';
   }
   var msg;
@@ -2469,11 +2469,11 @@ function appendProductCards(products){
         '<div class="pc-br">' + escapeHtml(p.brand || '') + '</div>' +
         '<h4>' + escapeHtml(p.product_name || 'Product') + '</h4>' +
         (Number(p.weight_lbs) > 1000
-          ? '<div class="pc-pr mono" style="margin-bottom:6px">$' + price.toLocaleString() + '</div>' +
+          ? '<div class="pc-pr" style="margin-bottom:6px">$' + price.toLocaleString() + '</div>' +
             '<div class="pc-quote-badge">⚠️ Freight Quote Required</div>' +
             '<button class="pc-quote-btn" onclick="event.stopPropagation();openFreightQuoteModal(\'' + escapeHtml(String(p.id)) + '\',\'' + String(p.sku || '').replace(/'/g,"\\'") + '\',\'' + String(p.product_name || '').replace(/'/g,"\\'") + '\')">Request Freight Quote</button>'
           : '<div class="pc-bt">' +
-              '<div class="pc-pr mono">$' + price.toLocaleString() + '</div>' +
+              '<div class="pc-pr">$' + price.toLocaleString() + '</div>' +
               '<button class="ab" onclick="event.stopPropagation();addToCart(\'' + escapeHtml(String(p.id)) + '\',\'' + String(p.product_name || '').replace(/'/g,"\\'") + '\',\'' + String(p.brand || '').replace(/'/g,"\\'") + '\',' + price + ',\'' + emoji + '\',' + (Number(p.core_charge) || 0) + ',' + (p.has_core ? 'true' : 'false') + ',' + (Number(p.weight_lbs) || 0) + ')">' +
                 '<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
               '</button>' +
