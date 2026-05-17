@@ -33,6 +33,12 @@
   --r:12px;--r2:16px;--r3:24px;
   --ease:cubic-bezier(.22,1,.36,1);
 }
+
+/* Color semantics (BSD restyle Pass 4-5):
+   AMBER (--gold / --goldg) = persistent selection, commitment, primary action.
+   ORANGE (#FF6B2C, hardcoded) = transient action needed, clearable state, warning.
+   See .pill.sel / .ct.on / .stg.on (amber) vs .afc-chip / .banner-paused (orange).
+   Intentionally separate roles — do not unify into one accent. */
 html,body{height:100%;overflow:hidden}
 body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);display:flex;justify-content:center;align-items:center}
 
@@ -62,14 +68,14 @@ body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);di
    ============================================================================ */
 .mk-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
 .mk-hero-l{flex:1;min-width:0}
-.mk-eyebrow{font-size:10px;font-weight:800;letter-spacing:2.4px;color:var(--gold);text-transform:uppercase;margin-bottom:4px}
-.mk-headline{font-size:28px;font-weight:900;letter-spacing:-.5px;color:#fff;line-height:1.05;margin:0}
-.mk-vp{flex-shrink:0;display:flex;align-items:center;gap:8px;background:rgba(20,20,24,.85);border:1.5px solid rgba(237,174,10,.32);border-radius:12px;padding:8px 12px;cursor:pointer;transition:.2s var(--ease);min-width:0;max-width:170px}
+.mk-eyebrow{font-size:10px;font-weight:800;letter-spacing:1.2px;color:var(--gold);text-transform:uppercase;margin-bottom:4px}
+.mk-headline{font-size:28px;font-weight:700;letter-spacing:-.5px;color:var(--t1);line-height:1.05;margin:0}
+.mk-vp{flex-shrink:0;display:flex;align-items:center;gap:8px;background:var(--c1);border:1px solid var(--gold);border-radius:var(--r);padding:8px 12px;cursor:pointer;transition:.2s var(--ease);min-width:0;max-width:170px}
 .mk-vp:active{transform:scale(.97)}
 .mk-vp-i{flex-shrink:0;width:18px;height:18px;color:var(--gold)}
 .mk-vp-i svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
 .mk-vp-t{min-width:0;line-height:1.15}
-.mk-vp-eng{font-size:11px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 1px rgba(0,0,0,.5)}
+.mk-vp-eng{font-size:11px;font-weight:800;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mk-vp-trk{font-size:9px;color:var(--t2);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.3px}
 .mk-vp-empty{font-size:10px;font-weight:700;color:var(--gold);letter-spacing:.5px}
 
@@ -78,9 +84,9 @@ body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);di
 #s-mkt .mk-top{display:none !important}
 
 /* New cart pill that sits next to the vehicle pill in the hero */
-.mk-cart{flex-shrink:0;position:relative;width:42px;height:42px;border-radius:12px;background:rgba(20,20,24,.85);border:1.5px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s var(--ease)}
+.mk-cart{flex-shrink:0;position:relative;width:42px;height:42px;border-radius:var(--r);background:var(--c1);border:1px solid var(--c4);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s var(--ease)}
 .mk-cart:active{transform:scale(.94)}
-.mk-cart svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2}
+.mk-cart svg{width:18px;height:18px;stroke:var(--t1);fill:none;stroke-width:2}
 .mk-cart .cbdg{position:absolute;top:-4px;right:-4px}
 
 /* ============================================================================
@@ -242,17 +248,17 @@ body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);di
 .cbtn:active{transform:scale(.88)}
 .cbtn svg{width:19px;height:19px;stroke:var(--t2);fill:none;stroke-width:1.7}
 .cbdg{position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;background:var(--goldg);border-radius:100px;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);padding:0 4px;color:#0a0a0a}
-.vstrip{padding:10px 14px;border-radius:12px;display:flex;align-items:center;gap:9px;margin-bottom:14px;font-size:11px;font-weight:600;color:var(--gold)}
+.vstrip{padding:10px 14px;border-radius:var(--r);display:flex;align-items:center;gap:9px;margin-bottom:14px;font-size:11px;font-weight:600;color:var(--gold)}
 .vstrip svg{width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:2;flex-shrink:0}
 .cats-wrap{position:relative;margin-bottom:12px}
 .cats-wrap::after{content:'';position:absolute;right:0;top:0;bottom:0;width:40px;background:linear-gradient(to right,transparent,var(--bg) 90%);pointer-events:none;z-index:2;border-radius:0 var(--r) var(--r) 0;opacity:0;transition:opacity .2s ease}
 .cats-wrap.is-scrollable::after{opacity:1}
 .cats{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;padding-right:20px}.cats::-webkit-scrollbar{display:none}
-.ct{padding:8px 16px;border-radius:100px;font-size:11px;font-weight:700;color:var(--t1);cursor:pointer;white-space:nowrap;transition:.25s var(--ease);background:var(--gl);border:1.5px solid rgba(255,255,255,.28);letter-spacing:.2px}
-.ct.on{color:#fff;background:linear-gradient(140deg,rgba(251,191,36,.45),rgba(217,119,6,.55));border:1.5px solid rgba(251,191,36,.85);text-shadow:0 1px 2px rgba(0,0,0,.7),0 0 1px rgba(0,0,0,.8);box-shadow:0 0 12px rgba(237,174,10,.28);font-weight:800}
+.ct{padding:8px 16px;border-radius:100px;font-size:11px;font-weight:600;color:var(--t2);cursor:pointer;white-space:nowrap;transition:.2s var(--ease);background:var(--c1);border:1px solid var(--c4);letter-spacing:.2px}
+.ct.on{color:#1a1207;background:var(--goldg);border:1px solid var(--gold);font-weight:700}
 .stg-row{display:flex;gap:6px;margin-bottom:10px}
-.stg{padding:7px 14px;border-radius:10px;font-size:10px;font-weight:800;letter-spacing:1px;color:var(--t1);cursor:pointer;transition:.25s var(--ease);text-transform:uppercase;background:var(--gl);border:1.5px solid rgba(255,255,255,.28)}
-.stg.on{color:#fff;background:linear-gradient(140deg,rgba(251,191,36,.45),rgba(217,119,6,.55));border:1.5px solid rgba(251,191,36,.85);text-shadow:0 1px 2px rgba(0,0,0,.7),0 0 1px rgba(0,0,0,.8);box-shadow:0 0 12px rgba(237,174,10,.28);font-weight:900}
+.stg{padding:7px 14px;border-radius:var(--r);font-size:10px;font-weight:700;letter-spacing:1px;color:var(--t2);cursor:pointer;transition:.2s var(--ease);text-transform:uppercase;background:var(--c1);border:1px solid var(--c4)}
+.stg.on{color:#1a1207;background:var(--goldg);border:1px solid var(--gold);font-weight:700}
 .dds{display:flex;gap:6px;margin-bottom:12px}
 .dd{flex:1;height:38px;background:var(--c1);border:1px solid var(--c4);border-radius:var(--r);padding:0 8px;font-size:12px;font-weight:700;color:var(--t1);outline:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%238b8a87' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center;background-size:12px;padding-right:22px}
 .dd:focus{border-color:var(--gold)}
@@ -285,8 +291,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);di
   :root{--t2:rgba(232,230,227,.85);--t3:rgba(232,230,227,.6);--t4:rgba(232,230,227,.4)}
   .btn-g{font-weight:800}
   .pill,.ct,.stg{border-color:rgba(255,255,255,.3)}
-  .pill.sel{color:#1a1207;background:var(--goldg);border-color:#FFE08A;font-weight:800}
-  .ct.on,.stg.on{color:#FFE08A;background:rgba(237,174,10,.32);border-color:rgba(237,174,10,.75)}
+  .pill.sel,.ct.on,.stg.on{color:#1a1207;background:var(--goldg);border-color:#FFE08A;font-weight:800}
   .dd{border-color:rgba(255,255,255,.3)}
 }
 .s1{background:rgba(96,165,250,.06);color:var(--blu);border:1px solid rgba(96,165,250,.1)}
