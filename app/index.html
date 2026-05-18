@@ -314,6 +314,9 @@ body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);di
 .hm-pop-r{text-align:right;flex-shrink:0}
 .hm-pop-pr{font-size:14px;font-weight:700;color:var(--t1);letter-spacing:-.3px}
 .hm-pop-st{font-size:9px;color:var(--grn);font-weight:600;margin-top:2px}
+.hm-pop-note{padding:6px 12px;border-radius:6px;font-size:10px;font-weight:600;letter-spacing:.3px;margin-bottom:10px;display:inline-block}
+.hm-pop-note-real{background:rgba(110,231,183,.08);color:var(--grn);border:1px solid rgba(110,231,183,.18)}
+.hm-pop-note-fallback{background:var(--c2);color:var(--t3);border:1px solid var(--c4)}
 
 .hm-rec-wrap{position:relative;margin-bottom:8px}
 .hm-rec{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
@@ -326,6 +329,39 @@ body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);di
 .hm-rec-nm{font-size:12px;font-weight:600;color:var(--t1);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:30px;margin-bottom:6px}
 .hm-rec-pr{font-size:13px;font-weight:700;color:var(--t1);letter-spacing:-.3px}
 .hm-rec-empty{padding:18px;text-align:center;color:var(--t3);font-size:11px;background:var(--c1);border:1px solid var(--c4);border-radius:var(--r2)}
+
+/* ============================================================================
+   #s-category — Phase C brand-within-category view
+   ============================================================================ */
+#s-category{padding:14px 18px 120px}
+#s-brands{padding:14px 18px 120px}
+.cat-view-top{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:0 2px}
+.cat-back{width:36px;height:36px;border-radius:10px;background:var(--c1);border:1px solid var(--c4);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t1);padding:0;flex-shrink:0}
+.cat-back:active{transform:scale(.94)}
+.cat-back svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+.cat-view-title{flex:1;text-align:center;font-size:14px;font-weight:700;color:var(--t1);letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 4px}
+.cat-view-spacer{width:36px;flex-shrink:0}
+.cat-header{display:flex;align-items:center;gap:14px;padding:16px;border-radius:var(--r2);background:var(--c1);border:1px solid var(--c4);margin-bottom:18px}
+.cat-header-i{width:54px;height:54px;border-radius:14px;background:var(--c2);border:1px solid var(--c4);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cat-header-i svg{width:26px;height:26px;stroke:var(--t2);fill:none;stroke-width:2}
+.cat-header-meta{flex:1;min-width:0}
+.cat-header-nm{font-size:16px;font-weight:700;color:var(--t1);line-height:1.2;margin-bottom:4px}
+.cat-header-sub{font-size:11px;color:var(--t3);font-weight:500}
+.cat-sec-h{margin-bottom:12px;padding:0 2px}
+.cat-sec-t{font-size:13px;font-weight:700;color:var(--t1);letter-spacing:.2px}
+.cat-brand-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.cat-brand-tile{position:relative;padding:14px;border-radius:var(--r2);background:var(--c1);border:1px solid var(--c4);cursor:pointer;transition:.2s var(--ease);min-height:84px;display:flex;flex-direction:column;justify-content:space-between}
+.cat-brand-tile:active{transform:scale(.965)}
+.cat-brand-tile.pinned{border-color:rgba(245,158,11,.28)}
+.cat-brand-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:auto}
+.cat-brand-name{font-size:13px;font-weight:700;color:var(--t1);line-height:1.25;flex:1;min-width:0;word-break:break-word}
+.cat-brand-fit{padding:3px 8px;border-radius:6px;font-size:9px;font-weight:800;letter-spacing:.4px;background:rgba(110,231,183,.08);color:var(--grn);border:1px solid rgba(110,231,183,.18);flex-shrink:0}
+.cat-brand-fit.none{background:var(--c2);color:var(--t3);border-color:var(--c4)}
+.cat-brand-ct{font-size:10px;color:var(--t3);margin-top:8px;font-weight:500}
+.cat-brand-loading{grid-column:1/-1;padding:24px;text-align:center;color:var(--t3);font-size:12px}
+.cat-browseall{display:block;width:100%;padding:0 24px;height:48px;border-radius:var(--r);background:var(--c1);border:1px solid var(--c4);color:var(--t2);font-size:12px;font-weight:700;cursor:pointer;transition:.2s;letter-spacing:.3px;margin-top:8px}
+.cat-browseall:active{transform:scale(.985)}
+.cat-browseall:hover{background:var(--c2);color:var(--t1)}
 
 #s-ai{padding:20px 24px 100px;display:flex;flex-direction:column;height:100%}
 .sec-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
@@ -854,6 +890,61 @@ src="https://www.facebook.com/tr?id=2798529717175247&ev=PageView&noscript=1"
       </div>
       <div class="hm-rec-wrap" id="hmRecWrap" style="display:none">
         <div class="hm-rec" id="hmRec"></div>
+      </div>
+    </div>
+
+    <!--
+         #s-category — Phase C category-detail view.
+         Opened from a Home category tile (goToParts -> renderCategoryView).
+         Shows pinned-first brand tiles for that category, with a
+         "Browse all" escape hatch to the Parts tab. All data is loaded by
+         renderCategoryView() / loadBrandsForCategory() in JS below.
+    -->
+    <div class="scr" id="s-category">
+      <div class="cat-view-top">
+        <button class="cat-back" type="button" onclick="closeCategoryView()" aria-label="Back to Home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="cat-view-title" id="catViewTitle">—</div>
+        <div class="cat-view-spacer"></div>
+      </div>
+
+      <div class="cat-header">
+        <div class="cat-header-i" id="catHeaderIcon"></div>
+        <div class="cat-header-meta">
+          <div class="cat-header-nm" id="catHeaderNm">—</div>
+          <div class="cat-header-sub" id="catHeaderSub">—</div>
+        </div>
+      </div>
+
+      <div class="cat-sec-h">
+        <div class="cat-sec-t">Filter by brand</div>
+      </div>
+      <div class="cat-brand-grid" id="catBrandGrid">
+        <div class="cat-brand-loading">Loading brands…</div>
+      </div>
+
+      <button class="cat-browseall" type="button" id="catBrowseAll" onclick="">Browse all parts</button>
+    </div>
+
+    <!--
+         #s-brands — Phase C Shop-by-Brand catalog-wide view.
+         Opened from the "Shop by Brand" tile appended to the Home
+         category grid (renderCategoryTiles -> renderBrandsView).
+         Reuses .cat-* classes from #s-category for layout; only the
+         padding rule (#s-brands) is new.
+    -->
+    <div class="scr" id="s-brands">
+      <div class="cat-view-top">
+        <button class="cat-back" type="button" onclick="closeBrandsView()" aria-label="Back to Home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="cat-view-title">Shop by Brand</div>
+        <div class="cat-view-spacer"></div>
+      </div>
+
+      <div class="cat-brand-grid" id="brandsGrid">
+        <div class="cat-brand-loading">Loading brands…</div>
       </div>
     </div>
 
@@ -1820,7 +1911,7 @@ function renderCategoryTiles(cats){
     grid.innerHTML = '<div class="hm-cat-loading">No categories yet.</div>';
     return;
   }
-  grid.innerHTML = cats.map(c => {
+  const catTilesHtml = cats.map(c => {
     const hasFit = V.year && V.engine && c.fitCount > 0;
     const fitBadge = hasFit
       ? '<div class="hm-cat-fit">' + c.fitCount + ' FIT</div>'
@@ -1837,12 +1928,210 @@ function renderCategoryTiles(cats){
       '<div class="hm-cat-ct">' + subtitle + '</div>' +
     '</div>';
   }).join('');
+
+  // Phase C — append the Shop by Brand entry tile AFTER the category
+  // tiles. Same dimensions (.hm-cat) but a distinct grid icon so it
+  // reads as the "browse the catalog by manufacturer" escape hatch.
+  const shopByBrandTile =
+    '<div class="hm-cat" onclick="renderBrandsView()">' +
+      '<div class="hm-cat-top">' +
+        '<div class="hm-cat-i">' +
+          '<svg viewBox="0 0 24 24">' +
+            '<rect x="3" y="3" width="7" height="7"/>' +
+            '<rect x="14" y="3" width="7" height="7"/>' +
+            '<rect x="3" y="14" width="7" height="7"/>' +
+            '<rect x="14" y="14" width="7" height="7"/>' +
+          '</svg>' +
+        '</div>' +
+      '</div>' +
+      '<div class="hm-cat-nm">Shop by Brand</div>' +
+      '<div class="hm-cat-ct">Browse by manufacturer</div>' +
+    '</div>';
+
+  grid.innerHTML = catTilesHtml + shopByBrandTile;
 }
 
-// Navigate to Parts tab with a category pre-selected.
+// Home category-tile handler. PHASE C: instead of jumping straight to
+// Parts, open the #s-category sub-view so the user can filter by brand
+// first. The "Browse all" button on that screen calls
+// goToPartsCategoryOnly to reach the old behavior.
 function goToParts(category){
+  renderCategoryView(category);
+}
+
+/* ============================================================================
+   PHASE C — #s-category brand-within-category view
+   ============================================================================
+   - renderCategoryView(cat)         : entry point (called by goToParts)
+   - loadBrandsForCategory(cat)      : fetches per-brand counts via the
+                                       get_brand_counts_for_category RPC
+   - sortBrandsPinnedFirst(rows)     : pinned brands first, then count DESC
+   - renderBrandTiles(rows, cat)     : paints the 2-col tile grid
+   - closeCategoryView()             : back-arrow handler -> Home
+   - goToPartsCategoryOnly(cat)      : "Browse all" — Parts + category only
+   - goToPartsCategoryBrand(cat, br) : brand-tile tap — Parts + cat + brand
+*/
+
+// Phase C — diesel brands the shop wants surfaced first inside any
+// category, regardless of raw product count. Order here is the order
+// shown on screen for brands that have any products in the category.
+const PINNED_BRANDS = [
+  'ARP', 'ATS Diesel Performance', 'BD Diesel', 'PPE', 'Wagler',
+  'Industrial Injection', 'Fleece Performance', 'S&B Filters',
+  'AFE Power', 'FASS Fuel Systems', 'Banks Power', 'Sinister Diesel',
+  'Bosch', 'Garrett', 'BorgWarner'
+];
+
+let CATEGORY_VIEW_LOCK = false;
+const CATEGORY_VIEW_STATE = {
+  currentCategory: null,
+  brands: [],
+  cached: {}    // key: "<category>|<vehicleKey>" -> brands rows
+};
+
+async function renderCategoryView(categoryName){
+  if(CATEGORY_VIEW_LOCK) return;
+  CATEGORY_VIEW_LOCK = true;
+  try {
+    CATEGORY_VIEW_STATE.currentCategory = categoryName;
+
+    // Swap to the sub-view. Bottom nav stays visible and Home stays
+    // active in bnav — tapping another tab takes the user out cleanly.
+    document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
+    const screen = document.getElementById('s-category');
+    if(screen) screen.classList.add('on');
+    window.scrollTo(0, 0);
+
+    // Header text & icon
+    const titleEl = document.getElementById('catViewTitle');
+    const iconEl = document.getElementById('catHeaderIcon');
+    const nmEl = document.getElementById('catHeaderNm');
+    const subEl = document.getElementById('catHeaderSub');
+    if(titleEl) titleEl.textContent = categoryName;
+    if(iconEl) iconEl.innerHTML = getCatIconSvg(categoryName);
+    if(nmEl) nmEl.textContent = categoryName;
+    if(subEl) subEl.textContent = 'Loading…';
+
+    // Wire the "Browse all" button to the bound category
+    const browseBtn = document.getElementById('catBrowseAll');
+    if(browseBtn){
+      browseBtn.textContent = 'Browse all ' + categoryName + ' parts';
+      browseBtn.onclick = function(){ goToPartsCategoryOnly(categoryName); };
+    }
+
+    await loadBrandsForCategory(categoryName);
+  } catch(err){
+    console.warn('[BSD] renderCategoryView error:', err);
+  } finally {
+    CATEGORY_VIEW_LOCK = false;
+  }
+}
+
+async function loadBrandsForCategory(categoryName){
+  const grid = document.getElementById('catBrandGrid');
+  if(!grid) return;
+
+  const cacheKey = categoryName + '|' + vehicleKey();
+  if(CATEGORY_VIEW_STATE.cached[cacheKey]){
+    const cached = CATEGORY_VIEW_STATE.cached[cacheKey];
+    CATEGORY_VIEW_STATE.brands = cached;
+    updateCategoryHeaderTotals(cached);
+    renderBrandTiles(cached, categoryName);
+    return;
+  }
+
+  grid.innerHTML = '<div class="cat-brand-loading">Loading brands…</div>';
+
+  try {
+    const hasVehicle = !!(V.year && V.make && V.model && V.engine);
+    const { data, error } = await sb.rpc('get_brand_counts_for_category', {
+      p_category:       categoryName,
+      p_vehicle_year:   hasVehicle ? parseInt(V.year, 10) : null,
+      p_vehicle_make:   hasVehicle ? V.make : null,
+      p_vehicle_model:  hasVehicle ? V.model : null,
+      p_vehicle_engine: hasVehicle ? V.engine : null
+    });
+    if(error) throw error;
+
+    const sorted = sortBrandsPinnedFirst(data || []);
+    CATEGORY_VIEW_STATE.cached[cacheKey] = sorted;
+    CATEGORY_VIEW_STATE.brands = sorted;
+    updateCategoryHeaderTotals(sorted);
+    renderBrandTiles(sorted, categoryName);
+  } catch(err){
+    console.warn('[BSD] loadBrandsForCategory error:', err);
+    grid.innerHTML = '<div class="cat-brand-loading">Could not load brands.</div>';
+    const subEl = document.getElementById('catHeaderSub');
+    if(subEl) subEl.textContent = '—';
+  }
+}
+
+function sortBrandsPinnedFirst(rows){
+  const clean = (rows || []).filter(r => r && r.brand);
+  const pinnedLower = PINNED_BRANDS.map(b => b.toLowerCase());
+  const pinnedSet = new Set(pinnedLower);
+  const pinned = clean.filter(r => pinnedSet.has(String(r.brand).toLowerCase()));
+  const rest = clean.filter(r => !pinnedSet.has(String(r.brand).toLowerCase()));
+
+  // Keep pinned brands in PINNED_BRANDS order (case-insensitive lookup).
+  const pinnedOrdered = pinnedLower
+    .map(name => pinned.find(r => String(r.brand).toLowerCase() === name))
+    .filter(Boolean);
+
+  rest.sort((a, b) => (b.product_count || 0) - (a.product_count || 0));
+  return pinnedOrdered.concat(rest).map(r => ({
+    brand: r.brand,
+    product_count: r.product_count || 0,
+    fit_count: r.fit_count || 0,
+    pinned: pinnedSet.has(String(r.brand).toLowerCase())
+  }));
+}
+
+function updateCategoryHeaderTotals(rows){
+  const subEl = document.getElementById('catHeaderSub');
+  if(!subEl) return;
+  const totalParts = rows.reduce((sum, r) => sum + (r.product_count || 0), 0);
+  const totalFit = rows.reduce((sum, r) => sum + (r.fit_count || 0), 0);
+  const hasVehicle = !!(V.year && V.make && V.model && V.engine);
+  subEl.textContent = hasVehicle
+    ? totalParts + ' parts · ' + totalFit + ' fit your truck'
+    : totalParts + ' parts';
+}
+
+function renderBrandTiles(rows, categoryName){
+  const grid = document.getElementById('catBrandGrid');
+  if(!grid) return;
+  if(!rows || rows.length === 0){
+    grid.innerHTML = '<div class="cat-brand-loading">No brands yet for ' + escapeHtml(categoryName) + '.</div>';
+    return;
+  }
+  const hasVehicle = !!(V.year && V.make && V.model && V.engine);
+  const catArg = escapeHtml(String(categoryName).replace(/'/g, "\\'"));
+  grid.innerHTML = rows.map(r => {
+    const fitBadge = (hasVehicle && r.fit_count > 0)
+      ? '<div class="cat-brand-fit">' + r.fit_count + ' FIT</div>'
+      : (hasVehicle ? '<div class="cat-brand-fit none">0</div>' : '');
+    const brandArg = escapeHtml(String(r.brand).replace(/'/g, "\\'"));
+    const pinClass = r.pinned ? ' pinned' : '';
+    return '<div class="cat-brand-tile' + pinClass + '" onclick="goToPartsCategoryBrand(\'' + catArg + '\',\'' + brandArg + '\')">' +
+      '<div class="cat-brand-top">' +
+        '<div class="cat-brand-name">' + escapeHtml(r.brand) + '</div>' +
+        fitBadge +
+      '</div>' +
+      '<div class="cat-brand-ct">' + r.product_count + ' parts</div>' +
+    '</div>';
+  }).join('');
+}
+
+function closeCategoryView(){
+  // Back to Home (re-renders FIT counts + recently viewed).
+  navByName('home');
+}
+
+// "Browse all <Category> parts" button — the old goToParts behavior:
+// Parts tab with the category chip applied, no brand filter.
+function goToPartsCategoryOnly(category){
   navByName('mkt');
-  // Apply the category filter by clicking the matching chip.
   setTimeout(() => {
     const chips = document.querySelectorAll('#catTabs .ct');
     let matched = false;
@@ -1852,58 +2141,264 @@ function goToParts(category){
         matched = true;
       }
     });
-    // If no matching chip found, just leave the user on Parts with "All" selected.
-    if(!matched) console.warn('[BSD] goToParts: no chip matched for', category);
+    if(!matched) console.warn('[BSD] goToPartsCategoryOnly: no chip matched for', category);
   }, 50);
 }
+
+// Brand-tile handler from inside #s-category. Apply category chip first
+// (which triggers rebuildBrandDropdown for that category), then wait for
+// the rebuild and select the brand. We re-await rebuildBrandDropdown
+// explicitly so we don't race the chip-click's fire-and-forget call.
+async function goToPartsCategoryBrand(category, brand){
+  navByName('mkt');
+  // Defer to next tick so the Parts screen is on before we click chips.
+  await new Promise(r => setTimeout(r, 50));
+
+  let matched = false;
+  document.querySelectorAll('#catTabs .ct').forEach(chip => {
+    if(chip.textContent.trim() === category){
+      chip.click();
+      matched = true;
+    }
+  });
+  if(!matched){
+    console.warn('[BSD] goToPartsCategoryBrand: no chip matched for', category);
+    return;
+  }
+
+  try {
+    await rebuildBrandDropdown(category);
+  } catch(err){
+    console.warn('[BSD] goToPartsCategoryBrand: brand dropdown rebuild failed', err);
+  }
+
+  const brandDd = document.getElementById('brandDd');
+  if(!brandDd) return;
+  const target = Array.from(brandDd.options).find(o => o.textContent === brand);
+  if(!target){
+    console.warn('[BSD] goToPartsCategoryBrand: brand not in dropdown', brand);
+    return;
+  }
+  brandDd.value = target.value;
+  if(typeof onFilterChange === 'function') onFilterChange();
+}
+
+/* ============================================================================
+   PHASE C — #s-brands Shop-by-Brand catalog-wide view
+   ============================================================================
+   - renderBrandsView()          : entry point (Home tile -> sub-view)
+   - loadAllBrands()             : fetch every brand with product counts
+                                   (p_category=NULL, vehicle args NULL —
+                                    Shop-by-Brand tiles don't show FIT)
+   - renderAllBrandTiles(rows)   : 2-col grid, no FIT badge
+   - closeBrandsView()           : back arrow -> Home
+   - goToPartsBrandOnly(brand)   : Parts tab with brand filter ONLY
+                                   (clears category to "All" first)
+*/
+
+let BRANDS_VIEW_LOCK = false;
+const BRANDS_VIEW_STATE = {
+  brands: [],
+  // Cached for the session — Shop-by-Brand counts don't vary by
+  // vehicle since FIT isn't displayed here. If you later add a
+  // FIT badge to these tiles, key the cache by vehicleKey().
+  cached: null
+};
+
+async function renderBrandsView(){
+  if(BRANDS_VIEW_LOCK) return;
+  BRANDS_VIEW_LOCK = true;
+  try {
+    document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
+    const screen = document.getElementById('s-brands');
+    if(screen) screen.classList.add('on');
+    window.scrollTo(0, 0);
+    await loadAllBrands();
+  } catch(err){
+    console.warn('[BSD] renderBrandsView error:', err);
+  } finally {
+    BRANDS_VIEW_LOCK = false;
+  }
+}
+
+async function loadAllBrands(){
+  const grid = document.getElementById('brandsGrid');
+  if(!grid) return;
+  if(BRANDS_VIEW_STATE.cached){
+    renderAllBrandTiles(BRANDS_VIEW_STATE.cached);
+    return;
+  }
+  grid.innerHTML = '<div class="cat-brand-loading">Loading brands…</div>';
+  try {
+    const { data, error } = await sb.rpc('get_brand_counts_for_category', {
+      p_category:       null,
+      p_vehicle_year:   null,
+      p_vehicle_make:   null,
+      p_vehicle_model:  null,
+      p_vehicle_engine: null
+    });
+    if(error) throw error;
+    const sorted = sortBrandsPinnedFirst(data || []);
+    BRANDS_VIEW_STATE.cached = sorted;
+    BRANDS_VIEW_STATE.brands = sorted;
+    renderAllBrandTiles(sorted);
+  } catch(err){
+    console.warn('[BSD] loadAllBrands error:', err);
+    grid.innerHTML = '<div class="cat-brand-loading">Could not load brands.</div>';
+  }
+}
+
+function renderAllBrandTiles(rows){
+  const grid = document.getElementById('brandsGrid');
+  if(!grid) return;
+  if(!rows || rows.length === 0){
+    grid.innerHTML = '<div class="cat-brand-loading">No brands yet.</div>';
+    return;
+  }
+  grid.innerHTML = rows.map(r => {
+    const brandArg = escapeHtml(String(r.brand).replace(/'/g, "\\'"));
+    const pinClass = r.pinned ? ' pinned' : '';
+    return '<div class="cat-brand-tile' + pinClass + '" onclick="goToPartsBrandOnly(\'' + brandArg + '\')">' +
+      '<div class="cat-brand-top">' +
+        '<div class="cat-brand-name">' + escapeHtml(r.brand) + '</div>' +
+      '</div>' +
+      '<div class="cat-brand-ct">' + r.product_count + ' parts</div>' +
+    '</div>';
+  }).join('');
+}
+
+function closeBrandsView(){
+  navByName('home');
+}
+
+// Brand-tile handler from inside #s-brands. Brand-only filter — first
+// reset the category chip to "All" so the brand isn't accidentally
+// narrowed by whatever category was last selected on the Parts tab.
+async function goToPartsBrandOnly(brand){
+  navByName('mkt');
+  await new Promise(r => setTimeout(r, 50));
+
+  let allMatched = false;
+  document.querySelectorAll('#catTabs .ct').forEach(chip => {
+    if(chip.textContent.trim() === 'All'){
+      chip.click();
+      allMatched = true;
+    }
+  });
+  if(!allMatched) console.warn('[BSD] goToPartsBrandOnly: no "All" chip found');
+
+  try {
+    await rebuildBrandDropdown(null);
+  } catch(err){
+    console.warn('[BSD] goToPartsBrandOnly: brand dropdown rebuild failed', err);
+  }
+
+  const brandDd = document.getElementById('brandDd');
+  if(!brandDd) return;
+  const target = Array.from(brandDd.options).find(o => o.textContent === brand);
+  if(!target){
+    console.warn('[BSD] goToPartsBrandOnly: brand not in dropdown', brand);
+    return;
+  }
+  brandDd.value = target.value;
+  if(typeof onFilterChange === 'function') onFilterChange();
+}
+
+/* ============================================================================
+   PHASE C — honest Popular list
+   ============================================================================
+   loadAndRenderPopular calls get_popular_products_for_vehicle (cross-customer
+   order_items aggregation) and, when there are <3 vehicle-relevant rows or
+   the RPC fails, falls back to the original price-DESC heuristic. The list
+   carries a small provenance note above it so the source is always disclosed.
+*/
 
 async function loadAndRenderPopular(){
   const list = document.getElementById('hmPop');
   if(!list) return;
 
   if(HOME_POP_CACHE && HOME_POP_CACHE.cachedFor === vehicleKey()){
-    renderPopularList(HOME_POP_CACHE.products);
+    renderPopularList(HOME_POP_CACHE.products, HOME_POP_CACHE.source);
     return;
   }
 
   list.innerHTML = '<div style="padding:18px;text-align:center;color:var(--t3);font-size:11px">Loading popular parts…</div>';
 
   try {
-    // PHASE B TODO: this currently sorts by price DESC as a placeholder for
-    // "popular." Once you aggregate order_items by SKU you can swap this for
-    // a real popularity query. Sort by an actual popularity score or join on
-    // an order_items rollup.
-    let q = sb.from('products')
-      .select('id, sku, product_name, brand, price, category, image_url, image_urls, fitment_years, fitment_engines, is_universal, stock_qty, weight_lbs')
-      .eq('is_visible', true)
-      .eq('has_margin', true)
-      .not('status', 'in', '("archived","discontinued","draft")');
-    if(V.year && V.engine){
-      q = q.contains('fitment_years', [Number(V.year)]);
-    }
-    q = q.order('price', { ascending: false }).limit(5);
-    const { data, error } = await q;
-    if(error){
-      console.warn('[BSD] popular query error:', error);
-      list.innerHTML = '<div style="padding:18px;text-align:center;color:var(--t3);font-size:11px">Could not load popular parts.</div>';
+    const hasVehicle = !!(V.year && V.make && V.model && V.engine);
+    const { data, error } = await sb.rpc('get_popular_products_for_vehicle', {
+      p_vehicle_year:   hasVehicle ? parseInt(V.year, 10) : null,
+      p_vehicle_make:   hasVehicle ? V.make : null,
+      p_vehicle_model:  hasVehicle ? V.model : null,
+      p_vehicle_engine: hasVehicle ? V.engine : null,
+      p_limit:          5
+    });
+    if(error) throw error;
+
+    const rows = data || [];
+    if(rows.length >= 3){
+      HOME_POP_CACHE = { products: rows, cachedFor: vehicleKey(), source: 'orders' };
+      renderPopularList(rows, 'orders');
       return;
     }
-    HOME_POP_CACHE = { products: data || [], cachedFor: vehicleKey() };
-    renderPopularList(data || []);
+
+    // Not enough real order history for this vehicle — fall back to
+    // the original price-DESC heuristic so the section still has content.
+    const fallback = await loadPopularFallback();
+    HOME_POP_CACHE = { products: fallback, cachedFor: vehicleKey(), source: 'fallback' };
+    renderPopularList(fallback, 'fallback');
   } catch(err){
-    console.warn('[BSD] loadAndRenderPopular error:', err);
-    list.innerHTML = '<div style="padding:18px;text-align:center;color:var(--t3);font-size:11px">Could not load popular parts.</div>';
+    console.warn('[BSD] loadAndRenderPopular (orders RPC) error:', err);
+    // Also fall back on RPC failure — never leave the section empty.
+    try {
+      const fallback = await loadPopularFallback();
+      HOME_POP_CACHE = { products: fallback, cachedFor: vehicleKey(), source: 'fallback' };
+      renderPopularList(fallback, 'fallback');
+    } catch(e){
+      console.warn('[BSD] loadPopularFallback error:', e);
+      list.innerHTML = '<div style="padding:18px;text-align:center;color:var(--t3);font-size:11px">Could not load popular parts.</div>';
+    }
   }
 }
 
-function renderPopularList(products){
+// Price-DESC heuristic — what loadAndRenderPopular used to do before the
+// order_items aggregation existed. Used as a graceful fallback when the
+// RPC returns fewer than 3 rows (e.g., new engine with no order history
+// yet) or fails entirely. Same row shape as the RPC, so renderPopularList
+// doesn't have to branch on source.
+async function loadPopularFallback(){
+  let q = sb.from('products')
+    .select('id, sku, product_name, brand, price, category, image_url, image_urls, fitment_years, fitment_engines, is_universal, stock_qty, weight_lbs, has_core, core_charge')
+    .eq('is_visible', true)
+    .eq('has_margin', true)
+    .not('status', 'in', '("archived","discontinued","draft")');
+  if(V.year && V.engine){
+    q = q.contains('fitment_years', [Number(V.year)]);
+  }
+  q = q.order('price', { ascending: false }).limit(5);
+  const { data, error } = await q;
+  if(error) throw error;
+  return data || [];
+}
+
+function renderPopularList(products, source){
   const list = document.getElementById('hmPop');
   if(!list) return;
   if(!products || products.length === 0){
     list.innerHTML = '<div style="padding:18px;text-align:center;color:var(--t3);font-size:11px">No popular parts found yet.</div>';
     return;
   }
-  list.innerHTML = products.map((p, idx) => {
+
+  // Provenance note above the rows. Drives the "real orders" vs
+  // "top-rated fallback" disclosure the spec asked for.
+  let noteHtml = '';
+  if(source === 'orders'){
+    noteHtml = '<div class="hm-pop-note hm-pop-note-real">Based on real customer orders</div>';
+  } else if(source === 'fallback'){
+    noteHtml = '<div class="hm-pop-note hm-pop-note-fallback">Based on top-rated parts — not enough order history for your engine yet</div>';
+  }
+
+  const rowsHtml = products.map((p, idx) => {
     const img = getPrimaryImage(p);
     const emoji = getCatEmoji(p.category);
     const price = parseFloat(p.price) || 0;
@@ -1926,6 +2421,8 @@ function renderPopularList(products){
       '</div>' +
     '</div>';
   }).join('');
+
+  list.innerHTML = noteHtml + rowsHtml;
 }
 
 /* ============================================================================
