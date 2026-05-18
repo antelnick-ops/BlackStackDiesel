@@ -61,6 +61,60 @@
    Bottom-sheet hinge: var(--r3) (24px) top corners for slide-up-from-bottom sheets (.cd-sh, .pdm).
    Qty stepper: 40x48 buttons inside rounded-2xl (var(--r2)) container, var(--c1) bg + var(--c4) border (.pdm-qty).
    Modal text colors: paragraph body var(--t2), helper/hint text var(--t3). */
+
+/* ============================================================================
+   PHASE B HANDOFF — for Claude Code
+   ============================================================================
+   This file is the post-restyle structural revamp. Goal: match the mockup
+   design (4-tab nav, Home screen with category tiles, AI hero, recently viewed)
+   while preserving all backend wiring from Phase A.
+
+   WHAT CHANGED FROM POST-RESTYLE:
+   1. Bottom nav: 3 tabs → 4 tabs (Home / Parts / Diagnose / Account).
+      Elevated center AI button REMOVED — all 4 tabs are flat equal-size.
+   2. NEW screen: #s-home (Home).
+      - BLACK/STACK branded header (lightning + wordmark + bell)
+      - "SHOPPING FOR <vehicle>" context strip with SWITCH button
+      - AI Diagnostics hero card (taps to Diagnose tab)
+      - "Shop by category" 2-column tile grid with FIT counts per vehicle
+      - "Popular for <engine>" horizontal list (top-priced heuristic for now)
+      - "Pick up where you left off" carousel (recently viewed, localStorage)
+   3. #s-ai renamed to "Diagnose" in nav. Internals unchanged.
+   4. #s-pro renamed to "Account" in nav. Internals unchanged.
+   5. proceedToVehicleOrApp() now routes: new users → Home, returning → Parts.
+   6. openProductDetail() now calls pushRecentView() to track in localStorage
+      under key 'bsd_recent_views' (capped at 10 entries, newest first).
+
+   WHAT TO FINISH WIRING (search for "PHASE B TODO" markers):
+   1. loadCategoryFitCounts(): currently uses a client-side loop counting
+      products per category. For 50k+ products this may be slow on first load.
+      Consider adding a Supabase RPC: count_products_by_category_for_vehicle(
+      year int, make text, model text, engine text) returns table(category text,
+      total_count int, fit_count int). Cache the result.
+   2. loadPopularForEngine(): currently sorts by price DESC as a placeholder.
+      Once you have order_items aggregated by SKU, swap to a real popularity
+      RPC.
+   3. Verify pushRecentView() runs every time openProductDetail() resolves.
+      Test: open 3 products, refresh, Home screen should show those 3 in the
+      recently-viewed carousel.
+   4. Bump sw.js cache version after merging this file (so existing users get
+      the new HTML on next load).
+
+   WHAT NOT TO TOUCH (production-critical, preserved verbatim):
+   - All sb.from() / sb.rpc() / sb.auth.* calls
+   - All fetch('/api/*') endpoints (checkout, freight-quote)
+   - The AI streaming function call to /functions/v1/chat
+   - sw.js registration (line at end of script)
+   - PRODUCT_STATE pagination, queryProducts, queryTotalCount
+   - rebuildBrandDropdown, get_distinct_product_brands_filtered_v2
+   - Vehicle picker DB object + flow
+   - Cart logic (addToCart, removeFromCart, renderCart, doCheckout)
+   - Terms-acceptance gate, password reset, OAuth
+   - TERMS_VERSION, CHECKOUT_ENABLED, SUPABASE_URL, SUPABASE_ANON_KEY
+   - Deep-link handler / handleDeepLink
+   - Meta Pixel
+   - Feedback, freight quote, core info, app modals
+   ============================================================================ */
 html,body{height:100%;overflow:hidden}
 body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);display:flex;justify-content:center;align-items:center}
 
@@ -112,35 +166,16 @@ body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);di
 .mk-cart .cbdg{position:absolute;top:-4px;right:-4px}
 
 /* ============================================================================
-   Elevated bottom nav — center AI tab as the differentiator
+   Bottom nav — Phase B: 4 equal tabs (Home / Parts / Diagnose / Account).
+   The previous elevated-center AI button was removed; all tabs are flat.
    ============================================================================ */
-.bnav-in{position:relative}
-.ni{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex:1;height:48px;cursor:pointer;color:var(--t3);transition:.2s var(--ease);padding:0 4px}
-.ni svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;transition:.2s var(--ease)}
-.ni span{font-size:9px;font-weight:800;letter-spacing:.6px;text-transform:uppercase}
-.ni.on{color:#fff}
-.ni.on svg{stroke:var(--gold)}
+.bnav{position:absolute;bottom:0;left:0;right:0;z-index:100;padding:0 18px 14px}
+.bnav-in{position:relative;display:flex;align-items:center;justify-content:space-around;height:56px;background:rgba(22,22,26,.92);backdrop-filter:blur(40px) saturate(1.8);-webkit-backdrop-filter:blur(40px) saturate(1.8);border:1px solid var(--c4);border-radius:100px;padding:0 6px}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;height:44px;border-radius:100px;color:var(--t3);transition:.2s var(--ease)}
+.ni svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;transition:.2s var(--ease)}
+.ni span{font-size:9px;font-weight:700;color:currentColor;text-transform:uppercase;letter-spacing:1.2px}
+.ni.on{color:var(--gold)}
 .ni:active{transform:scale(.92)}
-
-/* Center tab: elevated and gold-glowing — the AI Assistant differentiator */
-.ni.center{position:relative;flex:0 0 64px;height:64px;margin-top:-22px;border-radius:50%;background:linear-gradient(140deg,#FBBF24,var(--gold),var(--gold2));box-shadow:0 4px 20px rgba(245,158,11,.45),0 0 30px rgba(245,158,11,.25),inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(0,0,0,.2);border:2px solid rgba(22,22,26,.85);color:#1a1207;justify-content:center;gap:0}
-.ni.center svg{width:24px;height:24px;stroke:#1a1207;stroke-width:2.4}
-.ni.center span{display:none}
-.ni.center.on svg{stroke:#1a1207}
-.ni.center::after{content:'';position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:8px;font-weight:900;letter-spacing:1px;color:var(--gold);text-transform:uppercase}
-.ni.center.on::after,.ni.center::after{content:'AI'}
-
-/* Tighten the bnav container so the elevated center tab has breathing room */
-.bnav{padding:0 24px 14px}
-.bnav-in{height:62px;padding:0 4px;align-items:center}
-.bnav{position:absolute;bottom:0;left:0;right:0;z-index:100;padding:0 24px 14px}
-.bnav-in{display:flex;align-items:center;justify-content:space-around;height:56px;background:rgba(22,22,26,.75);backdrop-filter:blur(40px) saturate(1.8);-webkit-backdrop-filter:blur(40px) saturate(1.8);border:1px solid rgba(255,255,255,.04);border-radius:100px;padding:0 8px}
-.ni{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 24px;border-radius:100px;position:relative;transition:.3s var(--ease)}
-.ni svg{width:20px;height:20px;stroke:var(--t4);fill:none;stroke-width:1.7;transition:.35s var(--ease)}
-.ni span{font-size:9px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:1.8px;transition:.35s var(--ease)}
-.ni.on svg{stroke:var(--gold)}
-.ni.on span{color:var(--gold)}
-.ni.on::before{content:'';position:absolute;inset:0;border-radius:100px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.08)}
 .hid{display:none!important}
 
 .g{background:var(--c1);border:1px solid var(--c4);border-radius:var(--r2)}
@@ -210,6 +245,87 @@ body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);di
 .terms-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:calc(100% - 40px);max-width:340px;margin:0 auto;gap:18px}
 .terms-screen .ai-d{margin-bottom:8px}
 .terms-screen .terms-check{margin:8px 0;font-size:13px}
+
+/* ============================================================================
+   #s-home — Phase B Home screen
+   ============================================================================ */
+#s-home{padding:14px 18px 120px}
+.hm-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding:0 2px}
+.hm-brand{display:flex;align-items:center;gap:10px}
+.hm-bolt{width:36px;height:36px;border-radius:var(--r);background:var(--c1);border:1px solid var(--c4);display:flex;align-items:center;justify-content:center}
+.hm-bolt svg{width:18px;height:18px;fill:var(--gold)}
+.hm-wmk{font-size:16px;font-weight:800;letter-spacing:.5px}
+.hm-wmk em{font-style:normal;color:var(--gold)}
+.hm-bell{position:relative;width:36px;height:36px;border-radius:50%;background:var(--c1);border:1px solid var(--c4);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.hm-bell svg{width:16px;height:16px;stroke:var(--t1);fill:none;stroke-width:2}
+.hm-bell::after{content:'';position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--gold);display:none}
+.hm-bell.has-notif::after{display:block}
+
+.hm-veh{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--r);background:var(--c1);border:1px solid var(--c4);margin-bottom:18px}
+.hm-veh-i{width:30px;height:30px;border-radius:8px;background:var(--c2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hm-veh-i svg{width:16px;height:16px;stroke:var(--t2);fill:none;stroke-width:2}
+.hm-veh-t{flex:1;min-width:0;line-height:1.2}
+.hm-veh-lbl{font-size:9px;font-weight:800;color:var(--t3);letter-spacing:1.4px;text-transform:uppercase}
+.hm-veh-nm{font-size:13px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.hm-veh-sw{font-size:10px;font-weight:800;color:var(--gold);letter-spacing:1px;cursor:pointer;flex-shrink:0;padding:6px 10px;border-radius:8px;text-transform:uppercase}
+.hm-veh-sw:active{background:var(--goldgl)}
+
+.hm-hero{display:flex;align-items:flex-start;gap:14px;padding:18px;border-radius:var(--r2);background:var(--c1);border:1px solid var(--gold);margin-bottom:24px;cursor:pointer;transition:.2s var(--ease)}
+.hm-hero:active{transform:scale(.98)}
+.hm-hero-i{width:48px;height:48px;border-radius:var(--r);background:var(--goldgl);border:1px solid var(--goldb);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hm-hero-i svg{width:22px;height:22px;stroke:var(--gold);fill:none;stroke-width:2}
+.hm-hero-c{flex:1;min-width:0}
+.hm-hero-eb{font-size:10px;font-weight:800;letter-spacing:1.4px;color:var(--gold);text-transform:uppercase;margin-bottom:2px}
+.hm-hero-h{font-size:18px;font-weight:700;color:var(--t1);letter-spacing:-.2px;margin-bottom:6px;line-height:1.2}
+.hm-hero-d{font-size:12px;color:var(--t2);line-height:1.5}
+.hm-hero-a{flex-shrink:0;align-self:center}
+.hm-hero-a svg{width:18px;height:18px;stroke:var(--gold);fill:none;stroke-width:2}
+
+.hm-sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:0 2px}
+.hm-sec-t{font-size:18px;font-weight:700;letter-spacing:-.2px}
+.hm-sec-d{font-size:11px;color:var(--t3);margin-top:1px}
+.hm-sec-a{font-size:11px;font-weight:800;color:var(--gold);letter-spacing:.8px;cursor:pointer;display:flex;align-items:center;gap:4px;text-transform:uppercase}
+.hm-sec-a svg{width:13px;height:13px;stroke:var(--gold);fill:none;stroke-width:2.5}
+.hm-sec-a:active{opacity:.7}
+
+.hm-cats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px}
+.hm-cat{position:relative;padding:14px;border-radius:var(--r2);background:var(--c1);border:1px solid var(--c4);cursor:pointer;transition:.2s var(--ease);min-height:96px;display:flex;flex-direction:column;justify-content:space-between}
+.hm-cat:active{transform:scale(.965)}
+.hm-cat-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:auto}
+.hm-cat-i{width:34px;height:34px;border-radius:10px;background:var(--c2);border:1px solid var(--c4);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hm-cat-i svg{width:18px;height:18px;stroke:var(--t2);fill:none;stroke-width:2}
+.hm-cat-fit{padding:3px 8px;border-radius:6px;font-size:9px;font-weight:800;letter-spacing:.4px;background:rgba(110,231,183,.08);color:var(--grn);border:1px solid rgba(110,231,183,.18)}
+.hm-cat-fit.none{background:var(--c2);color:var(--t3);border-color:var(--c4)}
+.hm-cat-nm{font-size:14px;font-weight:700;color:var(--t1);margin-top:10px;line-height:1.2}
+.hm-cat-ct{font-size:10px;color:var(--t3);margin-top:3px;font-weight:500}
+.hm-cat-loading{grid-column:1/-1;padding:24px;text-align:center;color:var(--t3);font-size:12px}
+
+.hm-pop{display:flex;flex-direction:column;gap:8px;margin-bottom:28px}
+.hm-pop-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--r);background:var(--c1);border:1px solid var(--c4);cursor:pointer;transition:.2s var(--ease)}
+.hm-pop-row:active{transform:scale(.98)}
+.hm-pop-img{width:54px;height:54px;border-radius:10px;background:#f5f4f1;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:22px}
+.hm-pop-img img{width:100%;height:100%;object-fit:contain}
+.hm-pop-c{flex:1;min-width:0}
+.hm-pop-br{display:flex;align-items:center;gap:6px;margin-bottom:2px}
+.hm-pop-brn{font-size:9px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:1px}
+.hm-pop-bs{padding:2px 6px;border-radius:4px;font-size:8px;font-weight:800;letter-spacing:.5px;background:var(--goldgl);color:var(--gold);border:1px solid var(--goldb);text-transform:uppercase}
+.hm-pop-nm{font-size:13px;font-weight:600;color:var(--t1);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-pop-rt{font-size:10px;color:var(--t3);margin-top:2px}
+.hm-pop-r{text-align:right;flex-shrink:0}
+.hm-pop-pr{font-size:14px;font-weight:700;color:var(--t1);letter-spacing:-.3px}
+.hm-pop-st{font-size:9px;color:var(--grn);font-weight:600;margin-top:2px}
+
+.hm-rec-wrap{position:relative;margin-bottom:8px}
+.hm-rec{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.hm-rec::-webkit-scrollbar{display:none}
+.hm-rec-card{flex-shrink:0;width:152px;border-radius:var(--r2);background:var(--c1);border:1px solid var(--c4);overflow:hidden;cursor:pointer;transition:.2s var(--ease)}
+.hm-rec-card:active{transform:scale(.96)}
+.hm-rec-img{width:100%;aspect-ratio:1/1;background:#f5f4f1;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:30px}
+.hm-rec-img img{width:100%;height:100%;object-fit:contain}
+.hm-rec-bd{padding:10px 12px}
+.hm-rec-nm{font-size:12px;font-weight:600;color:var(--t1);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:30px;margin-bottom:6px}
+.hm-rec-pr{font-size:13px;font-weight:700;color:var(--t1);letter-spacing:-.3px}
+.hm-rec-empty{padding:18px;text-align:center;color:var(--t3);font-size:11px;background:var(--c1);border:1px solid var(--c4);border-radius:var(--r2)}
 
 #s-ai{padding:20px 24px 100px;display:flex;flex-direction:column;height:100%}
 .sec-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
@@ -662,6 +778,85 @@ src="https://www.facebook.com/tr?id=2798529717175247&ev=PageView&noscript=1"
       </div>
     </div>
 
+    <!-- ============================================================
+         #s-home — Phase B Home screen
+         New default landing for first-time users (returning users go to
+         #s-mkt). All data is loaded via renderHomeScreen() in JS below.
+         ============================================================ -->
+    <div class="scr" id="s-home">
+      <div class="hm-top">
+        <div class="hm-brand">
+          <div class="hm-bolt">
+            <svg viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+          </div>
+          <div class="hm-wmk">BLACK<em>/STACK</em></div>
+        </div>
+        <div class="hm-bell" id="hmBell" onclick="showNotifications()" title="Notifications">
+          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        </div>
+      </div>
+
+      <div class="hm-veh" id="hmVehStrip" style="display:none">
+        <div class="hm-veh-i">
+          <svg viewBox="0 0 24 24"><path d="M14 18V6a2 2 0 00-2-2H4a2 2 0 00-2 2v11a1 1 0 001 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 001-1v-3.65a1 1 0 00-.22-.624l-3.48-4.35A1 1 0 0017.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
+        </div>
+        <div class="hm-veh-t">
+          <div class="hm-veh-lbl">Shopping for</div>
+          <div class="hm-veh-nm" id="hmVehNm">No vehicle set</div>
+        </div>
+        <div class="hm-veh-sw" onclick="resetVeh()">Switch</div>
+      </div>
+
+      <div class="hm-hero" onclick="navByName('ai')">
+        <div class="hm-hero-i">
+          <svg viewBox="0 0 24 24"><path d="M12 2l1.4 4.6L18 8l-4.6 1.4L12 14l-1.4-4.6L6 8l4.6-1.4z"/><path d="M19 14l.7 2.3L22 17l-2.3.7L19 20l-.7-2.3L16 17l2.3-.7z"/></svg>
+        </div>
+        <div class="hm-hero-c">
+          <div class="hm-hero-eb">AI Diagnostics</div>
+          <div class="hm-hero-h" id="hmHeroH">Need help?</div>
+          <div class="hm-hero-d">Describe the symptoms. Get likely causes, repair steps, and the exact parts you'll need.</div>
+        </div>
+        <div class="hm-hero-a">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+      </div>
+
+      <div class="hm-sec-h">
+        <div>
+          <div class="hm-sec-t">Shop by category</div>
+        </div>
+        <div class="hm-sec-a" onclick="navByName('mkt')">
+          See all
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+      </div>
+      <div class="hm-cats" id="hmCats">
+        <div class="hm-cat-loading">Loading categories…</div>
+      </div>
+
+      <div class="hm-sec-h">
+        <div>
+          <div class="hm-sec-t" id="hmPopH">Popular parts</div>
+          <div class="hm-sec-d" id="hmPopD">What other owners are buying</div>
+        </div>
+        <div class="hm-sec-a" onclick="navByName('mkt')">
+          See all
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+      </div>
+      <div class="hm-pop" id="hmPop"></div>
+
+      <div class="hm-sec-h" id="hmRecHead" style="display:none">
+        <div>
+          <div class="hm-sec-t">Pick up where you left off</div>
+          <div class="hm-sec-d">Recently viewed</div>
+        </div>
+      </div>
+      <div class="hm-rec-wrap" id="hmRecWrap" style="display:none">
+        <div class="hm-rec" id="hmRec"></div>
+      </div>
+    </div>
+
     <div class="scr" id="s-ai">
       <div class="sec-h"><h2>AI Diagnostics</h2><div class="badge" id="aiBadge">—</div></div>
       <div class="ai-empty" id="aiEmpty">
@@ -815,9 +1010,10 @@ src="https://www.facebook.com/tr?id=2798529717175247&ev=PageView&noscript=1"
 
     <div class="bnav hid" id="bnav">
       <div class="bnav-in">
-        <div class="ni" data-s="pro" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profile</span></div>
-        <div class="ni center" data-s="ai" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span>AI</span></div>
-        <div class="ni on" data-s="mkt" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg><span>Parts</span></div>
+        <div class="ni on" data-s="home" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2h-4v-7h-6v7H5a2 2 0 01-2-2z"/></svg><span>Home</span></div>
+        <div class="ni" data-s="mkt" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg><span>Parts</span></div>
+        <div class="ni" data-s="ai" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span>Diagnose</span></div>
+        <div class="ni" data-s="pro" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Account</span></div>
       </div>
     </div>
 
@@ -1406,7 +1602,18 @@ async function proceedToVehicleOrApp(user){
     V.model = saved.model;
     V.engine = saved.engine;
     applyVehicle();
-    go('mkt');
+    // Phase B: route new users (no prior visits in localStorage) to Home;
+    // returning users go straight to Parts (their habitual entry point).
+    const visitCount = parseInt(localStorage.getItem('bsd_visit_count') || '0', 10);
+    if(visitCount === 0){
+      go('home');
+      setActiveTab('home');
+      renderHomeScreen();
+    } else {
+      go('mkt');
+      setActiveTab('mkt');
+    }
+    localStorage.setItem('bsd_visit_count', String(visitCount + 1));
     showNav();
     if(!vehicleObjIsComplete(acctVehicle)) await saveVehicleToAccount();
     await loadProducts();
@@ -1451,9 +1658,339 @@ function nav(el){
   document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
   el.classList.add('on');
   go(el.dataset.s);
+  // Phase B: re-render Home content every time the Home tab is shown,
+  // so FIT counts + recently viewed stay fresh.
+  if(el.dataset.s === 'home') renderHomeScreen();
+}
+// Phase B helper: switch tabs by name (e.g. from a Home tile or the AI hero).
+function navByName(name){
+  const el = document.querySelector('.ni[data-s="' + name + '"]');
+  if(el) nav(el);
+}
+// Phase B helper: set the active tab class without triggering a render
+// (used by proceedToVehicleOrApp / confirmV which already call renderHomeScreen).
+function setActiveTab(name){
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
+  const el = document.querySelector('.ni[data-s="' + name + '"]');
+  if(el) el.classList.add('on');
 }
 function showNav(){ document.getElementById('bnav').classList.remove('hid'); updateMkVehiclePill(); }
 function hideNav(){ document.getElementById('bnav').classList.add('hid'); }
+
+/* ============================================================================
+   PHASE B — Home screen renderers
+   ============================================================================ */
+
+// Truck nickname lookup. Memory says Bertha is Nantel's truck; future-proof:
+// could read from profiles.vehicle_nickname if you add the column.
+function getVehicleNickname(){
+  // PHASE B TODO: read from profiles.vehicle_nickname when the column exists.
+  // For now: pull from localStorage, falls back to empty string.
+  return (localStorage.getItem('bsd_vehicle_nickname') || '').trim();
+}
+
+// Per-category emoji/icon map (re-uses getCatEmoji for category names that
+// match, falls back to a generic wrench).
+function getCatIconSvg(cat){
+  // We use the same emoji palette as the marketplace cards for visual consistency;
+  // rendered inside a rounded tile so they're clearly differentiated.
+  const c = (cat || '').toLowerCase();
+  // Returns an inline SVG path string. Kept small to avoid bloat.
+  if(c.includes('engine')) return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>';
+  if(c.includes('fuel')) return '<svg viewBox="0 0 24 24"><path d="M3 22V4a2 2 0 012-2h7a2 2 0 012 2v18"/><path d="M14 9h2a2 2 0 012 2v2a2 2 0 002 2h0a2 2 0 002-2V9l-3-3"/><line x1="3" y1="22" x2="14" y2="22"/></svg>';
+  if(c.includes('exhaust')) return '<svg viewBox="0 0 24 24"><path d="M3 12h2M9 12h2M15 12h2M5 8s1-2 4-2 4 2 7 2 4-2 4-2"/><path d="M5 16s1 2 4 2 4-2 7-2 4 2 4 2"/></svg>';
+  if(c.includes('cool')) return '<svg viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="4" y1="4" x2="20" y2="20"/><line x1="4" y1="20" x2="20" y2="4"/></svg>';
+  if(c.includes('intake') || c.includes('air')) return '<svg viewBox="0 0 24 24"><path d="M22 12h-2.5a2.5 2.5 0 010-5H22"/><path d="M3 8c4 0 4 4 8 4s4-4 8-4"/><path d="M3 16c4 0 4-4 8-4s4 4 8 4"/></svg>';
+  if(c.includes('tun')) return '<svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>';
+  if(c.includes('emission')) return '<svg viewBox="0 0 24 24"><path d="M17.5 19h-11a4 4 0 010-8 6 6 0 1111.6 2"/></svg>';
+  if(c.includes('brake')) return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>';
+  if(c.includes('electrical') || c.includes('light')) return '<svg viewBox="0 0 24 24"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
+  if(c.includes('hardware')) return '<svg viewBox="0 0 24 24"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/></svg>';
+  // Default: wrench
+  return '<svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 015 5L9 21.2 2.8 15 12 5.8a4 4 0 012.7.5z"/></svg>';
+}
+
+let HOME_RENDER_LOCK = false;
+let HOME_CAT_CACHE = null;   // { cats: [{category, totalCount, fitCount}], cachedFor: vehicleKey }
+let HOME_POP_CACHE = null;   // { products: [...], cachedFor: vehicleKey }
+
+function vehicleKey(){
+  if(!V.year || !V.engine) return 'none';
+  return V.year + '|' + V.make + '|' + V.model + '|' + V.engine;
+}
+
+async function renderHomeScreen(){
+  if(HOME_RENDER_LOCK) return;
+  HOME_RENDER_LOCK = true;
+  try {
+    // Vehicle context strip
+    const strip = document.getElementById('hmVehStrip');
+    const nmEl = document.getElementById('hmVehNm');
+    if(V.year && V.make && V.model && V.engine){
+      strip.style.display = 'flex';
+      nmEl.textContent = V.year + ' ' + V.make + ' ' + V.model + ' · ' + V.engine;
+    } else {
+      strip.style.display = 'none';
+    }
+
+    // AI hero heading (uses truck nickname if set, else generic)
+    const heroH = document.getElementById('hmHeroH');
+    const nick = getVehicleNickname();
+    heroH.textContent = nick ? (nick + ' acting up?') : 'Need help?';
+
+    // Section headings on Popular list
+    if(V.engine){
+      document.getElementById('hmPopH').textContent = 'Popular for the ' + V.engine.split(' ')[0];
+      document.getElementById('hmPopD').textContent = 'What other ' + V.year + ' ' + V.model + ' owners buy';
+    } else {
+      document.getElementById('hmPopH').textContent = 'Popular parts';
+      document.getElementById('hmPopD').textContent = 'Top-selling diesel parts';
+    }
+
+    // Render parallel: categories, popular list, recently viewed
+    await Promise.all([
+      loadAndRenderCategories(),
+      loadAndRenderPopular(),
+      Promise.resolve(renderRecentlyViewed())
+    ]);
+  } catch(err){
+    console.warn('[BSD] renderHomeScreen error:', err);
+  } finally {
+    HOME_RENDER_LOCK = false;
+  }
+}
+
+async function loadAndRenderCategories(){
+  const grid = document.getElementById('hmCats');
+  if(!grid) return;
+
+  // Cache categories per-vehicle so re-entering Home tab doesn't re-query.
+  if(HOME_CAT_CACHE && HOME_CAT_CACHE.cachedFor === vehicleKey()){
+    renderCategoryTiles(HOME_CAT_CACHE.cats);
+    return;
+  }
+
+  grid.innerHTML = '<div class="hm-cat-loading">Loading categories…</div>';
+
+  try {
+    // Reuse the existing cached categories (loaded in rebuildProductCategoryDropdowns).
+    if(!CACHED_CATEGORIES) await rebuildProductCategoryDropdowns();
+    const cats = (CACHED_CATEGORIES || []).slice(0, 6); // show top 6 on Home
+
+    // PHASE B TODO: for each category we want both total count and FIT count.
+    // The simplest version below issues parallel count queries. For 6 cats × 2
+    // queries = 12 round-trips. Fine for now, slow on first Home load. Better:
+    // add an RPC count_products_by_category_for_vehicle(year, make, model, engine)
+    // returning a single table. Replace the loop below when that RPC ships.
+    const counts = await Promise.all(cats.map(async (cat) => {
+      const [totalRes, fitRes] = await Promise.all([
+        sb.from('products')
+          .select('id', { count: 'exact', head: true })
+          .eq('is_visible', true)
+          .eq('has_margin', true)
+          .eq('category', cat),
+        (V.year && V.engine)
+          ? sb.from('products')
+              .select('id', { count: 'exact', head: true })
+              .eq('is_visible', true)
+              .eq('has_margin', true)
+              .eq('category', cat)
+              .contains('fitment_years', [Number(V.year)])
+          : Promise.resolve({ count: 0 })
+      ]);
+      return {
+        category: cat,
+        totalCount: totalRes.count || 0,
+        fitCount: fitRes.count || 0
+      };
+    }));
+
+    HOME_CAT_CACHE = { cats: counts, cachedFor: vehicleKey() };
+    renderCategoryTiles(counts);
+  } catch(err){
+    console.warn('[BSD] loadAndRenderCategories error:', err);
+    grid.innerHTML = '<div class="hm-cat-loading">Could not load categories.</div>';
+  }
+}
+
+function renderCategoryTiles(cats){
+  const grid = document.getElementById('hmCats');
+  if(!grid) return;
+  if(!cats || cats.length === 0){
+    grid.innerHTML = '<div class="hm-cat-loading">No categories yet.</div>';
+    return;
+  }
+  grid.innerHTML = cats.map(c => {
+    const hasFit = V.year && V.engine && c.fitCount > 0;
+    const fitBadge = hasFit
+      ? '<div class="hm-cat-fit">' + c.fitCount + ' FIT</div>'
+      : (V.year ? '<div class="hm-cat-fit none">' + c.totalCount + '</div>' : '');
+    const subtitle = hasFit
+      ? c.fitCount + ' of ' + c.totalCount + ' parts'
+      : c.totalCount + ' parts';
+    return '<div class="hm-cat" onclick="goToParts(\'' + escapeHtml(String(c.category).replace(/\'/g,"\\\\'")) + '\')">' +
+      '<div class="hm-cat-top">' +
+        '<div class="hm-cat-i">' + getCatIconSvg(c.category) + '</div>' +
+        fitBadge +
+      '</div>' +
+      '<div class="hm-cat-nm">' + escapeHtml(c.category) + '</div>' +
+      '<div class="hm-cat-ct">' + subtitle + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// Navigate to Parts tab with a category pre-selected.
+function goToParts(category){
+  navByName('mkt');
+  // Apply the category filter by clicking the matching chip.
+  setTimeout(() => {
+    const chips = document.querySelectorAll('#catTabs .ct');
+    let matched = false;
+    chips.forEach(chip => {
+      if(chip.textContent.trim() === category){
+        chip.click();
+        matched = true;
+      }
+    });
+    // If no matching chip found, just leave the user on Parts with "All" selected.
+    if(!matched) console.warn('[BSD] goToParts: no chip matched for', category);
+  }, 50);
+}
+
+async function loadAndRenderPopular(){
+  const list = document.getElementById('hmPop');
+  if(!list) return;
+
+  if(HOME_POP_CACHE && HOME_POP_CACHE.cachedFor === vehicleKey()){
+    renderPopularList(HOME_POP_CACHE.products);
+    return;
+  }
+
+  list.innerHTML = '<div style="padding:18px;text-align:center;color:var(--t3);font-size:11px">Loading popular parts…</div>';
+
+  try {
+    // PHASE B TODO: this currently sorts by price DESC as a placeholder for
+    // "popular." Once you aggregate order_items by SKU you can swap this for
+    // a real popularity query. Sort by an actual popularity score or join on
+    // an order_items rollup.
+    let q = sb.from('products')
+      .select('id, sku, product_name, brand, price, category, image_url, image_urls, fitment_years, fitment_engines, is_universal, stock_qty, weight_lbs')
+      .eq('is_visible', true)
+      .eq('has_margin', true)
+      .not('status', 'in', '("archived","discontinued","draft")');
+    if(V.year && V.engine){
+      q = q.contains('fitment_years', [Number(V.year)]);
+    }
+    q = q.order('price', { ascending: false }).limit(5);
+    const { data, error } = await q;
+    if(error){
+      console.warn('[BSD] popular query error:', error);
+      list.innerHTML = '<div style="padding:18px;text-align:center;color:var(--t3);font-size:11px">Could not load popular parts.</div>';
+      return;
+    }
+    HOME_POP_CACHE = { products: data || [], cachedFor: vehicleKey() };
+    renderPopularList(data || []);
+  } catch(err){
+    console.warn('[BSD] loadAndRenderPopular error:', err);
+    list.innerHTML = '<div style="padding:18px;text-align:center;color:var(--t3);font-size:11px">Could not load popular parts.</div>';
+  }
+}
+
+function renderPopularList(products){
+  const list = document.getElementById('hmPop');
+  if(!list) return;
+  if(!products || products.length === 0){
+    list.innerHTML = '<div style="padding:18px;text-align:center;color:var(--t3);font-size:11px">No popular parts found yet.</div>';
+    return;
+  }
+  list.innerHTML = products.map((p, idx) => {
+    const img = getPrimaryImage(p);
+    const emoji = getCatEmoji(p.category);
+    const price = parseFloat(p.price) || 0;
+    const isFirst = idx === 0;
+    const inStock = (p.stock_qty === null || p.stock_qty === undefined) ? true : (p.stock_qty > 0);
+    return '<div class="hm-pop-row" onclick="openProductDetail(\'' + escapeHtml(String(p.id)) + '\')">' +
+      '<div class="hm-pop-img">' +
+        (img ? '<img src="' + escapeHtml(img) + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">' : emoji) +
+      '</div>' +
+      '<div class="hm-pop-c">' +
+        '<div class="hm-pop-br">' +
+          '<span class="hm-pop-brn">' + escapeHtml(p.brand || 'Unbranded') + '</span>' +
+          (isFirst ? '<span class="hm-pop-bs">Best Seller</span>' : '') +
+        '</div>' +
+        '<div class="hm-pop-nm">' + escapeHtml(p.product_name || 'Product') + '</div>' +
+      '</div>' +
+      '<div class="hm-pop-r">' +
+        '<div class="hm-pop-pr">$' + price.toLocaleString() + '</div>' +
+        (inStock ? '<div class="hm-pop-st">In stock</div>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ============================================================================
+   PHASE B — Recently viewed (localStorage-backed)
+   pushRecentView() is called from openProductDetail() on every load.
+   renderRecentlyViewed() runs every time the Home screen is shown.
+   ============================================================================ */
+
+function pushRecentView(product){
+  if(!product || !product.id) return;
+  try {
+    const key = 'bsd_recent_views';
+    let arr = JSON.parse(localStorage.getItem(key) || '[]');
+    // Remove any existing entry for this product (we'll re-add at front).
+    arr = arr.filter(v => v && v.id !== product.id);
+    arr.unshift({
+      id: product.id,
+      sku: product.sku || '',
+      product_name: product.product_name || '',
+      brand: product.brand || '',
+      price: parseFloat(product.price) || 0,
+      image_url: getPrimaryImage(product),
+      category: product.category || '',
+      viewedAt: Date.now()
+    });
+    if(arr.length > 10) arr = arr.slice(0, 10);
+    localStorage.setItem(key, JSON.stringify(arr));
+  } catch(err){
+    console.warn('[BSD] pushRecentView error:', err);
+  }
+}
+
+function renderRecentlyViewed(){
+  const head = document.getElementById('hmRecHead');
+  const wrap = document.getElementById('hmRecWrap');
+  const rec = document.getElementById('hmRec');
+  if(!head || !wrap || !rec) return;
+  let arr = [];
+  try {
+    arr = JSON.parse(localStorage.getItem('bsd_recent_views') || '[]');
+  } catch(e) { arr = []; }
+  if(!arr || arr.length === 0){
+    head.style.display = 'none';
+    wrap.style.display = 'none';
+    return;
+  }
+  head.style.display = 'flex';
+  wrap.style.display = 'block';
+  rec.innerHTML = arr.slice(0, 8).map(v => {
+    const emoji = getCatEmoji(v.category);
+    return '<div class="hm-rec-card" onclick="openProductDetail(\'' + escapeHtml(String(v.id)) + '\')">' +
+      '<div class="hm-rec-img">' +
+        (v.image_url ? '<img src="' + escapeHtml(v.image_url) + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">' : emoji) +
+      '</div>' +
+      '<div class="hm-rec-bd">' +
+        '<div class="hm-rec-nm">' + escapeHtml(v.product_name || 'Product') + '</div>' +
+        '<div class="hm-rec-pr">$' + (Number(v.price) || 0).toLocaleString() + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ============================================================================
+   End of Phase B Home screen renderers
+   ============================================================================ */
 
 function showTermsAcceptScreen(){
   hideNav();
@@ -1645,7 +2182,17 @@ async function confirmV(){
   // Vehicle changed — rebuild brand dropdown to reflect new fitment context.
   if(typeof rebuildBrandDropdown === 'function') rebuildBrandDropdown();
   applyVehicle();
-  go('mkt');
+  // Phase B: first-time vehicle setup → Home; returning users keep their habit.
+  const visitCount = parseInt(localStorage.getItem('bsd_visit_count') || '0', 10);
+  if(visitCount === 0){
+    go('home');
+    setActiveTab('home');
+    renderHomeScreen();
+  } else {
+    go('mkt');
+    setActiveTab('mkt');
+  }
+  localStorage.setItem('bsd_visit_count', String(visitCount + 1));
   showNav();
   await loadProducts();
 }
@@ -2543,6 +3090,9 @@ async function openProductDetail(productId){
   }
 
   renderProductDetail(p);
+  // Phase B: track this view for the Home screen "Pick up where you left off"
+  // carousel. Cap at 10, newest first, dedupes by product id.
+  pushRecentView(p);
 }
 
 function closeProductDetail(){
