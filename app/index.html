@@ -7,9 +7,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="BlackStack">
+<meta name="apple-mobile-web-app-title" content="BSD">
 <link rel="manifest" href="/app/manifest.json">
 <link rel="apple-touch-icon" href="/app/icon-192.png">
+<link rel="icon" type="image/png" href="/app/icon-192.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="/shared/shipping.js"></script>
 <title>Black Stack Diesel — Cummins, Duramax, Power Stroke Parts</title>
@@ -73,7 +74,7 @@
    1. Bottom nav: 3 tabs → 4 tabs (Home / Parts / Diagnose / Account).
       Elevated center AI button REMOVED — all 4 tabs are flat equal-size.
    2. NEW screen: #s-home (Home).
-      - BLACK/STACK branded header (lightning + wordmark + bell)
+      - BlackStack Diesel branded header (logo image + bell)
       - "SHOPPING FOR <vehicle>" context strip with SWITCH button
       - AI Diagnostics hero card (taps to Diagnose tab)
       - "Shop by category" 2-column tile grid with FIT counts per vehicle
@@ -185,9 +186,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);di
 .mono{/* DM Mono dropped — class kept as a no-op; HTML class="mono" refs cleaned up in a later pass */}
 
 #s-login{display:flex;flex-direction:column;padding:40px 28px;justify-content:center;align-items:center}
-.l-logo{width:56px;height:56px;border-radius:var(--r2);background:var(--c2);border:1px solid var(--c4);display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:20px}
-.l-mark{font-size:26px;font-weight:800;letter-spacing:-.8px;margin-bottom:2px}
-.l-mark em{font-style:normal;color:var(--gold)}
+.l-logo-img{height:140px;width:auto;margin-bottom:20px;display:block}
 .l-sub{color:var(--t3);font-size:12px;margin-bottom:36px;letter-spacing:.4px;font-weight:500}
 .fg{width:100%;margin-bottom:12px}
 .fl{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.8px;color:var(--t3);margin-bottom:6px}
@@ -252,10 +251,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#000;color:var(--t1);di
 #s-home{padding:14px 18px 120px}
 .hm-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding:0 2px}
 .hm-brand{display:flex;align-items:center;gap:10px}
-.hm-bolt{width:36px;height:36px;border-radius:var(--r);background:var(--c1);border:1px solid var(--c4);display:flex;align-items:center;justify-content:center}
-.hm-bolt svg{width:18px;height:18px;fill:var(--gold)}
-.hm-wmk{font-size:16px;font-weight:800;letter-spacing:.5px}
-.hm-wmk em{font-style:normal;color:var(--gold)}
+.hm-logo{height:40px;width:auto;display:block}
 .hm-bell{position:relative;width:36px;height:36px;border-radius:50%;background:var(--c1);border:1px solid var(--c4);display:flex;align-items:center;justify-content:center;cursor:pointer}
 .hm-bell svg{width:16px;height:16px;stroke:var(--t1);fill:none;stroke-width:2}
 .hm-bell::after{content:'';position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--gold);display:none}
@@ -706,8 +702,7 @@ src="https://www.facebook.com/tr?id=2798529717175247&ev=PageView&noscript=1"
   <div class="sw">
 
     <div class="scr on" id="s-login">
-      <div class="l-logo">⚡</div>
-      <div class="l-mark">Black<em>Stack</em></div>
+      <img class="l-logo-img" src="/app/icon-512.png" alt="BlackStack Diesel" />
       <div class="l-sub">Diesel parts & diagnostics</div>
 
       <div id="authErr" style="display:none;width:100%;padding:10px 14px;border-radius:var(--r);background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.15);color:var(--red);font-size:12px;font-weight:500;margin-bottom:12px;text-align:center"></div>
@@ -822,10 +817,7 @@ src="https://www.facebook.com/tr?id=2798529717175247&ev=PageView&noscript=1"
     <div class="scr" id="s-home">
       <div class="hm-top">
         <div class="hm-brand">
-          <div class="hm-bolt">
-            <svg viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
-          </div>
-          <div class="hm-wmk">BLACK<em>/STACK</em></div>
+          <img class="hm-logo" src="/app/icon-192.png" alt="BlackStack Diesel" />
         </div>
         <div class="hm-bell" id="hmBell" onclick="showNotifications()" title="Notifications">
           <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
