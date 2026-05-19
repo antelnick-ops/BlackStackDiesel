@@ -1,0 +1,240 @@
+{
+  "count": 47,
+  "brands": {
+    "389": {
+      "term_name": "Husky Liners",
+      "brand_id": "389",
+      "name": "Husky Liners"
+    },
+    "877": {
+      "term_name": "DiabloSport",
+      "brand_id": "877",
+      "name": "DiabloSport"
+    },
+    "963": {
+      "term_name": "Holley",
+      "brand_id": "963",
+      "name": "Holley Performance"
+    },
+    "3589": {
+      "term_name": "Rock Krawler",
+      "brand_id": "3589",
+      "name": "Rock Krawler"
+    },
+    "5742": {
+      "term_name": "ADS Racing Shocks",
+      "brand_id": "5742",
+      "name": "ADS Racing Shocks"
+    },
+    "8663": {
+      "term_name": "Bulldog Winch",
+      "brand_id": "8663",
+      "name": "Bulldog Winch"
+    },
+    "10089": {
+      "term_name": "Baja Designs",
+      "brand_id": "10089",
+      "name": "Baja Designs"
+    },
+    "10916": {
+      "term_name": "USA Standard Gear",
+      "brand_id": "10916",
+      "name": "USA Standard Gear"
+    },
+    "12441": {
+      "term_name": "Yukon Gear & Axle",
+      "brand_id": "12441",
+      "name": "Yukon Gear and Axle"
+    },
+    "17579": {
+      "term_name": "Volant",
+      "brand_id": "17579",
+      "name": "Volant"
+    },
+    "21483": {
+      "term_name": "ATS Diesel Performance",
+      "brand_id": "21483",
+      "name": "ATS Diesel Performance"
+    },
+    "22609": {
+      "term_name": "Rigid Industries",
+      "brand_id": "22609",
+      "name": "RIGID"
+    },
+    "24899": {
+      "term_name": "Skyjacker",
+      "brand_id": "24899",
+      "name": "Skyjacker"
+    },
+    "29425": {
+      "term_name": "Pacific Performance Engineering",
+      "brand_id": "29425",
+      "name": "Pacific Performance Engineering"
+    },
+    "45319": {
+      "term_name": "EZ Lynk",
+      "brand_id": "45319",
+      "name": "EZ Lynk"
+    },
+    "72434": {
+      "term_name": "Diamond Eye Performance",
+      "brand_id": "72434",
+      "name": "Diamond Eye Performance"
+    },
+    "83748": {
+      "term_name": "ICON Vehicle Dynamics",
+      "brand_id": "83748",
+      "name": "Icon Vehicle Dynamics"
+    },
+    "84847": {
+      "term_name": "Gator Fasteners",
+      "brand_id": "84847",
+      "name": "Gator Fasteners"
+    },
+    "115148": {
+      "term_name": "Choate Performance",
+      "brand_id": "115148",
+      "name": "Choate Performance"
+    },
+    "116519": {
+      "term_name": "Freedom Off-Road",
+      "brand_id": "116519",
+      "name": "Freedom Off-Road"
+    },
+    "130082": {
+      "term_name": "Zone Offroad",
+      "brand_id": "130082",
+      "name": "Zone Offroad"
+    },
+    "130085": {
+      "term_name": "BDS Suspension",
+      "brand_id": "130085",
+      "name": "BDS Suspension"
+    },
+    "130108": {
+      "term_name": "Fox Factory",
+      "brand_id": "130108",
+      "name": "Fox Factory"
+    },
+    "175491": {
+      "term_name": "BD Diesel",
+      "brand_id": "175491",
+      "name": "BD Diesel"
+    },
+    "194765": {
+      "term_name": "Bilstein",
+      "brand_id": "194765",
+      "name": "Bilstein"
+    },
+    "194845": {
+      "term_name": "Edge Products",
+      "brand_id": "194845",
+      "name": "Edge Products"
+    },
+    "194929": {
+      "term_name": "Flowmaster",
+      "brand_id": "194929",
+      "name": "Flowmaster"
+    },
+    "195297": {
+      "term_name": "AEM Electronics",
+      "brand_id": "195297",
+      "name": "AEM Electronics"
+    },
+    "196448": {
+      "term_name": "ACCEL",
+      "brand_id": "196448",
+      "name": "ACCEL"
+    },
+    "197827": {
+      "term_name": "BAK",
+      "brand_id": "197827",
+      "name": "BAK"
+    },
+    "198463": {
+      "term_name": "Go Rhino",
+      "brand_id": "198463",
+      "name": "Go Rhino"
+    },
+    "198918": {
+      "term_name": "Bushwacker",
+      "brand_id": "198918",
+      "name": "Bushwacker"
+    },
+    "199076": {
+      "term_name": "AMP Research",
+      "brand_id": "199076",
+      "name": "AMP Research"
+    },
+    "199410": {
+      "term_name": "Superlift",
+      "brand_id": "199410",
+      "name": "Superlift"
+    },
+    "201713": {
+      "term_name": "NFab",
+      "brand_id": "201713",
+      "name": "NFab"
+    },
+    "201890": {
+      "term_name": "Extang",
+      "brand_id": "201890",
+      "name": "Extang"
+    },
+    "202068": {
+      "term_name": "Truxedo",
+      "brand_id": "202068",
+      "name": "Truxedo"
+    },
+    "202487": {
+      "term_name": "Lund",
+      "brand_id": "202487",
+      "name": "Lund"
+    },
+    "202782": {
+      "term_name": "Carli Suspension",
+      "brand_id": "202782",
+      "name": "Carli Suspension"
+    },
+    "203662": {
+      "term_name": "Dynatrac",
+      "brand_id": "203662",
+      "name": "Dynatrac"
+    },
+    "204071": {
+      "term_name": "Hays",
+      "brand_id": "204071",
+      "name": "Hays"
+    },
+    "204433": {
+      "term_name": "Rugged Ridge",
+      "brand_id": "204433",
+      "name": "Rugged Ridge"
+    },
+    "206132": {
+      "term_name": "Retrax",
+      "brand_id": "206132",
+      "name": "Retrax"
+    },
+    "206187": {
+      "term_name": "UnderCover",
+      "brand_id": "206187",
+      "name": "UnderCover"
+    },
+    "38601": {
+      "term_name": "Rock Slide Engineering",
+      "brand_id": "38601",
+      "name": "Rock Slide Engineering"
+    },
+    "197288": {
+      "term_name": "Crown Automotive",
+      "brand_id": "197288",
+      "name": "Crown Automotive"
+    },
+    "196584": {
+      "term_name": "Mr Gasket",
+      "brand_id": "196584",
+      "name": "Mr Gasket"
+    }
+  }
+}

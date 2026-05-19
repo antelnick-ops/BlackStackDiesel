@@ -278,7 +278,7 @@ function buildEnrichmentPayload(detail, matchMethod) {
 // MATCHING
 // =====================================================================
 const MATCH_SELECT =
-  'id, sku, mfg_sku, upc, brand, aaia_brand_id, status, is_visible, archive_tags, fitment_rows';
+  'id, sku, mfg_sku, upc, brand, aaia_brand_id, status, is_visible, archive_tags, fitment_rows, asap_synced_at';
 
 // Strip the trailing AAIA suffix from an ASAP SKU. ASAP formats SKUs as
 // "{mfg_sku}-{aaia_code}" where the AAIA is everything after the LAST
@@ -298,6 +298,28 @@ function normalizeAsapSku(sku) {
 // enforces a server-side 1000-row response cap. brandPattern (optional)
 // narrows the query via `brand ILIKE pattern` to prevent cross-brand
 // mfg_sku collisions.
+//
+// SKIP-ALREADY-ENRICHED guard lives in the per-item loop, NOT here.
+// MATCH_SELECT intentionally includes asap_synced_at so the loop can
+// decide whether to skip vs. enrich without re-querying. We do NOT add
+// `.is('asap_synced_at', null)` to this select because previously-
+// enriched products would then look "unmatched" to the per-item loop
+// and pollute asap_unmatched_skus with false negatives. See the active
+// branch in main() for the actual skip logic + the
+// matched_active_skipped_already_enriched counter.
+//
+// Why asap_synced_at and not asap_extras? The asap_extras column defaults
+// to '{}' on every row (verified 2026-05-18: 50,525/50,525 visible +
+// marginable products have non-null asap_extras), so it's NOT a reliable
+// "needs enrichment" predicate. asap_synced_at is only ever set on the
+// successful UPDATE path in this script (buildEnrichmentPayload at line
+// ~271), making it the true "has been enriched" signal.
+//
+// Stale-data caveat: a product enriched 6 months ago will never refresh
+// through this guard. A separate "freshness sweep" is the right tool for
+// re-enriching stale rows on a different cadence. If/when sku-match and
+// upc-match paths get added (see help text line 38-42), they MUST carry
+// the same skip check in the per-item loop.
 async function batchMatchByMfgSku(normalizedSkus, brandPattern) {
   const CHUNK = 500;
   const PAGE_SIZE = 1000;
@@ -360,6 +382,7 @@ async function main() {
   // Counters
   const counts = {
     matched_active: 0,
+    matched_active_skipped_already_enriched: 0,
     matched_archived_resurrected: 0,
     matched_archived_skipped_tagged: 0,
     matched_archived_skipped_no_diesel_fitment: 0,
@@ -487,6 +510,17 @@ async function main() {
       continue; // no sleep — we never hit the API
     }
 
+    // SKIP-ALREADY-ENRICHED guard. Only applies to ACTIVE products;
+    // archived products fall through so the resurrection check still
+    // runs (a product that was enriched-then-archived may legitimately
+    // belong in the resurrection path). For active+already-enriched we
+    // skip BEFORE the ASAP detail call to save API budget.
+    if (product.status === 'active' && product.asap_synced_at) {
+      counts.matched_active_skipped_already_enriched++;
+      progress(i + 1, total, sku, 'SKIP_ALREADY_ENRICHED');
+      continue; // no sleep — we never hit the API
+    }
+
     // MATCHED — fetch detail (or reuse cached detail from pre-match) and enrich.
     try {
       let detail = detailCache.get(sku);
@@ -582,6 +616,7 @@ async function main() {
   console.log(`Mode: ${DRY_RUN ? 'DRY-RUN' : 'COMMIT'}`);
   console.log(`Total ASAP SKUs:                       ${total}`);
   console.log(`Active matched + updated:              ${counts.matched_active}`);
+  console.log(`Active skipped (already enriched):     ${counts.matched_active_skipped_already_enriched}`);
   console.log(`Archived resurrected:                  ${counts.matched_archived_resurrected}`);
   console.log(`Archived skipped (tagged):             ${counts.matched_archived_skipped_tagged}`);
   console.log(`Archived skipped (no diesel fitment):  ${counts.matched_archived_skipped_no_diesel_fitment}`);

@@ -88,6 +88,33 @@ const PREFIX_RULES = {
 };
 
 // =====================================================================
+// DEFER_BRANDS — brands skipped tonight pending normalization investigation
+// =====================================================================
+// These brands 0-matched in the 2026-05-18 bulk run despite BSD carrying
+// products under each brand name. Diagnosis (scripts/diagnostics/
+// asap-probe-sku-format.js + DB intersection) ruled out the PPE-pattern
+// (list-mode works for both) AND the strip_length:0 fix (BSD's BDS/Fox
+// SKUs don't textually match ASAP's, even with no stripping). Real cause
+// appears to be catalog drift between APG and ASAP for these specific
+// brands — they expose different SKU naming conventions, or carry
+// largely non-overlapping product subsets.
+//
+// Skipping these here prevents repeating the false-unmatched pollution
+// (~2,500 rows in asap_unmatched_skus on the 2026-05-18 run) on each
+// bulk run. Remove a brand from this set once a working match strategy
+// (likely UPC-based) is implemented for it.
+//
+// TODO(separate-workstream):
+//   - probe UPC overlap between APG and ASAP for BDS / Fox
+//   - if overlap exists, implement UPC-fallback in asap-import.js matcher
+//   - if no overlap, accept that BDS/Fox are not enrichable from ASAP and
+//     remove this defer set when the wrapper grows a real hard-stop guard
+const DEFER_BRANDS = new Set([
+  '130085', // BDS Suspension — see 2026-05-18 diagnostic log
+  '130108'  // Fox Factory    — see 2026-05-18 diagnostic log
+]);
+
+// =====================================================================
 // CLI
 // =====================================================================
 function parseArgs(argv) {
@@ -468,6 +495,24 @@ async function main() {
   flush();
 
   for (const brand of brands) {
+    if (DEFER_BRANDS.has(String(brand.brand_id))) {
+      console.log('');
+      console.log('========================================================');
+      console.log(`>>> SKIPPED (DEFER_BRANDS): ${brand.name} (brand_id=${brand.brand_id})`);
+      console.log('========================================================');
+      console.log('See DEFER_BRANDS comment block near top of file for context.');
+      masterLog.brands.push({
+        brand_id: String(brand.brand_id),
+        brand_name: brand.name,
+        deferred: true,
+        deferred_reason: 'catalog mismatch — see DEFER_BRANDS in asap-bulk-import.js',
+        started_at: new Date().toISOString(),
+        completed_at: new Date().toISOString()
+      });
+      flush();
+      continue;
+    }
+
     const brandStart = new Date();
     console.log('');
     console.log('========================================================');

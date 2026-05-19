@@ -43,11 +43,19 @@ coverage/
 
 # Misc
 .cache/
-tmp/
+tmp/*
  
-# Distributor data feeds (never commit) 
-tmp/ 
-*.csv 
+# Distributor data feeds (never commit)
+tmp/*
+*.csv
+
+# Exception: tracked snapshot of ASAP-approved brand list. Captures
+# point-in-time approval state with git history (when was each brand
+# added — see commits referencing tmp/asap_approved_brands.json).
+# Regenerable via scripts/diagnostics/asap-list-brands.js or probe-asap.js,
+# but the live ASAP API doesn't preserve approval-date history, so the
+# snapshot stays tracked. Other tmp/ contents remain ignored as before.
+!tmp/asap_approved_brands.json
 
 # Secrets - NEVER COMMIT
 .local-secrets.txt
